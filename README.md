@@ -153,4 +153,4 @@ configs — see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ## 📄 License
 
-MIT — see [LICENSE](LICENSE). Built by [saipavan333](https://github.com/saipavan333).
+MIT — see [LICENSE](LICENSE). Built by [U E Sai Pavan Vamshi Krishna](https://github.com/saipavan333).

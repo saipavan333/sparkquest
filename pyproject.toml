@@ -5,7 +5,7 @@ description = "A gamified, browser-based course that takes learners from zero to
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "saipavan333" }]
+authors = [{ name = "U E Sai Pavan Vamshi Krishna" }]
 keywords = ["pyspark", "apache-spark", "data-engineering", "education", "structured-streaming", "fastapi", "edtech"]
 
 [tool.ruff]
