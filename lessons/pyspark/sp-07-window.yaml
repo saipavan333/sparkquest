@@ -1,0 +1,53 @@
+id: sp-07-window
+track: pyspark
+order: 7
+title: "Window Functions"
+difficulty: 4
+concepts: ["Window", "row_number", "partitionBy", "ranking"]
+needs_spark: true
+brief: |
+  Window functions compute across a set of rows *related to the current row*
+  without collapsing them — ranking, running totals, lead/lag. They're a favourite
+  in data-engineering interviews.
+
+  **Mission:** For each `ticker`, find its **largest** trade by `amount`. Use a
+  window partitioned by ticker, ordered by amount descending, add a `row_number()`
+  column named `rk`, then keep only the rows where `rk == 1`. Store them in `top`.
+
+  You'll need: `from pyspark.sql.window import Window`. `F` is already imported.
+
+  Expected: AAPL/300 and GOOG/80, each with rk 1.
+starter_code: |
+  from pyspark.sql.window import Window
+
+  trades = spark.createDataFrame(
+      [("AAPL", 100), ("AAPL", 300), ("GOOG", 50), ("GOOG", 80)],
+      ["ticker", "amount"],
+  )
+  # TODO: rank by amount within ticker (desc), keep rk == 1 -> `top`
+  top = ...
+  top.show()
+solution_code: |
+  from pyspark.sql.window import Window
+
+  trades = spark.createDataFrame(
+      [("AAPL", 100), ("AAPL", 300), ("GOOG", 50), ("GOOG", 80)],
+      ["ticker", "amount"],
+  )
+  w = Window.partitionBy("ticker").orderBy(F.col("amount").desc())
+  top = (
+      trades.withColumn("rk", F.row_number().over(w))
+      .filter(F.col("rk") == 1)
+  )
+  top.show()
+checks:
+  - type: df_equals
+    name: top
+    expected:
+      - {"ticker": "AAPL", "amount": 300, "rk": 1}
+      - {"ticker": "GOOG", "amount": 80, "rk": 1}
+    message: "top should hold the single largest trade per ticker (rk == 1)"
+    fail_detail: "Define a Window partitionBy ticker orderBy amount desc, add row_number() as rk, filter rk == 1."
+hints:
+  - "Window.partitionBy(\"ticker\").orderBy(F.col(\"amount\").desc())"
+  - "F.row_number().over(w) numbers rows within each partition; keep rk == 1."

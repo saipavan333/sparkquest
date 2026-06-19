@@ -1,0 +1,23 @@
+# Local one-command run:  docker compose up --build
+# Then open http://localhost:7860
+services:
+  sparkquest:
+    build: .
+    image: sparkquest:local
+    container_name: sparkquest
+    ports:
+      - "7860:7860"
+    environment:
+      SPARKQUEST_ENV: production
+      SPARK_LOCAL_IP: 127.0.0.1
+      # Optional AI tutor — uncomment and set to enable a live LLM tutor:
+      # SQ_TUTOR_PROVIDER: anthropic
+      # SQ_TUTOR_MODEL: claude-3-5-haiku-latest
+      # SQ_TUTOR_API_KEY: ${SQ_TUTOR_API_KEY}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:7860/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+    restart: unless-stopped

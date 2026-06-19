@@ -1,0 +1,36 @@
+id: py-06-wordcount
+track: python
+order: 6
+title: "Count the Tickers (MapReduce in Miniature)"
+difficulty: 3
+concepts: ["dictionaries", "counting", "mapreduce-intuition"]
+needs_spark: false
+brief: |
+  Counting how often each item appears is *the* canonical big-data problem — the
+  famous "word count". Today you'll do it in plain Python; tomorrow Spark will do
+  the exact same thing across a thousand machines.
+
+  **Mission:** Given a list of `tickers`, build a dictionary named `counts`
+  mapping each ticker to how many times it appears.
+
+  Expected: `{"AAPL": 3, "GOOG": 2, "MSFT": 1}`
+starter_code: |
+  tickers = ["AAPL", "GOOG", "AAPL", "MSFT", "AAPL", "GOOG"]
+  # TODO: build `counts` mapping each ticker -> frequency
+  counts = {}
+  print(counts)
+solution_code: |
+  tickers = ["AAPL", "GOOG", "AAPL", "MSFT", "AAPL", "GOOG"]
+  counts = {}
+  for t in tickers:
+      counts[t] = counts.get(t, 0) + 1
+  print(counts)
+checks:
+  - type: var_equals
+    name: counts
+    expected: {"AAPL": 3, "GOOG": 2, "MSFT": 1}
+    message: "`counts` should map each ticker to its frequency"
+    fail_detail: "For each ticker, increment its running count in the dict."
+hints:
+  - "dict.get(key, 0) returns 0 when the key is missing — handy for counting."
+  - "counts[t] = counts.get(t, 0) + 1"

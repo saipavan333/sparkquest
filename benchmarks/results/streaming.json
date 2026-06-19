@@ -1,0 +1,7 @@
+{
+  "files": 40,
+  "events": 100000,
+  "elapsed_s": 8.341188364000118,
+  "throughput_events_per_s": 11988.699407819606,
+  "groups": 5
+}

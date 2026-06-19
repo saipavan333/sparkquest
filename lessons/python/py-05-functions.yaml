@@ -1,0 +1,36 @@
+id: py-05-functions
+track: python
+order: 5
+title: "A Profit Function"
+difficulty: 2
+concepts: ["functions", "return values"]
+needs_spark: false
+brief: |
+  A *function* packages logic so you can reuse it. Spark UDFs, transformations,
+  and pipelines are all functions under the hood.
+
+  **Mission:** Write a function named `pnl(buy, sell, qty)` that returns the
+  profit-and-loss of a trade: `(sell - buy) * qty`.
+
+  Examples: `pnl(100, 110, 10) == 100` and `pnl(50, 40, 5) == -50`
+starter_code: |
+  # TODO: define pnl(buy, sell, qty) returning (sell - buy) * qty
+  def pnl(buy, sell, qty):
+      ...
+solution_code: |
+  def pnl(buy, sell, qty):
+      return (sell - buy) * qty
+checks:
+  - type: callable_returns
+    name: pnl
+    args: [100, 110, 10]
+    expected: 100
+    message: "pnl(100, 110, 10) should return 100"
+  - type: callable_returns
+    name: pnl
+    args: [50, 40, 5]
+    expected: -50
+    message: "pnl(50, 40, 5) should return -50 (a loss)"
+hints:
+  - "Use the return keyword to send a value back."
+  - "return (sell - buy) * qty"

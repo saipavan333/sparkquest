@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SparkQuest — Learn Python, PySpark & Spark Streaming by Playing</title>
+  <meta name="description" content="A gamified, browser-based course that takes you from zero to pro in Python, PySpark, and Spark Structured Streaming, with an AI tutor and auto-graded challenges that run real Spark." />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">⚡</span>
+      <span class="brand-name">SparkQuest</span>
+      <span class="brand-tag">zero → pro in Spark</span>
+    </div>
+    <div class="progress-cluster">
+      <div class="level-chip" id="level-chip" title="Your level">Lv <span id="level-num">1</span></div>
+      <div class="xp">
+        <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+        <div class="xp-text"><span id="xp-num">0</span> XP <span id="xp-next" class="muted"></span></div>
+      </div>
+      <button class="nav-btn" id="btn-badges" title="Your badges">🏅 <span id="badge-count">0</span></button>
+      <button class="nav-btn" id="btn-leaderboard">Leaderboard</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <span>Curriculum</span>
+        <span class="muted" id="solved-summary">0 solved</span>
+      </div>
+      <nav id="track-list"><div class="loading">Loading lessons…</div></nav>
+      <div class="identity">
+        <label for="display-name">Leaderboard name</label>
+        <input id="display-name" type="text" maxlength="24" placeholder="Anonymous Quester" />
+      </div>
+    </aside>
+
+    <section class="content" id="content">
+      <article class="lesson" id="lesson">
+        <div class="lesson-head">
+          <h1 id="lesson-title">Welcome to SparkQuest</h1>
+          <div class="lesson-meta">
+            <span class="badge-spark" id="lesson-spark" hidden>⚡ runs real Spark</span>
+            <span class="difficulty" id="lesson-difficulty"></span>
+            <span class="xp-reward" id="lesson-xp"></span>
+          </div>
+        </div>
+        <div class="concepts" id="lesson-concepts"></div>
+        <div class="brief" id="lesson-brief">
+          <p>Pick a lesson on the left to begin. You'll write real code, run it against
+          a live engine, and earn XP as you go. Stuck? The AI tutor is one click away.</p>
+        </div>
+      </article>
+
+      <div class="workbench">
+        <div class="editor-toolbar">
+          <span class="editor-label" id="editor-label">Python</span>
+          <div class="spacer"></div>
+          <button class="btn" id="btn-reset" title="Restore the starter code">Reset</button>
+          <button class="btn" id="btn-solution" title="Reveal the reference solution">Solution</button>
+          <button class="btn btn-run" id="btn-run">▶ Run</button>
+          <button class="btn btn-submit" id="btn-submit">✓ Submit</button>
+        </div>
+        <div id="editor" class="editor"></div>
+        <div class="console" id="console">
+          <div class="console-head">
+            <span>Output</span>
+            <span class="muted" id="run-meta"></span>
+          </div>
+          <pre id="console-out" class="console-out">Run your code to see output here.</pre>
+          <div id="checks" class="checks"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- AI Tutor -->
+  <button class="tutor-fab" id="tutor-fab" title="Ask the AI Tutor">🤖 Tutor</button>
+  <div class="tutor-panel" id="tutor-panel" hidden>
+    <div class="tutor-head">
+      <span>🤖 AI Tutor <span class="muted" id="tutor-provider"></span></span>
+      <button class="icon-btn" id="tutor-close">✕</button>
+    </div>
+    <div class="tutor-log" id="tutor-log"></div>
+    <div class="tutor-input">
+      <input id="tutor-question" type="text" placeholder="Ask for a hint, or 'explain my error'…" />
+      <button class="btn btn-run" id="tutor-send">Send</button>
+    </div>
+    <div class="tutor-quick">
+      <button data-q="Give me a hint without the full answer.">Hint</button>
+      <button data-q="Explain my last error in simple terms.">Explain error</button>
+      <button data-q="What concept does this lesson teach?">Concept</button>
+    </div>
+  </div>
+
+  <!-- Leaderboard / Badges modal -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-card">
+      <div class="modal-head"><span id="modal-title">Leaderboard</span><button class="icon-btn" id="modal-close">✕</button></div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toast-wrap"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+id: st-02-streaming-agg
+track: streaming
+order: 2
+title: "Streaming Aggregation"
+difficulty: 4
+concepts: ["stateful aggregation", "groupBy", "complete output mode"]
+needs_spark: true
+brief: |
+  Streaming really shines when it maintains a *running* aggregate as new data
+  arrives. Spark keeps the aggregation **state** for you between micro-batches.
+
+  **Mission:** Stream the same `data/sample/stream_events` folder and compute a
+  live **count of events per ticker**. Because it's an aggregation, use
+  `outputMode("complete")`. Land it in a memory table named `ticker_counts`, then
+  load `out = spark.table("ticker_counts")`.
+
+  Expected: AAPL 4, GOOG 2, MSFT 2.
+starter_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  # TODO: count events per ticker, write with complete mode, load `out`
+  out = ...
+  out.show()
+solution_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  counts = stream.groupBy("ticker").count()
+  query = (
+      counts.writeStream
+      .format("memory")
+      .queryName("ticker_counts")
+      .outputMode("complete")
+      .trigger(availableNow=True)
+      .start()
+  )
+  query.awaitTermination()
+  out = spark.table("ticker_counts")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "count": 4}
+      - {"ticker": "GOOG", "count": 2}
+      - {"ticker": "MSFT", "count": 2}
+    message: "out should hold the running event count per ticker"
+    fail_detail: "Aggregations require outputMode(\"complete\"); group by ticker and count()."
+hints:
+  - "stream.groupBy(\"ticker\").count() defines the running aggregate."
+  - "Stateful aggregations need .outputMode(\"complete\")."

@@ -1,0 +1,70 @@
+id: st-03-windowed-watermark
+track: streaming
+order: 3
+title: "Event-Time Windows & Watermarks"
+difficulty: 4
+concepts: ["event time", "window", "withWatermark", "late data"]
+needs_spark: true
+brief: |
+  The capstone of streaming: aggregating by **event time** (when something
+  happened, not when it arrived) using tumbling **windows**, with a **watermark**
+  that tells Spark how long to wait for late data before finalising a window.
+
+  **Mission:** Stream `data/sample/stream_events` and count events per `ticker`
+  within **10-minute** tumbling windows over the event-time column `ts`. Declare a
+  watermark of `1 minute` on `ts`. Write to a memory table `windowed_counts` with
+  `outputMode("complete")`, then load `out = spark.table("windowed_counts")`.
+
+  Your `out` should contain a `window` column and a `count` column.
+starter_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  # TODO: watermark on ts, group by 10-minute window + ticker, count -> `out`
+  out = ...
+  out.show(truncate=False)
+solution_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  windowed = (
+      stream.withWatermark("ts", "1 minute")
+      .groupBy(F.window("ts", "10 minutes"), "ticker")
+      .count()
+  )
+  query = (
+      windowed.writeStream
+      .format("memory")
+      .queryName("windowed_counts")
+      .outputMode("complete")
+      .trigger(availableNow=True)
+      .start()
+  )
+  query.awaitTermination()
+  out = spark.table("windowed_counts")
+  out.show(truncate=False)
+checks:
+  - type: custom
+    message: "out should have a window column, a count column, and at least one row"
+    code: |
+      df = ns.get("out")
+      cols = df.columns if df is not None else []
+      ok = ("window" in cols) and ("count" in cols) and df.count() > 0
+    fail_detail: "Use F.window(\"ts\", \"10 minutes\") inside groupBy, and set a watermark with withWatermark."
+hints:
+  - "Set the watermark first: stream.withWatermark(\"ts\", \"1 minute\")."
+  - "Group by F.window(\"ts\", \"10 minutes\") together with \"ticker\", then count()."

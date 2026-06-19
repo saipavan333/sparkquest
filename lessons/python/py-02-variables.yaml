@@ -1,0 +1,36 @@
+id: py-02-variables
+track: python
+order: 2
+title: "Position Sizing"
+difficulty: 1
+concepts: ["variables", "arithmetic"]
+needs_spark: false
+brief: |
+  A *variable* is a named box that stores a value. Data engineering is mostly
+  moving values between boxes and transforming them along the way.
+
+  **Mission:** A stock trades at `189.50` and you buy `100` shares. Compute the
+  total cost and store it in a variable named `cost`.
+
+  Expected: `cost == 18950.0`
+starter_code: |
+  price = 189.50
+  quantity = 100
+  # TODO: compute total cost into a variable named `cost`
+  cost = ...
+  print(cost)
+solution_code: |
+  price = 189.50
+  quantity = 100
+  cost = price * quantity
+  print(cost)
+checks:
+  - type: var_close
+    name: cost
+    expected: 18950.0
+    tol: 0.001
+    message: "cost should equal price * quantity (18950.0)"
+    fail_detail: "Multiply price by quantity and assign the result to `cost`."
+hints:
+  - "Multiplication uses the * operator."
+  - "cost = price * quantity"

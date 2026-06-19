@@ -1,0 +1,46 @@
+id: sp-06-spark-sql
+track: pyspark
+order: 6
+title: "Spark SQL"
+difficulty: 3
+concepts: ["createOrReplaceTempView", "spark.sql", "SQL"]
+needs_spark: true
+brief: |
+  Prefer SQL? Spark speaks it fluently. Register a DataFrame as a temporary view,
+  then query it with `spark.sql(...)`. The DataFrame API and SQL compile to the
+  exact same optimised plan.
+
+  **Mission:** Register `trades` as a view named `trades`, then use SQL to compute
+  the **average price per ticker**, aliased as `avg_price`. Store the resulting
+  DataFrame in `result`.
+
+  Expected: AAPL 195.0, GOOG 142.0.
+starter_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 190), ("AAPL", 200), ("GOOG", 142)],
+      ["ticker", "price"],
+  )
+  # TODO: register a temp view, then query average price per ticker -> `result`
+  result = ...
+  result.show()
+solution_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 190), ("AAPL", 200), ("GOOG", 142)],
+      ["ticker", "price"],
+  )
+  trades.createOrReplaceTempView("trades")
+  result = spark.sql(
+      "SELECT ticker, AVG(price) AS avg_price FROM trades GROUP BY ticker"
+  )
+  result.show()
+checks:
+  - type: df_equals
+    name: result
+    expected:
+      - {"ticker": "AAPL", "avg_price": 195.0}
+      - {"ticker": "GOOG", "avg_price": 142.0}
+    message: "result should hold the average price per ticker"
+    fail_detail: "Register the view, then SELECT ticker, AVG(price) AS avg_price ... GROUP BY ticker."
+hints:
+  - "trades.createOrReplaceTempView(\"trades\") makes it queryable."
+  - "Alias the aggregate in SQL with: AVG(price) AS avg_price"
