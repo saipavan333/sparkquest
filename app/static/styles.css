@@ -74,6 +74,9 @@ body {
 .identity label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
 .identity input { width: 100%; background: var(--bg-3); border: 1px solid var(--border);
   color: var(--text); border-radius: 8px; padding: 7px 9px; font-size: 13px; }
+.credit { padding: 10px 16px 14px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); }
+.credit a { color: var(--blue); text-decoration: none; }
+.credit a:hover { text-decoration: underline; }
 
 /* ---------- Content ---------- */
 .content { overflow-y: auto; display: flex; flex-direction: column; }
