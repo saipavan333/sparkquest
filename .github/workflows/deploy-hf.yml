@@ -25,11 +25,9 @@ jobs:
       - name: Deploy to Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          HF_USER: saipavan333
-          HF_SPACE: sparkquest
         run: |
           if [ -z "${HF_TOKEN}" ]; then
             echo "HF_TOKEN secret not set — skipping Hugging Face deploy."
             exit 0
           fi
-          bash scripts/deploy_hf.sh
+          python scripts/deploy_hf.py --user saipavan333 --space sparkquest

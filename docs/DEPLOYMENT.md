@@ -82,13 +82,13 @@ image.
 
 ### Scripted (recommended)
 
-```bash
+```powershell
 pip install "huggingface_hub>=0.23"
-export HF_TOKEN=hf_xxx          # https://huggingface.co/settings/tokens (write)
-export HF_USER=saipavan333
-export HF_SPACE=sparkquest
-bash scripts/deploy_hf.sh        # creates the Space (sdk=docker) and pushes
+$env:HF_TOKEN="hf_xxx"           # write token: https://huggingface.co/settings/tokens
+python scripts/deploy_hf.py --user saipavan333 --space sparkquest   # creates the Space (sdk=docker) and pushes
 ```
+
+(Cross-platform: it's pure Python — no `bash`/`rsync` needed, so it works the same on Windows, macOS, and Linux/CI.)
 
 Your demo will be live at `https://huggingface.co/spaces/saipavan333/sparkquest`
 (first build takes a few minutes).
