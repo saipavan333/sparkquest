@@ -1,0 +1,41 @@
+id: sp-03-withcolumn
+track: pyspark
+order: 3
+title: "Derive a Column"
+difficulty: 3
+concepts: ["withColumn", "expressions", "columns"]
+needs_spark: true
+brief: |
+  Real pipelines enrich data by computing new columns. `withColumn(name, expr)`
+  returns a new DataFrame with an extra (or replaced) column.
+
+  **Mission:** Add a column named `total` equal to `price * qty` to the `orders`
+  DataFrame. Store the result in `priced`.
+
+  The helper `F` (``pyspark.sql.functions``) is already imported for you.
+starter_code: |
+  orders = spark.createDataFrame(
+      [("AAPL", 190, 100), ("GOOG", 142, 50)],
+      ["ticker", "price", "qty"],
+  )
+  # TODO: add a column `total` = price * qty -> `priced`
+  priced = ...
+  priced.show()
+solution_code: |
+  orders = spark.createDataFrame(
+      [("AAPL", 190, 100), ("GOOG", 142, 50)],
+      ["ticker", "price", "qty"],
+  )
+  priced = orders.withColumn("total", F.col("price") * F.col("qty"))
+  priced.show()
+checks:
+  - type: df_equals
+    name: priced
+    expected:
+      - {"ticker": "AAPL", "price": 190, "qty": 100, "total": 19000}
+      - {"ticker": "GOOG", "price": 142, "qty": 50, "total": 7100}
+    message: "priced should keep all columns plus total = price * qty"
+    fail_detail: "Use withColumn(\"total\", F.col(\"price\") * F.col(\"qty\"))."
+hints:
+  - "Reference columns with F.col(\"price\")."
+  - "orders.withColumn(\"total\", F.col(\"price\") * F.col(\"qty\"))"

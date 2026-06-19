@@ -1,0 +1,35 @@
+name: Deploy to Hugging Face Space
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+# Requires repository secret HF_TOKEN (a Hugging Face write token).
+# If the secret is absent the job no-ops, so forks/PRs won't fail.
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install huggingface_hub
+        run: pip install "huggingface_hub>=0.23"
+
+      - name: Deploy to Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USER: saipavan333
+          HF_SPACE: sparkquest
+        run: |
+          if [ -z "${HF_TOKEN}" ]; then
+            echo "HF_TOKEN secret not set — skipping Hugging Face deploy."
+            exit 0
+          fi
+          bash scripts/deploy_hf.sh

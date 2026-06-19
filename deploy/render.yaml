@@ -1,0 +1,16 @@
+# Render Blueprint — one-click deploy of the Docker image.
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: sparkquest
+    runtime: docker
+    plan: starter            # free tier sleeps; starter keeps it warm
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: SPARKQUEST_ENV
+        value: production
+      - key: SPARK_LOCAL_IP
+        value: 127.0.0.1
+      - key: PORT             # Render routes to this port; app binds it
+        value: 7860

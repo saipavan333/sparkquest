@@ -1,0 +1,42 @@
+id: sp-05-join
+track: pyspark
+order: 5
+title: "Joining Datasets"
+difficulty: 3
+concepts: ["join", "keys"]
+needs_spark: true
+brief: |
+  Joins combine two DataFrames on a shared key — enriching trades with reference
+  data, stitching fact and dimension tables, the bread and butter of a data
+  engineer.
+
+  **Mission:** Join `trades` with the `sectors` lookup on `ticker` so each trade
+  gains its `sector`. Store the result in `joined`.
+
+  Expected columns: ticker, qty, sector.
+starter_code: |
+  trades = spark.createDataFrame([("AAPL", 100), ("JPM", 75)], ["ticker", "qty"])
+  sectors = spark.createDataFrame(
+      [("AAPL", "Tech"), ("JPM", "Financials")], ["ticker", "sector"]
+  )
+  # TODO: join trades with sectors on "ticker" -> `joined`
+  joined = ...
+  joined.show()
+solution_code: |
+  trades = spark.createDataFrame([("AAPL", 100), ("JPM", 75)], ["ticker", "qty"])
+  sectors = spark.createDataFrame(
+      [("AAPL", "Tech"), ("JPM", "Financials")], ["ticker", "sector"]
+  )
+  joined = trades.join(sectors, on="ticker", how="inner")
+  joined.show()
+checks:
+  - type: df_equals
+    name: joined
+    expected:
+      - {"ticker": "AAPL", "qty": 100, "sector": "Tech"}
+      - {"ticker": "JPM", "qty": 75, "sector": "Financials"}
+    message: "joined should attach each trade's sector"
+    fail_detail: "Use trades.join(sectors, on=\"ticker\")."
+hints:
+  - "df_a.join(df_b, on=\"ticker\") joins on a shared column name."
+  - "The default join type is inner, which keeps only matching keys."

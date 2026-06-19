@@ -1,0 +1,42 @@
+id: sp-04-groupby
+track: pyspark
+order: 4
+title: "Group & Aggregate"
+difficulty: 3
+concepts: ["groupBy", "aggregation", "sum", "alias"]
+needs_spark: true
+brief: |
+  Aggregation collapses many rows into summaries — the heartbeat of analytics.
+  `groupBy(col).agg(...)` is Spark's distributed `GROUP BY`.
+
+  **Mission:** From `trades`, compute the **total quantity per ticker**. Name the
+  aggregated column `total` and store the result in `totals`.
+
+  Expected: AAPL 170, GOOG 70, MSFT 30.
+starter_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", 50), ("AAPL", 70), ("MSFT", 30), ("GOOG", 20)],
+      ["ticker", "qty"],
+  )
+  # TODO: total qty per ticker, aggregated column named `total` -> `totals`
+  totals = ...
+  totals.show()
+solution_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", 50), ("AAPL", 70), ("MSFT", 30), ("GOOG", 20)],
+      ["ticker", "qty"],
+  )
+  totals = trades.groupBy("ticker").agg(F.sum("qty").alias("total"))
+  totals.show()
+checks:
+  - type: df_equals
+    name: totals
+    expected:
+      - {"ticker": "AAPL", "total": 170}
+      - {"ticker": "GOOG", "total": 70}
+      - {"ticker": "MSFT", "total": 30}
+    message: "totals should hold the summed quantity per ticker"
+    fail_detail: "Use groupBy(\"ticker\").agg(F.sum(\"qty\").alias(\"total\"))."
+hints:
+  - "Group first: trades.groupBy(\"ticker\")"
+  - "Then aggregate: .agg(F.sum(\"qty\").alias(\"total\"))"

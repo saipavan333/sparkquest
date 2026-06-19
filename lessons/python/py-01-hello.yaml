@@ -1,0 +1,27 @@
+id: py-01-hello
+track: python
+order: 1
+title: "Hello, Trader"
+difficulty: 1
+concepts: ["print", "strings"]
+needs_spark: false
+brief: |
+  Welcome to **SparkQuest**! Every data pipeline ever written started with a
+  single line of code. Let's write yours.
+
+  **Mission:** Print a greeting that contains the word `Hello`.
+
+  In Python, `print(...)` writes text to the screen. Text (a *string*) goes
+  inside quotes.
+starter_code: |
+  # Print a greeting that includes the word "Hello"
+solution_code: |
+  print("Hello, Trader! Ready to learn Spark?")
+checks:
+  - type: stdout_contains
+    value: "Hello"
+    message: "Your output should contain the word 'Hello'"
+    fail_detail: "Nothing matched. Did you call print() with text containing Hello?"
+hints:
+  - "Use print(\"your text here\") — the quotes are required."
+  - "Make sure the exact word Hello (capital H) appears in the text."

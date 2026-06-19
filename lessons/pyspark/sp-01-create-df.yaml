@@ -1,0 +1,40 @@
+id: sp-01-create-df
+track: pyspark
+order: 1
+title: "Your First DataFrame"
+difficulty: 2
+concepts: ["SparkSession", "createDataFrame", "DataFrame"]
+needs_spark: true
+brief: |
+  A Spark **DataFrame** is a distributed table — rows and named columns spread
+  across a cluster, but you program it as if it were one tidy table.
+
+  A ready-to-use `spark` session is already available to you (no setup needed).
+
+  **Mission:** Create a DataFrame named `df` from the list below, with columns
+  `ticker` and `qty`.
+
+  ```
+  [("AAPL", 100), ("GOOG", 50), ("MSFT", 30)]
+  ```
+starter_code: |
+  data = [("AAPL", 100), ("GOOG", 50), ("MSFT", 30)]
+  # TODO: create a DataFrame named `df` with columns "ticker" and "qty"
+  df = ...
+  df.show()
+solution_code: |
+  data = [("AAPL", 100), ("GOOG", 50), ("MSFT", 30)]
+  df = spark.createDataFrame(data, ["ticker", "qty"])
+  df.show()
+checks:
+  - type: df_columns
+    name: df
+    expected: ["ticker", "qty"]
+    message: "df should have columns ticker and qty"
+  - type: df_row_count
+    name: df
+    expected: 3
+    message: "df should have 3 rows"
+hints:
+  - "spark.createDataFrame(data, [\"col1\", \"col2\"]) builds a DataFrame."
+  - "Pass the column names as a list of strings."

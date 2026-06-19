@@ -1,0 +1,22 @@
+{
+  "python_ms": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "python_median_ms": 1,
+  "spark_total_ms": [
+    9393,
+    8569,
+    8415
+  ],
+  "spark_total_median_ms": 8569,
+  "spark_startup_ms": [
+    4334,
+    3537,
+    3375
+  ],
+  "spark_startup_median_ms": 3537
+}

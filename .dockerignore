@@ -1,0 +1,33 @@
+# Keep the image small & build context clean
+.git
+.github
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.coverage
+htmlcov
+
+# Docs / research artifacts not needed at runtime
+paper
+docs
+benchmarks
+tests
+*.md
+!data/README.md
+
+# Local Spark / data scratch
+spark-warehouse
+metastore_db
+derby.log
+checkpoints
+data/raw
+
+# Env & secrets
+.env
+kaggle.json
+wandb

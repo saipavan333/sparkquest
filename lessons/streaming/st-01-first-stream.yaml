@@ -1,0 +1,72 @@
+id: st-01-first-stream
+track: streaming
+order: 1
+title: "Your First Stream"
+difficulty: 3
+concepts: ["readStream", "writeStream", "memory sink", "availableNow"]
+needs_spark: true
+brief: |
+  Structured Streaming lets you write a streaming job using the *same* DataFrame
+  API you already know — Spark handles the "keep it running" part. A stream is
+  just an unbounded table that grows over time.
+
+  We have a folder of JSON event files at `data/sample/stream_events`. You'll read
+  it as a stream and land every event into an in-memory table you can query.
+
+  **Mission:**
+  1. Read the folder as a stream using the provided `schema`.
+  2. Write it to the **memory** sink with query name `events_raw`,
+     `outputMode("append")`, and `trigger(availableNow=True)` (process all
+     available data, then stop — perfect for testing).
+  3. After `awaitTermination()`, load the table into `out = spark.table("events_raw")`.
+
+  Expected: 8 rows, columns `ticker`, `amount`, `ts`.
+starter_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  # TODO: read the stream, write to the memory sink, then load `out`
+  out = ...
+  out.show()
+solution_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  events = spark.readStream.schema(schema).json("data/sample/stream_events")
+  query = (
+      events.writeStream
+      .format("memory")
+      .queryName("events_raw")
+      .outputMode("append")
+      .trigger(availableNow=True)
+      .start()
+  )
+  query.awaitTermination()
+  out = spark.table("events_raw")
+  out.show()
+checks:
+  - type: df_columns
+    name: out
+    expected: ["ticker", "amount", "ts"]
+    message: "out should have columns ticker, amount, ts"
+  - type: df_row_count
+    name: out
+    expected: 8
+    message: "out should contain all 8 streamed events"
+    fail_detail: "Make sure you call .start() AND query.awaitTermination() before reading the table."
+hints:
+  - "spark.readStream.schema(schema).json(path) opens a file stream."
+  - "Use .trigger(availableNow=True) so the query drains all files then stops."
+  - "Read results back with spark.table(\"events_raw\")."

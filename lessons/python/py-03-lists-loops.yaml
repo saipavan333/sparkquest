@@ -1,0 +1,36 @@
+id: py-03-lists-loops
+track: python
+order: 3
+title: "Summing Returns"
+difficulty: 2
+concepts: ["lists", "loops", "accumulation"]
+needs_spark: false
+brief: |
+  A *list* holds many values in order. Looping over a list and accumulating a
+  result is the seed of every aggregation you'll later do in Spark.
+
+  **Mission:** Given a list of daily `returns`, add them all up and store the
+  result in a variable named `total`.
+
+  Expected: `total == 0.055`
+starter_code: |
+  returns = [0.02, -0.01, 0.03, 0.015]
+  # TODO: sum every value in `returns` into `total`
+  total = ...
+  print(total)
+solution_code: |
+  returns = [0.02, -0.01, 0.03, 0.015]
+  total = 0.0
+  for r in returns:
+      total += r
+  print(total)
+checks:
+  - type: var_close
+    name: total
+    expected: 0.055
+    tol: 0.0001
+    message: "total should be the sum of all returns (0.055)"
+    fail_detail: "Loop over the list and add each value, or use sum(returns)."
+hints:
+  - "You can loop: for r in returns: total += r"
+  - "Or use Python's built-in: total = sum(returns)"

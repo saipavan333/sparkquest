@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, ai-projects ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 11 (for Spark)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "11"
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check app tests scripts benchmarks
+
+      - name: Validate every lesson solution
+        env:
+          SPARK_LOCAL_IP: 127.0.0.1
+        run: python scripts/validate_lessons.py
+
+      - name: Run test suite (incl. Spark)
+        env:
+          SPARK_LOCAL_IP: 127.0.0.1
+        run: pytest --cov=app --cov-report=term-missing

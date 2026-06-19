@@ -1,0 +1,42 @@
+id: sp-02-select-filter
+track: pyspark
+order: 2
+title: "Select & Filter"
+difficulty: 2
+concepts: ["select", "filter", "where"]
+needs_spark: true
+brief: |
+  The two most common DataFrame operations: **select** picks columns, **filter**
+  (a.k.a. `where`) keeps the rows you want. Both return a *new* DataFrame —
+  Spark DataFrames are immutable.
+
+  **Mission:** From `trades`, keep only rows where `qty` is greater than `50`,
+  and select the `ticker` and `qty` columns, into a DataFrame named `big`.
+
+  Expected rows: AAPL/100 and JPM/75.
+starter_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", 50), ("MSFT", 30), ("JPM", 75)],
+      ["ticker", "qty"],
+  )
+  # TODO: filter qty > 50 and select ticker, qty into `big`
+  big = ...
+  big.show()
+solution_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", 50), ("MSFT", 30), ("JPM", 75)],
+      ["ticker", "qty"],
+  )
+  big = trades.filter(trades.qty > 50).select("ticker", "qty")
+  big.show()
+checks:
+  - type: df_equals
+    name: big
+    expected:
+      - {"ticker": "AAPL", "qty": 100}
+      - {"ticker": "JPM", "qty": 75}
+    message: "big should contain only the trades with qty > 50"
+    fail_detail: "Filter with trades.qty > 50, then select the two columns."
+hints:
+  - "trades.filter(trades.qty > 50) keeps matching rows."
+  - "Chain .select(\"ticker\", \"qty\") to pick columns."

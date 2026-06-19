@@ -1,0 +1,41 @@
+id: py-04-dicts
+track: python
+order: 4
+title: "The Price Book"
+difficulty: 2
+concepts: ["dictionaries", "lookup"]
+needs_spark: false
+brief: |
+  A *dictionary* maps keys to values — like a price book mapping a ticker to its
+  price. Lookups are instant, which is why dictionaries power joins and caches.
+
+  **Mission:** Build a dictionary named `prices` with these entries, then look up
+  Google's price into a variable named `goog`.
+
+  - `AAPL` -> `189.5`
+  - `GOOG` -> `142.1`
+  - `MSFT` -> `415.6`
+
+  Expected: `goog == 142.1`
+starter_code: |
+  # TODO: build the `prices` dictionary, then read GOOG into `goog`
+  prices = {}
+  goog = ...
+  print(goog)
+solution_code: |
+  prices = {"AAPL": 189.5, "GOOG": 142.1, "MSFT": 415.6}
+  goog = prices["GOOG"]
+  print(goog)
+checks:
+  - type: var_type
+    name: prices
+    type_name: dict
+    message: "`prices` should be a dictionary"
+  - type: var_close
+    name: goog
+    expected: 142.1
+    tol: 0.001
+    message: "`goog` should be the GOOG price looked up from the dict (142.1)"
+hints:
+  - "Dict literal: {\"AAPL\": 189.5, ...}"
+  - "Look up a value with square brackets: prices[\"GOOG\"]"
