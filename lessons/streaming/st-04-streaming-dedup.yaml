@@ -1,0 +1,64 @@
+id: st-04-streaming-dedup
+track: streaming
+order: 4
+title: "Streaming Deduplication"
+difficulty: 4
+concepts: ["dropDuplicates", "watermark", "exactly-once"]
+needs_spark: true
+brief: |
+  Streams often redeliver records. `dropDuplicates` with a watermark keeps only the
+  first occurrence of each key while bounding how much state Spark must remember.
+
+  **Mission:** Stream `data/sample/stream_events` and keep only the **first event
+  per `ticker`** using `dropDuplicates(["ticker"])` with a watermark on `ts`. Use
+  `outputMode("append")`, land it in a memory table, then load `out`.
+
+  Expected: one row per ticker — AAPL, GOOG, MSFT.
+starter_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  # TODO: watermark on ts, dropDuplicates by ticker, append to memory, load `out`
+  out = ...
+  out.show()
+solution_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  deduped = stream.withWatermark("ts", "10 minutes").dropDuplicates(["ticker"])
+  query = (
+      deduped.writeStream
+      .format("memory")
+      .queryName("deduped_events")
+      .outputMode("append")
+      .trigger(availableNow=True)
+      .start()
+  )
+  query.awaitTermination()
+  out = spark.table("deduped_events")
+  out.show()
+checks:
+  - type: custom
+    message: "out should contain exactly one row per ticker (AAPL, GOOG, MSFT)"
+    code: |
+      out = ns.get("out")
+      tickers = sorted(r["ticker"] for r in out.collect()) if out is not None else []
+      ok = tickers == ["AAPL", "GOOG", "MSFT"]
+    fail_detail: "Use withWatermark(\"ts\", ...) then dropDuplicates([\"ticker\"]) in append mode."
+hints:
+  - "Set the watermark before dropping: stream.withWatermark(\"ts\", \"10 minutes\")."
+  - "dropDuplicates([\"ticker\"]) keeps the first row per ticker."

@@ -1,0 +1,40 @@
+id: sp-15-pivot
+track: pyspark
+order: 15
+title: "Pivot Tables"
+difficulty: 4
+concepts: ["pivot", "groupBy", "reshaping"]
+needs_spark: true
+brief: |
+  Pivoting turns row values into columns — a staple for reports and feature
+  tables. `groupBy(...).pivot(col).agg(...)` does it in one expression.
+
+  **Mission:** Pivot `trades` so each `side` (BUY/SELL) becomes a column holding
+  the **summed** `qty` per `ticker`. Store the result in `pvt`.
+
+  GOOG never sold, so its SELL cell is null.
+starter_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", "BUY", 100), ("AAPL", "SELL", 40), ("GOOG", "BUY", 50)],
+      ["ticker", "side", "qty"],
+  )
+  # TODO: pivot side into columns, summing qty per ticker -> `pvt`
+  pvt = ...
+  pvt.show()
+solution_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", "BUY", 100), ("AAPL", "SELL", 40), ("GOOG", "BUY", 50)],
+      ["ticker", "side", "qty"],
+  )
+  pvt = trades.groupBy("ticker").pivot("side").sum("qty")
+  pvt.show()
+checks:
+  - type: df_equals
+    name: pvt
+    expected:
+      - {"ticker": "AAPL", "BUY": 100, "SELL": 40}
+      - {"ticker": "GOOG", "BUY": 50, "SELL": null}
+    message: "each side should become a column of summed qty; missing combos are null"
+hints:
+  - "groupBy(\"ticker\").pivot(\"side\").sum(\"qty\")"
+  - "Pivot column names come from the distinct values of `side`."

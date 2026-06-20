@@ -1,0 +1,73 @@
+id: st-06-stream-static-join
+track: streaming
+order: 6
+title: "Stream–Static Joins"
+difficulty: 4
+concepts: ["stream-static join", "enrichment", "aggregation"]
+needs_spark: true
+brief: |
+  A classic pattern: enrich a live stream with a static reference table (a
+  dimension). Joining a streaming DataFrame to a batch DataFrame is fully
+  supported and needs no watermark.
+
+  **Mission:** Join the event stream to the static `sectors` table on `ticker`,
+  then count events **per sector** (complete mode). Land it in a memory table and
+  load `out`.
+
+  Sectors: AAPL & GOOG are `Tech`, MSFT is `Software`. Expected: Tech 6, Software 2.
+starter_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  sectors = spark.createDataFrame(
+      [("AAPL", "Tech"), ("GOOG", "Tech"), ("MSFT", "Software")],
+      ["ticker", "sector"],
+  )
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  # TODO: join stream to sectors on ticker, count per sector, complete mode -> `out`
+  out = ...
+  out.show()
+solution_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  sectors = spark.createDataFrame(
+      [("AAPL", "Tech"), ("GOOG", "Tech"), ("MSFT", "Software")],
+      ["ticker", "sector"],
+  )
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  enriched = stream.join(sectors, "ticker")
+  counts = enriched.groupBy("sector").count()
+  query = (
+      counts.writeStream
+      .format("memory")
+      .queryName("sector_counts")
+      .outputMode("complete")
+      .trigger(availableNow=True)
+      .start()
+  )
+  query.awaitTermination()
+  out = spark.table("sector_counts")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"sector": "Tech", "count": 6}
+      - {"sector": "Software", "count": 2}
+    message: "events should be counted per joined sector (Tech 6, Software 2)"
+hints:
+  - "stream.join(sectors, \"ticker\") enriches each event with its sector."
+  - "Then groupBy(\"sector\").count() with outputMode(\"complete\")."

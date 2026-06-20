@@ -42,8 +42,9 @@ streaming with watermarks.
 - **Real execution, real feedback** — submissions run in a process-isolated sandbox
   with timeouts and output caps; grading inspects program state and DataFrame
   contents.
-- **Zero → pro curriculum** — 16 finance-themed challenges across 3 tracks: Python
-  Foundations → PySpark & Spark SQL → Structured Streaming.
+- **Zero → pro curriculum** — 37 finance-themed challenges across 6 tracks (and
+  growing): Python for DE → PySpark & DataFrames → Performance → Structured
+  Streaming → Lakehouse/Delta → Capstone ETL. Full [syllabus](docs/CURRICULUM.md).
 - **AI tutor** — Socratic hints powered by your choice of Anthropic/OpenAI/HF, with
   a fully offline rule-based fallback so the demo is free.
 - **Gamification** — XP, levels, badges (First Blood, Pythonista, Spark Wrangler,
@@ -106,11 +107,17 @@ Without a key, the tutor uses its built-in offline hint engine.
 
 ## 📚 Curriculum
 
-| Track | Challenges | You'll learn |
-|-------|:---------:|--------------|
-| **Python Foundations** | 6 | variables, lists, dicts, functions, and a word-count *MapReduce bridge* |
-| **PySpark & Spark SQL** | 7 | DataFrames, select/filter, `withColumn`, group-by, joins, SQL views, window functions |
-| **Structured Streaming** | 3 | file-source streams, stateful aggregation, event-time windows + watermarks |
+The full syllabus — every topic with official-doc links — lives in
+**[docs/CURRICULUM.md](docs/CURRICULUM.md)**. Six ordered tracks:
+
+| Track | Live | You'll learn |
+|-------|:----:|--------------|
+| **Python for Data Engineering** | 12 | collections, comprehensions, errors, generators, decorators, dataclasses, stdlib |
+| **PySpark Foundations & DataFrames** | 15 | schemas, file formats, select/filter, when/otherwise, string/date/null/cast, joins, windows, complex types, pivot |
+| **Performance & Internals** | 4 | repartition/coalesce, caching, broadcast joins, data skew & salting |
+| **Structured Streaming** | 6 | sources/sinks, aggregations, event-time windows, watermarks, dedup, `foreachBatch`, stream-static joins |
+| **Lakehouse & Delta Lake** | soon | Parquet, Delta ACID, `MERGE`/upsert, time travel, medallion architecture |
+| **Capstone ETL** | soon | end-to-end batch & streaming pipelines, data-quality checks |
 
 Lessons are plain YAML in [`lessons/`](lessons/) — add your own without touching code.
 
@@ -122,7 +129,7 @@ Lessons are plain YAML in [`lessons/`](lessons/) — add your own without touchi
 | Structured Streaming ingestion | **~11,989 events/s** |
 | Auto-grade, Python challenge | **~1 ms** |
 | Auto-grade, Spark challenge (end-to-end) | **~8.6 s** (3.5 s Spark cold start) |
-| Reference solutions passing their grader | **16/16 (100%)** |
+| Reference solutions passing their grader | **37/37 (100%)** |
 
 Reproduce: `python benchmarks/run_benchmarks.py --all`. Details and discussion in
 [the paper](paper/sparkquest.pdf).

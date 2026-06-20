@@ -16,9 +16,12 @@ _LEVEL_THRESHOLDS = [0, 150, 400, 750, 1200, 1800, 2500, 3300, 4200, 5200]
 # id -> (display name, description, emoji)
 BADGES: dict[str, tuple[str, str, str]] = {
     "first_blood": ("First Blood", "Solved your first challenge", "🩸"),
-    "pythonista": ("Pythonista", "Completed the Python Foundations track", "🐍"),
-    "spark_wrangler": ("Spark Wrangler", "Completed the PySpark & Spark SQL track", "⚡"),
+    "pythonista": ("Pythonista", "Completed the Python for Data Engineering track", "🐍"),
+    "spark_wrangler": ("Spark Wrangler", "Completed the PySpark Foundations & DataFrames track", "⚡"),
+    "speed_demon": ("Speed Demon", "Completed the Performance & Internals track", "🚀"),
     "stream_master": ("Stream Master", "Completed the Structured Streaming track", "🌊"),
+    "lake_keeper": ("Lake Keeper", "Completed the Lakehouse & Delta Lake track", "🏞️"),
+    "pipeline_pro": ("Pipeline Pro", "Completed the Capstone ETL track", "🛠️"),
     "rising_star": ("Rising Star", "Reached level 5", "⭐"),
     "grand_master": ("Grand Master", "Solved every challenge in SparkQuest", "👑"),
 }
@@ -56,7 +59,14 @@ def evaluate_badges(progress: UserProgress, by_track: dict[str, list[str]], all_
     earned: set[str] = set()
     if len(progress.solved) >= 1:
         earned.add("first_blood")
-    track_badge = {"python": "pythonista", "pyspark": "spark_wrangler", "streaming": "stream_master"}
+    track_badge = {
+        "python": "pythonista",
+        "pyspark": "spark_wrangler",
+        "performance": "speed_demon",
+        "streaming": "stream_master",
+        "delta": "lake_keeper",
+        "capstone": "pipeline_pro",
+    }
     for track, badge in track_badge.items():
         ids = by_track.get(track) or []
         if ids and set(ids) <= progress.solved:

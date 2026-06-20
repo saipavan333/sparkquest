@@ -18,6 +18,7 @@ import json
 import sys
 import time
 import traceback
+import types
 from typing import Any
 
 _MISSING = object()
@@ -101,7 +102,12 @@ def main() -> None:
         "duration_ms": 0,
         "spark_startup_ms": 0,
     }
-    ns: dict[str, Any] = {"__name__": "__sparkquest__"}
+    # Back the namespace with a real module registered in sys.modules so that
+    # features relying on module introspection (e.g. @dataclass) work correctly.
+    _module = types.ModuleType("__sparkquest__")
+    sys.modules["__sparkquest__"] = _module
+    ns: dict[str, Any] = _module.__dict__
+    ns["__name__"] = "__sparkquest__"
     t0 = time.time()
     spark = None
 

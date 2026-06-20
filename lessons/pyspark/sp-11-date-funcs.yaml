@@ -1,0 +1,45 @@
+id: sp-11-date-funcs
+track: pyspark
+order: 11
+title: "Date & Time Functions"
+difficulty: 4
+concepts: ["to_date", "datediff", "year"]
+needs_spark: true
+brief: |
+  Time is central to trading and pipelines. Parse strings to dates with
+  `to_date`, then use `datediff`, `year`, `month`, `date_format`, and friends.
+
+  **Mission:** From `df` (string `buy`/`sell` dates), build `dated` with columns
+  `ticker`, `held` (days between sell and buy via `datediff`), and `yr` (the year
+  of the buy date).
+
+  Expected: AAPL held 14 / yr 2026, GOOG held 9 / yr 2026.
+starter_code: |
+  df = spark.createDataFrame(
+      [("AAPL", "2026-01-01", "2026-01-15"), ("GOOG", "2026-02-01", "2026-02-10")],
+      ["ticker", "buy", "sell"],
+  )
+  # TODO: select ticker, held (datediff), yr (year of buy) into `dated`
+  dated = ...
+  dated.show()
+solution_code: |
+  df = spark.createDataFrame(
+      [("AAPL", "2026-01-01", "2026-01-15"), ("GOOG", "2026-02-01", "2026-02-10")],
+      ["ticker", "buy", "sell"],
+  )
+  dated = df.select(
+      "ticker",
+      F.datediff(F.to_date("sell"), F.to_date("buy")).alias("held"),
+      F.year(F.to_date("buy")).alias("yr"),
+  )
+  dated.show()
+checks:
+  - type: df_equals
+    name: dated
+    expected:
+      - {"ticker": "AAPL", "held": 14, "yr": 2026}
+      - {"ticker": "GOOG", "held": 9, "yr": 2026}
+    message: "held should be the day count; yr should be the buy year"
+hints:
+  - "Parse with F.to_date(\"buy\") (default format yyyy-MM-dd)."
+  - "F.datediff(end, start) returns whole days; F.year(date) returns the year."

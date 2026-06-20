@@ -1,0 +1,39 @@
+id: perf-04-skew-salting
+track: performance
+order: 4
+title: "Data Skew & Salting"
+difficulty: 5
+concepts: ["data skew", "salting", "key distribution"]
+needs_spark: true
+brief: |
+  When one key holds most of the rows ("hot key"), a single task does all the work
+  and your job crawls. **Salting** spreads one hot key across several synthetic
+  sub-keys so the work parallelises.
+
+  **Mission:** Every row has the same hot `key` ("HOT"). Add a `salted_key` that
+  appends `_` plus `id % 3`, turning one key into **3** buckets. Then store the
+  number of distinct salted keys in `n_buckets`.
+
+  Expected: `n_buckets == 3`
+starter_code: |
+  df = spark.range(6).select(F.lit("HOT").alias("key"), F.col("id"))
+  # TODO: salted_key = key + "_" + (id % 3); count distinct salted keys -> n_buckets
+  salted = ...
+  n_buckets = ...
+  print(n_buckets)
+solution_code: |
+  df = spark.range(6).select(F.lit("HOT").alias("key"), F.col("id"))
+  salted = df.withColumn(
+      "salted_key",
+      F.concat(F.col("key"), F.lit("_"), (F.col("id") % 3).cast("string")),
+  )
+  n_buckets = salted.select("salted_key").distinct().count()
+  print(n_buckets)
+checks:
+  - type: var_equals
+    name: n_buckets
+    expected: 3
+    message: "salting id % 3 should produce 3 distinct sub-keys"
+hints:
+  - "Build the salt with F.concat(key, F.lit(\"_\"), (id % 3).cast(\"string\"))."
+  - "Count buckets with salted.select(\"salted_key\").distinct().count()."

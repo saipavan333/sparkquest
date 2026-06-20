@@ -1,0 +1,40 @@
+id: py-07-comprehensions
+track: python
+order: 7
+title: "Comprehensions"
+difficulty: 3
+concepts: ["list comprehension", "dict comprehension", "filtering"]
+needs_spark: false
+brief: |
+  Comprehensions build a new list or dict in one readable line — they're the
+  Pythonic replacement for many loops and a daily tool in data work.
+
+  **Mission:** From `data` (ticker, daily return) pairs:
+  1. Build a list `winners` of the tickers whose return is **positive**.
+  2. Build a dict `ret_map` mapping every ticker to its return.
+
+  Expected: `winners == ["AAPL", "MSFT"]` and
+  `ret_map == {"AAPL": 0.02, "GOOG": -0.01, "MSFT": 0.03, "JPM": -0.02}`
+starter_code: |
+  data = [("AAPL", 0.02), ("GOOG", -0.01), ("MSFT", 0.03), ("JPM", -0.02)]
+  # TODO: winners (list comprehension) and ret_map (dict comprehension)
+  winners = ...
+  ret_map = ...
+  print(winners, ret_map)
+solution_code: |
+  data = [("AAPL", 0.02), ("GOOG", -0.01), ("MSFT", 0.03), ("JPM", -0.02)]
+  winners = [t for t, r in data if r > 0]
+  ret_map = {t: r for t, r in data}
+  print(winners, ret_map)
+checks:
+  - type: var_equals
+    name: winners
+    expected: ["AAPL", "MSFT"]
+    message: "winners should list only the tickers with a positive return"
+  - type: var_equals
+    name: ret_map
+    expected: {"AAPL": 0.02, "GOOG": -0.01, "MSFT": 0.03, "JPM": -0.02}
+    message: "ret_map should map every ticker to its return"
+hints:
+  - "List comp with a filter: [t for t, r in data if r > 0]"
+  - "Dict comp: {t: r for t, r in data}"

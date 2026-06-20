@@ -8,9 +8,12 @@ import yaml
 from app.core.models import Challenge, TrackMeta
 
 TRACKS: list[TrackMeta] = [
-    TrackMeta(id="python", title="Python Foundations", subtitle="Zero to comfortable", order=1),
-    TrackMeta(id="pyspark", title="PySpark & Spark SQL", subtitle="Think in DataFrames", order=2),
-    TrackMeta(id="streaming", title="Structured Streaming", subtitle="Real-time pipelines", order=3),
+    TrackMeta(id="python", title="Python for Data Engineering", subtitle="Zero to comfortable", order=1),
+    TrackMeta(id="pyspark", title="PySpark Foundations & DataFrames", subtitle="Think in DataFrames", order=2),
+    TrackMeta(id="performance", title="Performance & Internals", subtitle="Make Spark fast", order=3),
+    TrackMeta(id="streaming", title="Structured Streaming", subtitle="Real-time pipelines", order=4),
+    TrackMeta(id="delta", title="Lakehouse & Delta Lake", subtitle="ACID on the lake", order=5),
+    TrackMeta(id="capstone", title="Capstone ETL Projects", subtitle="Put it all together", order=6),
 ]
 _TRACK_ORDER = {t.id: t.order for t in TRACKS}
 

@@ -1,0 +1,42 @@
+id: sp-10-string-funcs
+track: pyspark
+order: 10
+title: "String Functions"
+difficulty: 3
+concepts: ["upper", "concat_ws", "string functions"]
+needs_spark: true
+brief: |
+  Cleaning text is half of data engineering. Spark ships dozens of string
+  functions in `F` — `upper`, `lower`, `trim`, `substring`, `split`,
+  `regexp_replace`, `concat_ws`, and more.
+
+  **Mission:** From `df`, add `symbol` = the **uppercased** ticker, and `label` =
+  `symbol` and `name` joined by a single space. Store it in `labeled`.
+starter_code: |
+  df = spark.createDataFrame(
+      [("aapl", "Apple"), ("goog", "Google")],
+      ["ticker", "name"],
+  )
+  # TODO: add symbol = upper(ticker) and label = "SYMBOL Name"
+  labeled = ...
+  labeled.show()
+solution_code: |
+  df = spark.createDataFrame(
+      [("aapl", "Apple"), ("goog", "Google")],
+      ["ticker", "name"],
+  )
+  labeled = (
+      df.withColumn("symbol", F.upper("ticker"))
+      .withColumn("label", F.concat_ws(" ", F.col("symbol"), F.col("name")))
+  )
+  labeled.show()
+checks:
+  - type: df_equals
+    name: labeled
+    expected:
+      - {"ticker": "aapl", "name": "Apple", "symbol": "AAPL", "label": "AAPL Apple"}
+      - {"ticker": "goog", "name": "Google", "symbol": "GOOG", "label": "GOOG Google"}
+    message: "symbol should be uppercase; label should join symbol and name with a space"
+hints:
+  - "F.upper(\"ticker\") uppercases the column."
+  - "F.concat_ws(\" \", col1, col2) joins with a separator."

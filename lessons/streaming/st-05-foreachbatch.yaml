@@ -1,0 +1,70 @@
+id: st-05-foreachbatch
+track: streaming
+order: 5
+title: "Custom Sinks with foreachBatch"
+difficulty: 4
+concepts: ["foreachBatch", "custom sink", "micro-batch"]
+needs_spark: true
+brief: |
+  `foreachBatch` hands you each micro-batch as a normal DataFrame, so you can do
+  *anything* — upsert to a database, write to several targets, or call an API. It's
+  the escape hatch that makes Structured Streaming production-ready.
+
+  **Mission:** Stream `data/sample/stream_events` and use `foreachBatch` to record
+  each batch's row count into the `processed` list. After the query finishes, store
+  the grand total in `total`.
+
+  Expected: `total == 8` (all events seen exactly once).
+starter_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  processed = []
+
+  def handle(batch_df, batch_id):
+      # TODO: append this batch's row count to `processed`
+      ...
+
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  # TODO: writeStream with foreachBatch(handle), availableNow; then total = sum(processed)
+  total = ...
+  print(total)
+solution_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  processed = []
+
+  def handle(batch_df, batch_id):
+      processed.append(batch_df.count())
+
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  query = (
+      stream.writeStream
+      .foreachBatch(handle)
+      .trigger(availableNow=True)
+      .start()
+  )
+  query.awaitTermination()
+  total = sum(processed)
+  print(total)
+checks:
+  - type: var_equals
+    name: total
+    expected: 8
+    message: "total rows processed across all batches should be 8"
+hints:
+  - "Inside handle, do processed.append(batch_df.count())."
+  - "Attach it with .writeStream.foreachBatch(handle), then sum(processed) after awaitTermination()."

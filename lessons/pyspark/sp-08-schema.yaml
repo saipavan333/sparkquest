@@ -1,0 +1,44 @@
+id: sp-08-schema
+track: pyspark
+order: 8
+title: "Explicit Schemas"
+difficulty: 3
+concepts: ["StructType", "StructField", "types"]
+needs_spark: true
+brief: |
+  In production you almost never let Spark *guess* types — you declare a schema.
+  It's faster (no inference scan) and safer (bad data fails loudly).
+
+  The types module is available to you as `T` (`pyspark.sql.types`).
+
+  **Mission:** Build `df` from `data` using an explicit schema: `ticker` as
+  `StringType`, `qty` as `LongType`, `price` as `DoubleType`.
+starter_code: |
+  data = [("AAPL", 100, 190.0), ("GOOG", 50, 142.5)]
+  # TODO: define a StructType schema and create df with it
+  schema = ...
+  df = spark.createDataFrame(data, schema)
+  df.printSchema()
+solution_code: |
+  data = [("AAPL", 100, 190.0), ("GOOG", 50, 142.5)]
+  schema = T.StructType([
+      T.StructField("ticker", T.StringType()),
+      T.StructField("qty", T.LongType()),
+      T.StructField("price", T.DoubleType()),
+  ])
+  df = spark.createDataFrame(data, schema)
+  df.printSchema()
+checks:
+  - type: df_columns
+    name: df
+    expected: ["ticker", "qty", "price"]
+    message: "df should have columns ticker, qty, price"
+  - type: df_equals
+    name: df
+    expected:
+      - {"ticker": "AAPL", "qty": 100, "price": 190.0}
+      - {"ticker": "GOOG", "qty": 50, "price": 142.5}
+    message: "df rows should match the input under the declared schema"
+hints:
+  - "Build T.StructType([...]) with one T.StructField(name, T.SomeType()) each."
+  - "Pass the schema as the second arg to spark.createDataFrame(data, schema)."

@@ -1,0 +1,35 @@
+id: perf-01-repartition-coalesce
+track: performance
+order: 1
+title: "Repartition vs Coalesce"
+difficulty: 3
+concepts: ["partitions", "repartition", "coalesce", "shuffle"]
+needs_spark: true
+brief: |
+  Spark splits data into **partitions** processed in parallel. Too few starves
+  your cores; too many adds overhead. `repartition(n)` reshuffles into exactly `n`
+  (a full shuffle); `coalesce(n)` only *merges* down (no shuffle) — cheaper for
+  reducing partitions.
+
+  **Mission:** Take `df`, `repartition` it into **4** partitions, then `coalesce`
+  to **2**. Store the final partition count in `n` (use `.rdd.getNumPartitions()`).
+
+  Expected: `n == 2`
+starter_code: |
+  df = spark.range(100)
+  # TODO: repartition to 4, then coalesce to 2; read the partition count into n
+  n = ...
+  print(n)
+solution_code: |
+  df = spark.range(100)
+  result = df.repartition(4).coalesce(2)
+  n = result.rdd.getNumPartitions()
+  print(n)
+checks:
+  - type: var_equals
+    name: n
+    expected: 2
+    message: "after coalesce(2) the DataFrame should have 2 partitions"
+hints:
+  - "Chain it: df.repartition(4).coalesce(2)"
+  - "Read the count with result.rdd.getNumPartitions()."

@@ -1,0 +1,55 @@
+id: py-11-dataclasses
+track: python
+order: 11
+title: "Dataclasses & OOP"
+difficulty: 3
+concepts: ["dataclass", "classes", "methods"]
+needs_spark: false
+brief: |
+  `@dataclass` gives you a tidy record type with almost no boilerplate — perfect
+  for modelling rows, configs, and events in a pipeline.
+
+  **Mission:** Define a dataclass `Trade` with fields `ticker` (str), `qty` (int),
+  and `price` (float), plus a method `notional(self)` returning `qty * price`.
+  Then create `t = Trade("AAPL", 10, 190.0)` and store `value = t.notional()`.
+
+  Expected: `value == 1900.0`
+starter_code: |
+  from dataclasses import dataclass
+
+  @dataclass
+  class Trade:
+      # TODO: declare fields and a notional() method
+      ...
+
+  t = Trade("AAPL", 10, 190.0)
+  value = t.notional()
+  print(value)
+solution_code: |
+  from dataclasses import dataclass
+
+  @dataclass
+  class Trade:
+      ticker: str
+      qty: int
+      price: float
+
+      def notional(self):
+          return self.qty * self.price
+
+  t = Trade("AAPL", 10, 190.0)
+  value = t.notional()
+  print(value)
+checks:
+  - type: var_type
+    name: t
+    type_name: Trade
+    message: "t should be an instance of your Trade dataclass"
+  - type: var_close
+    name: value
+    expected: 1900.0
+    tol: 0.001
+    message: "value should equal qty * price (1900.0)"
+hints:
+  - "Declare fields with type hints under the class: ticker: str, etc."
+  - "Add a regular method: def notional(self): return self.qty * self.price"

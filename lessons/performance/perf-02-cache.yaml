@@ -1,0 +1,37 @@
+id: perf-02-cache
+track: performance
+order: 2
+title: "Caching & Persistence"
+difficulty: 3
+concepts: ["cache", "persist", "reuse"]
+needs_spark: true
+brief: |
+  Spark recomputes a DataFrame every time you use it — wasteful when you reuse the
+  same result. `cache()` (or `persist()`) keeps it in memory after the first
+  action, so repeated queries are fast.
+
+  **Mission:** Build the aggregate `agg`, **cache** it, then trigger one action so
+  the cache materialises.
+starter_code: |
+  df = spark.range(1000).select((F.col("id") % 3).alias("k"))
+  agg = df.groupBy("k").count()
+  # TODO: cache agg, then run an action (e.g. .count()) to materialise it
+  ...
+  agg.show()
+solution_code: |
+  df = spark.range(1000).select((F.col("id") % 3).alias("k"))
+  agg = df.groupBy("k").count()
+  agg.cache()
+  agg.count()  # action that materialises the cache
+  agg.show()
+checks:
+  - type: custom
+    message: "agg should be cached (persisted in memory or on disk)"
+    code: |
+      d = ns.get("agg")
+      sl = d.storageLevel if d is not None else None
+      ok = bool(sl and (sl.useMemory or sl.useDisk))
+    fail_detail: "Call agg.cache() and then an action like agg.count()."
+hints:
+  - "agg.cache() marks it for caching (lazily)."
+  - "Run agg.count() (or any action) once to actually populate the cache."

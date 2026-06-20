@@ -1,0 +1,39 @@
+id: py-08-errors
+track: python
+order: 8
+title: "Error Handling"
+difficulty: 3
+concepts: ["try/except", "exceptions", "robustness"]
+needs_spark: false
+brief: |
+  Real pipelines hit bad data. Catching exceptions lets your code keep running
+  instead of crashing on one bad row.
+
+  **Mission:** Write a function `safe_divide(a, b)` that returns `a / b`, but
+  returns `None` when `b` is `0` (catch the `ZeroDivisionError`).
+
+  Examples: `safe_divide(10, 2) == 5.0` and `safe_divide(10, 0) is None`
+starter_code: |
+  def safe_divide(a, b):
+      # TODO: return a / b, but None if b is 0
+      ...
+solution_code: |
+  def safe_divide(a, b):
+      try:
+          return a / b
+      except ZeroDivisionError:
+          return None
+checks:
+  - type: callable_returns
+    name: safe_divide
+    args: [10, 2]
+    expected: 5.0
+    message: "safe_divide(10, 2) should return 5.0"
+  - type: callable_returns
+    name: safe_divide
+    args: [10, 0]
+    expected: null
+    message: "safe_divide(10, 0) should return None, not crash"
+hints:
+  - "Wrap the division in try: ... except ZeroDivisionError: ..."
+  - "Return None from the except block."

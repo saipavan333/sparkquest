@@ -1,0 +1,40 @@
+id: sp-12-null-handling
+track: pyspark
+order: 12
+title: "Null Handling"
+difficulty: 3
+concepts: ["na.fill", "na.drop", "nulls"]
+needs_spark: true
+brief: |
+  Missing data is everywhere. Spark gives you `df.na.fill(...)`, `df.na.drop(...)`,
+  and `F.coalesce(...)` to handle it deliberately instead of letting nulls poison
+  your aggregates.
+
+  **Mission:** The `qty` for GOOG is missing (`None`). Replace every null `qty`
+  with `0`, storing the result in `filled`.
+starter_code: |
+  df = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", None), ("MSFT", 30)],
+      ["ticker", "qty"],
+  )
+  # TODO: fill null qty with 0 -> `filled`
+  filled = ...
+  filled.show()
+solution_code: |
+  df = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", None), ("MSFT", 30)],
+      ["ticker", "qty"],
+  )
+  filled = df.na.fill({"qty": 0})
+  filled.show()
+checks:
+  - type: df_equals
+    name: filled
+    expected:
+      - {"ticker": "AAPL", "qty": 100}
+      - {"ticker": "GOOG", "qty": 0}
+      - {"ticker": "MSFT", "qty": 30}
+    message: "the missing GOOG qty should become 0"
+hints:
+  - "df.na.fill({\"qty\": 0}) replaces nulls in that column."
+  - "You can also pass a single value to fill all numeric columns."

@@ -1,0 +1,42 @@
+id: sp-14-explode
+track: pyspark
+order: 14
+title: "Arrays & explode"
+difficulty: 4
+concepts: ["arrays", "explode", "complex types"]
+needs_spark: true
+brief: |
+  Real data is often nested — a record holding a list of items. `F.explode` turns
+  each element of an array column into its own row, flattening the structure for
+  analysis.
+
+  **Mission:** Each ticker has an array of `actions`. Explode it so every action
+  becomes its own row with column `action`, keeping `ticker`. Store it in `flat`.
+
+  Expected 3 rows: AAPL/buy, AAPL/sell, GOOG/buy.
+starter_code: |
+  df = spark.createDataFrame(
+      [("AAPL", ["buy", "sell"]), ("GOOG", ["buy"])],
+      ["ticker", "actions"],
+  )
+  # TODO: explode actions into one row each -> `flat` (columns ticker, action)
+  flat = ...
+  flat.show()
+solution_code: |
+  df = spark.createDataFrame(
+      [("AAPL", ["buy", "sell"]), ("GOOG", ["buy"])],
+      ["ticker", "actions"],
+  )
+  flat = df.select("ticker", F.explode("actions").alias("action"))
+  flat.show()
+checks:
+  - type: df_equals
+    name: flat
+    expected:
+      - {"ticker": "AAPL", "action": "buy"}
+      - {"ticker": "AAPL", "action": "sell"}
+      - {"ticker": "GOOG", "action": "buy"}
+    message: "each array element should become its own row"
+hints:
+  - "F.explode(\"actions\") creates one row per array element."
+  - "Select ticker alongside the exploded column and alias it 'action'."

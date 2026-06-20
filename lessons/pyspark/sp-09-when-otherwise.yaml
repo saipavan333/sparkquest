@@ -1,0 +1,42 @@
+id: sp-09-when-otherwise
+track: pyspark
+order: 9
+title: "Conditionals: when / otherwise"
+difficulty: 3
+concepts: ["when", "otherwise", "conditional columns"]
+needs_spark: true
+brief: |
+  `F.when(condition, value).otherwise(value)` is Spark's `CASE WHEN` — the way you
+  bucket, flag, and classify rows.
+
+  **Mission:** Add a column `band` to `trades`: `"large"` when `amount` is at least
+  `1000`, otherwise `"small"`. Store the result in `tagged`.
+starter_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 1200), ("GOOG", 800), ("MSFT", 1500)],
+      ["ticker", "amount"],
+  )
+  # TODO: add a `band` column using F.when(...).otherwise(...)
+  tagged = ...
+  tagged.show()
+solution_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 1200), ("GOOG", 800), ("MSFT", 1500)],
+      ["ticker", "amount"],
+  )
+  tagged = trades.withColumn(
+      "band",
+      F.when(F.col("amount") >= 1000, "large").otherwise("small"),
+  )
+  tagged.show()
+checks:
+  - type: df_equals
+    name: tagged
+    expected:
+      - {"ticker": "AAPL", "amount": 1200, "band": "large"}
+      - {"ticker": "GOOG", "amount": 800, "band": "small"}
+      - {"ticker": "MSFT", "amount": 1500, "band": "large"}
+    message: "band should be 'large' for amount >= 1000, else 'small'"
+hints:
+  - "F.when(F.col(\"amount\") >= 1000, \"large\").otherwise(\"small\")"
+  - "Wrap it in withColumn(\"band\", ...)."

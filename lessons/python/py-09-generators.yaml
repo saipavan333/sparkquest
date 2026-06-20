@@ -1,0 +1,39 @@
+id: py-09-generators
+track: python
+order: 9
+title: "Generators"
+difficulty: 4
+concepts: ["generators", "yield", "lazy evaluation"]
+needs_spark: false
+brief: |
+  Generators produce values lazily with `yield`, so you can stream through huge
+  datasets without loading them all into memory — exactly Spark's philosophy, in
+  miniature.
+
+  **Mission:** Write a generator function `batches(items, size)` that yields
+  successive chunks of `items`, each a list of length `size` (the last may be
+  shorter). Then collect them into `result`.
+
+  Expected: `result == [[1, 2], [3, 4], [5]]`
+starter_code: |
+  def batches(items, size):
+      # TODO: yield successive chunks of length `size`
+      ...
+
+  result = [list(b) for b in batches([1, 2, 3, 4, 5], 2)]
+  print(result)
+solution_code: |
+  def batches(items, size):
+      for i in range(0, len(items), size):
+          yield items[i:i + size]
+
+  result = [list(b) for b in batches([1, 2, 3, 4, 5], 2)]
+  print(result)
+checks:
+  - type: var_equals
+    name: result
+    expected: [[1, 2], [3, 4], [5]]
+    message: "result should be the input split into chunks of 2"
+hints:
+  - "Step through indices: for i in range(0, len(items), size)"
+  - "Yield a slice each step: yield items[i:i + size]"

@@ -1,0 +1,47 @@
+id: py-10-decorators
+track: python
+order: 10
+title: "Decorators"
+difficulty: 4
+concepts: ["decorators", "closures", "higher-order functions"]
+needs_spark: false
+brief: |
+  A decorator wraps a function to add behaviour — timing, retries, logging,
+  caching — without touching the function's body. They're everywhere in data
+  frameworks.
+
+  **Mission:** Write a decorator `double` that **doubles** whatever a function
+  returns, then apply it to `add(a, b)`.
+
+  Examples: `add(2, 3) == 10` (because 2 + 3 = 5, doubled) and `add(10, 5) == 30`
+starter_code: |
+  def double(fn):
+      # TODO: return a wrapper that doubles fn's result
+      ...
+
+  @double
+  def add(a, b):
+      return a + b
+solution_code: |
+  def double(fn):
+      def wrapper(*args, **kwargs):
+          return fn(*args, **kwargs) * 2
+      return wrapper
+
+  @double
+  def add(a, b):
+      return a + b
+checks:
+  - type: callable_returns
+    name: add
+    args: [2, 3]
+    expected: 10
+    message: "add(2, 3) should be doubled to 10"
+  - type: callable_returns
+    name: add
+    args: [10, 5]
+    expected: 30
+    message: "add(10, 5) should be doubled to 30"
+hints:
+  - "Define an inner wrapper(*args, **kwargs) and return it from double."
+  - "Inside wrapper, return fn(*args, **kwargs) * 2"

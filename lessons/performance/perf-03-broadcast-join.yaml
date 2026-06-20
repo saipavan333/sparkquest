@@ -1,0 +1,44 @@
+id: perf-03-broadcast-join
+track: performance
+order: 3
+title: "Broadcast Joins"
+difficulty: 4
+concepts: ["broadcast", "join", "shuffle avoidance"]
+needs_spark: true
+brief: |
+  Joining a huge table to a tiny one? Don't shuffle both. **Broadcasting** sends
+  the small table to every executor so the join happens locally — often a massive
+  speed-up. Wrap the small side in `F.broadcast(...)`.
+
+  **Mission:** Join `big` with the small `sectors` lookup on `ticker`, broadcasting
+  `sectors`. Store the result in `joined`.
+starter_code: |
+  big = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", 50), ("AAPL", 70)], ["ticker", "qty"]
+  )
+  sectors = spark.createDataFrame(
+      [("AAPL", "Tech"), ("GOOG", "Tech")], ["ticker", "sector"]
+  )
+  # TODO: broadcast-join big with sectors on ticker -> `joined`
+  joined = ...
+  joined.show()
+solution_code: |
+  big = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", 50), ("AAPL", 70)], ["ticker", "qty"]
+  )
+  sectors = spark.createDataFrame(
+      [("AAPL", "Tech"), ("GOOG", "Tech")], ["ticker", "sector"]
+  )
+  joined = big.join(F.broadcast(sectors), "ticker")
+  joined.show()
+checks:
+  - type: df_equals
+    name: joined
+    expected:
+      - {"ticker": "AAPL", "qty": 100, "sector": "Tech"}
+      - {"ticker": "GOOG", "qty": 50, "sector": "Tech"}
+      - {"ticker": "AAPL", "qty": 70, "sector": "Tech"}
+    message: "joined should attach each trade's sector via a broadcast join"
+hints:
+  - "Wrap the small DataFrame: F.broadcast(sectors)"
+  - "big.join(F.broadcast(sectors), \"ticker\")"

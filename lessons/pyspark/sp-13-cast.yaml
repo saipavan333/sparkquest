@@ -1,0 +1,38 @@
+id: sp-13-cast
+track: pyspark
+order: 13
+title: "Casting Types"
+difficulty: 3
+concepts: ["cast", "type conversion"]
+needs_spark: true
+brief: |
+  Raw data often arrives as strings — prices, quantities, dates all as text. Use
+  `.cast(...)` to convert columns to the right type before you compute on them.
+
+  **Mission:** `price_str` is text. Cast it to a **double** column named `price`,
+  keeping `ticker`. Store the result in `casted`.
+starter_code: |
+  df = spark.createDataFrame(
+      [("AAPL", "190.5"), ("GOOG", "142.0")],
+      ["ticker", "price_str"],
+  )
+  # TODO: cast price_str to double as `price`; keep ticker -> `casted`
+  casted = ...
+  casted.show()
+solution_code: |
+  df = spark.createDataFrame(
+      [("AAPL", "190.5"), ("GOOG", "142.0")],
+      ["ticker", "price_str"],
+  )
+  casted = df.select("ticker", F.col("price_str").cast("double").alias("price"))
+  casted.show()
+checks:
+  - type: df_equals
+    name: casted
+    expected:
+      - {"ticker": "AAPL", "price": 190.5}
+      - {"ticker": "GOOG", "price": 142.0}
+    message: "price should be a numeric double cast from the string"
+hints:
+  - "F.col(\"price_str\").cast(\"double\") converts the type."
+  - "Use .alias(\"price\") to name the new column."
