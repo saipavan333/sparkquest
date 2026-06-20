@@ -30,12 +30,35 @@ jobs:
       - name: Lint (ruff)
         run: ruff check app tests scripts benchmarks
 
-      - name: Validate every lesson solution
+      - name: Validate every lesson solution (Delta excluded)
         env:
           SPARK_LOCAL_IP: 127.0.0.1
-        run: python scripts/validate_lessons.py
+        run: python scripts/validate_lessons.py --skip-delta
 
-      - name: Run test suite (incl. Spark)
+      - name: Run test suite (Spark; Delta excluded)
         env:
           SPARK_LOCAL_IP: 127.0.0.1
-        run: pytest --cov=app --cov-report=term-missing
+        run: pytest -m "not delta" --cov=app --cov-report=term-missing
+
+  delta:
+    name: Delta Lake lessons (Maven-gated)
+    runs-on: ubuntu-latest
+    continue-on-error: true   # Delta needs a Maven JAR fetch; never blocks the main check
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "11"
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Validate Delta lessons (fetches the Delta JAR from Maven)
+        env:
+          SPARK_LOCAL_IP: 127.0.0.1
+        run: pytest -m delta -q

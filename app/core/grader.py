@@ -24,6 +24,8 @@ class GradeResult:
 
 def _timeout_for(challenge: Challenge) -> int:
     s = get_settings()
+    if challenge.needs_delta:
+        return s.delta_exec_timeout  # Delta may download its JAR on first use
     return s.spark_exec_timeout if challenge.needs_spark else s.exec_timeout
 
 
@@ -33,6 +35,7 @@ def grade(challenge: Challenge, code: str) -> GradeResult:
     res = run_job(
         code,
         needs_spark=challenge.needs_spark,
+        needs_delta=challenge.needs_delta,
         checks=challenge.checks,
         spark_master=s.spark_master,
         timeout=_timeout_for(challenge),
@@ -60,6 +63,7 @@ def run_only(challenge: Challenge, code: str) -> ExecResult:
     return run_job(
         code,
         needs_spark=challenge.needs_spark,
+        needs_delta=challenge.needs_delta,
         checks=[],
         spark_master=s.spark_master,
         timeout=_timeout_for(challenge),

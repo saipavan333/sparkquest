@@ -1,16 +1,25 @@
 """Structural tests for the lesson catalog (fast, no code execution)."""
+from pathlib import Path
+
 from app.catalog import get_catalog
+from app.config import get_settings
+from app.content.loader import TRACKS
+
+_VALID_TRACKS = {t.id for t in TRACKS}
 
 
-def test_catalog_loads_expected_count():
-    assert len(get_catalog().challenges) == 16
+def test_catalog_matches_lesson_files():
+    n_files = len(list(Path(get_settings().lessons_dir).rglob("*.yaml")))
+    challenges = get_catalog().challenges
+    assert len(challenges) == n_files
+    assert len(challenges) >= 50  # curriculum has grown well past the MVP
 
 
-def test_track_counts():
+def test_live_tracks_have_lessons():
     by_track = get_catalog().by_track()
-    assert len(by_track["python"]) == 6
-    assert len(by_track["pyspark"]) == 7
-    assert len(by_track["streaming"]) == 3
+    assert set(by_track) <= _VALID_TRACKS
+    for track in ("python", "pyspark", "performance", "streaming", "capstone"):
+        assert by_track.get(track), f"track {track} has no lessons"
 
 
 def test_ids_are_unique():
@@ -24,7 +33,7 @@ def test_every_challenge_is_well_formed():
         assert c.brief.strip(), f"{c.id} missing brief"
         assert c.solution_code.strip(), f"{c.id} missing solution"
         assert c.checks, f"{c.id} has no grader checks"
-        assert c.track in {"python", "pyspark", "streaming"}
+        assert c.track in _VALID_TRACKS, f"{c.id} has unknown track {c.track}"
         assert 1 <= c.difficulty <= 5
 
 

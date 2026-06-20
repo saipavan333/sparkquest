@@ -1,0 +1,60 @@
+id: delta-02-merge
+track: delta
+order: 2
+title: "MERGE / Upsert (CDC)"
+difficulty: 4
+concepts: ["MERGE", "upsert", "change-data-capture"]
+needs_spark: true
+needs_delta: true
+brief: |
+  The killer feature: `MERGE` updates existing rows and inserts new ones in a
+  single atomic operation — the foundation of change-data-capture (CDC) into a
+  lakehouse. Parquet alone can't do this.
+
+  **Mission:** A positions table exists with AAPL 100, GOOG 50. Apply `updates`
+  (AAPL → 120, MSFT 30) with a `MERGE`: update matched tickers, insert new ones.
+  Then read the table into `result`.
+
+  Expected: AAPL 120 (updated), GOOG 50 (unchanged), MSFT 30 (inserted).
+starter_code: |
+  import os, tempfile
+
+  path = os.path.join(tempfile.mkdtemp(), "positions")
+  spark.createDataFrame([("AAPL", 100), ("GOOG", 50)], ["ticker", "qty"]) \
+      .write.format("delta").mode("overwrite").save(path)
+  updates = spark.createDataFrame([("AAPL", 120), ("MSFT", 30)], ["ticker", "qty"])
+
+  # TODO: MERGE updates into the Delta table at path (update matched, insert new)
+  dt = DeltaTable.forPath(spark, path)
+  ...
+  result = spark.read.format("delta").load(path)
+  result.show()
+solution_code: |
+  import os, tempfile
+
+  path = os.path.join(tempfile.mkdtemp(), "positions")
+  spark.createDataFrame([("AAPL", 100), ("GOOG", 50)], ["ticker", "qty"]) \
+      .write.format("delta").mode("overwrite").save(path)
+  updates = spark.createDataFrame([("AAPL", 120), ("MSFT", 30)], ["ticker", "qty"])
+
+  dt = DeltaTable.forPath(spark, path)
+  (
+      dt.alias("t")
+      .merge(updates.alias("u"), "t.ticker = u.ticker")
+      .whenMatchedUpdate(set={"qty": "u.qty"})
+      .whenNotMatchedInsert(values={"ticker": "u.ticker", "qty": "u.qty"})
+      .execute()
+  )
+  result = spark.read.format("delta").load(path)
+  result.show()
+checks:
+  - type: df_equals
+    name: result
+    expected:
+      - {"ticker": "AAPL", "qty": 120}
+      - {"ticker": "GOOG", "qty": 50}
+      - {"ticker": "MSFT", "qty": 30}
+    message: "MERGE should update AAPL, keep GOOG, and insert MSFT"
+hints:
+  - "DeltaTable.forPath(spark, path) gives you the table to merge into."
+  - "Chain .merge(updates, cond).whenMatchedUpdate(...).whenNotMatchedInsert(...).execute()"

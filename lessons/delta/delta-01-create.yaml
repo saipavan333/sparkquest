@@ -1,0 +1,43 @@
+id: delta-01-create
+track: delta
+order: 1
+title: "Your First Delta Table"
+difficulty: 3
+concepts: ["delta", "ACID", "write", "read"]
+needs_spark: true
+needs_delta: true
+brief: |
+  **Delta Lake** turns a folder of Parquet files into an ACID table — atomic
+  writes, consistent reads, and a transaction log — all on cheap object storage.
+  Writing one is just `format("delta")`.
+
+  A Delta-enabled `spark` session and the `DeltaTable` helper are ready for you.
+
+  **Mission:** Write `df` as a Delta table at `path`, then read it back into
+  `loaded`.
+starter_code: |
+  import os, tempfile
+
+  df = spark.createDataFrame([("AAPL", 100), ("GOOG", 50)], ["ticker", "qty"])
+  path = os.path.join(tempfile.mkdtemp(), "trades")
+  # TODO: write df as Delta (overwrite) to path, then read it back into loaded
+  loaded = ...
+  loaded.show()
+solution_code: |
+  import os, tempfile
+
+  df = spark.createDataFrame([("AAPL", 100), ("GOOG", 50)], ["ticker", "qty"])
+  path = os.path.join(tempfile.mkdtemp(), "trades")
+  df.write.format("delta").mode("overwrite").save(path)
+  loaded = spark.read.format("delta").load(path)
+  loaded.show()
+checks:
+  - type: df_equals
+    name: loaded
+    expected:
+      - {"ticker": "AAPL", "qty": 100}
+      - {"ticker": "GOOG", "qty": 50}
+    message: "loaded should round-trip the rows back from the Delta table"
+hints:
+  - "df.write.format(\"delta\").mode(\"overwrite\").save(path)"
+  - "spark.read.format(\"delta\").load(path) reads it back."

@@ -24,6 +24,7 @@ addopts = "-q"
 filterwarnings = ["ignore::DeprecationWarning"]
 markers = [
     "spark: tests that start a real Spark session (slow; deselect with -m 'not spark')",
+    "delta: tests needing Delta Lake + its Maven JAR (run in CI/Docker, not the offline sandbox)",
 ]
 
 [tool.coverage.run]

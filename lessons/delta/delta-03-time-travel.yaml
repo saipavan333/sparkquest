@@ -1,0 +1,49 @@
+id: delta-03-time-travel
+track: delta
+order: 3
+title: "Time Travel"
+difficulty: 4
+concepts: ["time travel", "versioning", "transaction log"]
+needs_spark: true
+needs_delta: true
+brief: |
+  Because Delta keeps a transaction log, you can query the table **as of** any past
+  version — perfect for audits, reproducibility, and "what did this look like
+  yesterday?" debugging.
+
+  **Mission:** Write version 0 (AAPL @ 100), then overwrite with version 1
+  (AAPL @ 200). Read the table back **as of version 0** into `old`.
+
+  Expected: the original AAPL @ 100.
+starter_code: |
+  import os, tempfile
+
+  path = os.path.join(tempfile.mkdtemp(), "prices")
+  spark.createDataFrame([("AAPL", 100)], ["ticker", "price"]) \
+      .write.format("delta").mode("overwrite").save(path)   # version 0
+  spark.createDataFrame([("AAPL", 200)], ["ticker", "price"]) \
+      .write.format("delta").mode("overwrite").save(path)   # version 1
+
+  # TODO: read the table AS OF version 0 into `old`
+  old = ...
+  old.show()
+solution_code: |
+  import os, tempfile
+
+  path = os.path.join(tempfile.mkdtemp(), "prices")
+  spark.createDataFrame([("AAPL", 100)], ["ticker", "price"]) \
+      .write.format("delta").mode("overwrite").save(path)   # version 0
+  spark.createDataFrame([("AAPL", 200)], ["ticker", "price"]) \
+      .write.format("delta").mode("overwrite").save(path)   # version 1
+
+  old = spark.read.format("delta").option("versionAsOf", 0).load(path)
+  old.show()
+checks:
+  - type: df_equals
+    name: old
+    expected:
+      - {"ticker": "AAPL", "price": 100}
+    message: "old should show the table as it was at version 0 (price 100)"
+hints:
+  - "Use .option(\"versionAsOf\", 0) when reading the Delta table."
+  - "Each overwrite creates a new version; version 0 is the first write."

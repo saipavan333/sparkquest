@@ -37,6 +37,12 @@ COPY --chown=user:user lessons ./lessons
 COPY --chown=user:user data ./data
 
 USER user
+
+# Pre-fetch the Delta Lake JAR into the Ivy cache so Delta lessons run offline at
+# runtime. Needs Maven access at build time (CI / Docker builders have it).
+RUN SPARK_LOCAL_IP=127.0.0.1 python -c "from app.core.spark_session import build_spark_session; s = build_spark_session(delta=True); s.range(1).write.format('delta').mode('overwrite').save('/tmp/_delta_warm'); s.stop()" \
+    || echo "WARN: Delta warm-up skipped (no Maven access at build time)"
+
 EXPOSE 7860
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=45s --retries=3 \

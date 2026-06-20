@@ -42,7 +42,7 @@ streaming with watermarks.
 - **Real execution, real feedback** — submissions run in a process-isolated sandbox
   with timeouts and output caps; grading inspects program state and DataFrame
   contents.
-- **Zero → pro curriculum** — 50 finance-themed challenges across 6 tracks (and
+- **Zero → pro curriculum** — 54 finance-themed challenges across 6 tracks (and
   growing): Python for DE → PySpark & DataFrames → Performance → Structured
   Streaming → Lakehouse/Delta → Capstone ETL. Full [syllabus](docs/CURRICULUM.md).
 - **AI tutor** — Socratic hints powered by your choice of Anthropic/OpenAI/HF, with
@@ -116,7 +116,7 @@ The full syllabus — every topic with official-doc links — lives in
 | **PySpark Foundations & DataFrames** | 20 | schemas, Parquet, select/filter, when/otherwise, string/date/null/cast, all join types, windows (rank/lag), complex types/structs, pivot, UDFs |
 | **Performance & Internals** | 5 | repartition/coalesce, caching, broadcast joins, data skew & salting, partitioned writes & pruning |
 | **Structured Streaming** | 6 | sources/sinks, aggregations, event-time windows, watermarks, dedup, `foreachBatch`, stream-static joins |
-| **Lakehouse & Delta Lake** | soon | Parquet, Delta ACID, `MERGE`/upsert, time travel, medallion architecture |
+| **Lakehouse & Delta Lake** | 4 | create Delta tables, `MERGE`/upsert (CDC), time travel, schema evolution |
 | **Capstone ETL** | 3 | end-to-end batch ETL, data-quality checks, a live streaming pipeline |
 
 Lessons are plain YAML in [`lessons/`](lessons/) — add your own without touching code.
@@ -129,7 +129,7 @@ Lessons are plain YAML in [`lessons/`](lessons/) — add your own without touchi
 | Structured Streaming ingestion | **~11,989 events/s** |
 | Auto-grade, Python challenge | **~1 ms** |
 | Auto-grade, Spark challenge (end-to-end) | **~8.6 s** (3.5 s Spark cold start) |
-| Reference solutions passing their grader | **50/50 (100%)** |
+| Reference solutions passing their grader | **50/50 sandbox + 4 Delta (CI)** |
 
 Reproduce: `python benchmarks/run_benchmarks.py --all`. Details and discussion in
 [the paper](paper/sparkquest.pdf).

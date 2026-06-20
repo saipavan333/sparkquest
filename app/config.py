@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     # --- Code execution sandbox ---
     exec_timeout: int = Field(25, validation_alias="SQ_EXEC_TIMEOUT_SECONDS")
     spark_exec_timeout: int = Field(90, validation_alias="SQ_SPARK_EXEC_TIMEOUT_SECONDS")
+    delta_exec_timeout: int = Field(300, validation_alias="SQ_DELTA_EXEC_TIMEOUT_SECONDS")
     max_output_chars: int = Field(20000, validation_alias="SQ_EXEC_MAX_OUTPUT_CHARS")
     spark_master: str = Field("local[2]", validation_alias="SQ_SPARK_MASTER")
 

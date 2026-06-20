@@ -23,11 +23,16 @@ def main(filters: list[str] | None = None) -> int:
     from app.catalog import get_catalog
     from app.core.grader import grade
 
-    filters = filters or []
+    filters = list(filters or [])
+    skip_delta = "--skip-delta" in filters
+    if skip_delta:
+        filters.remove("--skip-delta")
     catalog = get_catalog()
     failures = 0
     checked = 0
     for challenge in catalog.challenges:
+        if skip_delta and challenge.needs_delta:
+            continue
         if not _included(challenge, filters):
             continue
         checked += 1

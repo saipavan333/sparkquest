@@ -1,0 +1,49 @@
+id: delta-04-schema-evolution
+track: delta
+order: 4
+title: "Schema Evolution"
+difficulty: 4
+concepts: ["schema evolution", "mergeSchema", "append"]
+needs_spark: true
+needs_delta: true
+brief: |
+  Schemas change over time — a new field appears upstream. Delta can **evolve** the
+  table schema on write with `mergeSchema`, backfilling older rows with null for the
+  new column, instead of rejecting the data.
+
+  **Mission:** A table has `ticker, qty`. Append a row that *also* has a `sector`
+  column, using `mergeSchema`. Then read the whole table into `result`.
+
+  Expected: AAPL (sector null) and GOOG (sector "Tech").
+starter_code: |
+  import os, tempfile
+
+  path = os.path.join(tempfile.mkdtemp(), "evolving")
+  spark.createDataFrame([("AAPL", 100)], ["ticker", "qty"]) \
+      .write.format("delta").mode("overwrite").save(path)
+
+  new = spark.createDataFrame([("GOOG", 50, "Tech")], ["ticker", "qty", "sector"])
+  # TODO: append `new` with schema evolution (mergeSchema), then read into result
+  result = ...
+  result.show()
+solution_code: |
+  import os, tempfile
+
+  path = os.path.join(tempfile.mkdtemp(), "evolving")
+  spark.createDataFrame([("AAPL", 100)], ["ticker", "qty"]) \
+      .write.format("delta").mode("overwrite").save(path)
+
+  new = spark.createDataFrame([("GOOG", 50, "Tech")], ["ticker", "qty", "sector"])
+  new.write.format("delta").mode("append").option("mergeSchema", "true").save(path)
+  result = spark.read.format("delta").load(path)
+  result.show()
+checks:
+  - type: df_equals
+    name: result
+    expected:
+      - {"ticker": "AAPL", "qty": 100, "sector": null}
+      - {"ticker": "GOOG", "qty": 50, "sector": "Tech"}
+    message: "the new sector column should appear, null for the pre-existing AAPL row"
+hints:
+  - "Append with .option(\"mergeSchema\", \"true\") to allow the new column."
+  - "Older rows automatically get null for the added column."

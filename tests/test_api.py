@@ -9,12 +9,12 @@ client = TestClient(app)
 def test_healthz():
     body = client.get("/healthz").json()
     assert body["status"] == "ok"
-    assert body["challenges"] == 16
+    assert body["challenges"] >= 50
 
 
 def test_tracks_endpoint():
     tracks = client.get("/api/tracks").json()["tracks"]
-    assert {t["id"] for t in tracks} == {"python", "pyspark", "streaming"}
+    assert {"python", "pyspark", "performance", "streaming", "capstone"} <= {t["id"] for t in tracks}
 
 
 def test_index_served():

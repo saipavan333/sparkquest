@@ -41,6 +41,7 @@ def run_job(
     user_code: str,
     *,
     needs_spark: bool = False,
+    needs_delta: bool = False,
     checks: list | None = None,
     spark_master: str = "local[2]",
     timeout: int = 25,
@@ -54,6 +55,7 @@ def run_job(
         job = {
             "user_code": user_code,
             "needs_spark": needs_spark,
+            "needs_delta": needs_delta,
             "spark_master": spark_master,
             "checks": checks,
             "max_output_chars": max_output_chars,

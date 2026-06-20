@@ -5,9 +5,10 @@ topic below maps to a **graded, runnable challenge** (✅ = live now, 🔜 = on 
 roadmap). The structure mirrors the official documentation so you can always go
 deeper at the source.
 
-**Status:** 50 graded lessons live across 5 tracks (Python, PySpark, Performance,
-Streaming, Capstone). Delta Lake lands next. Every live lesson's reference solution
-is verified to pass its own auto-grader (100%).
+**Status:** 54 graded lessons across all 6 tracks. The 50 Python / PySpark /
+Performance / Streaming / Capstone lessons are verified in the offline sandbox; the
+4 Delta lessons are verified by a dedicated Maven-enabled CI job (Delta needs an
+internet JAR fetch). Every reference solution passes its own auto-grader.
 
 **Primary references (always current):**
 - Python — <https://docs.python.org/3/tutorial/> · <https://docs.python.org/3/library/>
@@ -137,18 +138,19 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 5 — Lakehouse & Delta Lake (next phase)
+## Track 5 — Lakehouse & Delta Lake (4 live)
 
 > *Goal: bring ACID, upserts, and time travel to data lakes.*
 > Docs: <https://docs.delta.io/latest/delta-intro.html>
-> *Note: Delta requires the `delta-spark` package + a Maven-fetched JAR; these
-> lessons are validated in CI/Docker (which have Maven access) and ship next.*
+> *Note: Delta needs the `delta-spark` package + a Maven-fetched JAR, so these
+> lessons run in CI / Docker / your machine (which have Maven). They're verified by
+> a dedicated `delta` CI job, isolated so it can never block the main check.*
 
+- ✅ Delta basics — create a Delta table, ACID write/read
+- ✅ `MERGE` / upserts — change-data-capture into a table
+- ✅ Time travel — querying previous versions (`versionAsOf`)
+- ✅ Schema evolution — `mergeSchema` on append
 - 🔜 Parquet deep-dive — columnar storage, predicate/column pushdown
-- 🔜 Delta basics — ACID transactions, the transaction log
-- 🔜 `MERGE` / upserts — change-data-capture into a table
-- 🔜 Time travel — querying previous versions
-- 🔜 Schema evolution & enforcement — safe column changes
 - 🔜 Medallion architecture — bronze → silver → gold layers
 
 ---
@@ -170,7 +172,8 @@ your output. Tracks are ordered — finish one before the next.
 This is a living curriculum. **Phase 1** shipped the full syllabus plus Modules
 1.1–1.3 and the core of Track 2. **Phase 2** added the remaining Python stdlib
 topics, advanced DataFrame ops (joins, windows, Parquet, UDFs, structs),
-partitioned writes, and the entire Capstone track — **50 graded lessons total**.
-**Phase 3** brings the Delta Lake track and the remaining 🔜 topics (AQE, Spark UI,
-stream-stream joins, CDC). Track your progress in the app — solved counts and badges
-update per track.
+partitioned writes, and the entire Capstone track. **Phase 3** added the Delta Lake
+track (create, MERGE, time travel, schema evolution) — **54 graded lessons total**.
+Remaining 🔜 topics (AQE, Spark UI, stream-stream joins, medallion, CDC) land in
+future phases. Track your progress in the app — solved counts and badges update per
+track.

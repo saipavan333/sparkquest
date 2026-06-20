@@ -20,6 +20,7 @@ class Challenge(BaseModel):
     concepts: list[str] = Field(default_factory=list)
     brief: str = ""
     needs_spark: bool = False
+    needs_delta: bool = False
     starter_code: str = ""
     solution_code: str = ""
     checks: list[dict[str, Any]] = Field(default_factory=list)

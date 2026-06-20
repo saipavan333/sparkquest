@@ -88,6 +88,7 @@ def main() -> None:
 
     user_code = job["user_code"]
     needs_spark = job.get("needs_spark", False)
+    needs_delta = job.get("needs_delta", False)
     master = job.get("spark_master", "local[2]")
     checks = job.get("checks", [])
     max_output = int(job.get("max_output_chars", 20000))
@@ -117,12 +118,18 @@ def main() -> None:
             from app.core.spark_session import build_spark_session
 
             ts = time.time()
-            spark = build_spark_session(master=master, app_name="sparkquest-grader")
+            spark = build_spark_session(
+                master=master, app_name="sparkquest-grader", delta=needs_delta
+            )
             result["spark_startup_ms"] = int((time.time() - ts) * 1000)
             from pyspark.sql import functions as F  # noqa: N812
             from pyspark.sql import types as T  # noqa: N812
 
             ns.update({"spark": spark, "F": F, "T": T})
+            if needs_delta:
+                from delta.tables import DeltaTable
+
+                ns["DeltaTable"] = DeltaTable
         except Exception as exc:  # noqa: BLE001
             result["error"] = f"Failed to start Spark: {exc}"
             result["traceback"] = traceback.format_exc()
