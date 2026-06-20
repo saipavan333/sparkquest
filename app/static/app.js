@@ -261,6 +261,50 @@
     $("badge-count").textContent = String((parseInt($("badge-count").textContent) || 0) + 1);
   }
 
+  // ---- Handbook ----
+  let hbLoaded = false;
+  let hbFileToSlug = {};
+  async function openHandbook() {
+    $("handbook").hidden = false;
+    if (hbLoaded) return;
+    try {
+      const { chapters } = await fetch("/api/handbook").then(r => r.json());
+      hbFileToSlug = {};
+      const nav = $("hb-nav");
+      nav.innerHTML = "";
+      chapters.forEach(c => {
+        hbFileToSlug[c.file] = c.slug;
+        const link = document.createElement("div");
+        link.className = "hb-link"; link.dataset.slug = c.slug; link.textContent = c.title;
+        link.addEventListener("click", () => loadChapter(c.slug));
+        nav.appendChild(link);
+      });
+      hbLoaded = true;
+      if (chapters.length) loadChapter(chapters[0].slug);
+    } catch (e) {
+      $("hb-content").innerHTML = `<div class="loading">Failed to load handbook: ${e}</div>`;
+    }
+  }
+  async function loadChapter(slug) {
+    try {
+      const res = await fetch("/api/handbook/" + slug).then(r => r.json());
+      const html = window.marked ? marked.parse(res.markdown) : escapeHtml(res.markdown);
+      $("hb-content").innerHTML = `<div class="markdown-inner">${html}</div>`;
+      $("hb-content").scrollTop = 0;
+      document.querySelectorAll(".hb-link").forEach(l => l.classList.toggle("active", l.dataset.slug === slug));
+      // make in-text .md links navigate within the reader
+      $("hb-content").querySelectorAll('a[href$=".md"]').forEach(a => {
+        a.addEventListener("click", (e) => {
+          const file = a.getAttribute("href").split("/").pop();
+          const target = hbFileToSlug[file];
+          if (target) { e.preventDefault(); loadChapter(target); }
+        });
+      });
+    } catch (e) {
+      $("hb-content").innerHTML = `<div class="loading">Failed to load chapter: ${e}</div>`;
+    }
+  }
+
   // ---- Buttons ----
   function wireButtons() {
     $("btn-run").addEventListener("click", doRun);
@@ -279,6 +323,8 @@
     document.querySelectorAll(".tutor-quick button").forEach(b => b.addEventListener("click", () => askTutor(b.dataset.q)));
     $("btn-leaderboard").addEventListener("click", openLeaderboard);
     $("btn-badges").addEventListener("click", openBadges);
+    $("btn-handbook").addEventListener("click", openHandbook);
+    $("hb-close").addEventListener("click", () => { $("handbook").hidden = true; });
     $("modal-close").addEventListener("click", () => $("modal").hidden = true);
     $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) $("modal").hidden = true; });
   }

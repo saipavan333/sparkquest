@@ -21,6 +21,7 @@
         <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
         <div class="xp-text"><span id="xp-num">0</span> XP <span id="xp-next" class="muted"></span></div>
       </div>
+      <button class="nav-btn" id="btn-handbook" title="The interview-prep handbook">📖 Handbook</button>
       <button class="nav-btn" id="btn-badges" title="Your badges">🏅 <span id="badge-count">0</span></button>
       <button class="nav-btn" id="btn-leaderboard">Leaderboard</button>
     </div>
@@ -103,6 +104,18 @@
     <div class="modal-card">
       <div class="modal-head"><span id="modal-title">Leaderboard</span><button class="icon-btn" id="modal-close">✕</button></div>
       <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Handbook reader -->
+  <div class="handbook" id="handbook" hidden>
+    <div class="hb-head">
+      <span class="hb-brand">📖 SparkQuest Handbook <span class="muted">· interview-grade depth</span></span>
+      <button class="icon-btn" id="hb-close" title="Close">✕</button>
+    </div>
+    <div class="hb-body">
+      <nav class="hb-nav" id="hb-nav"><div class="loading">Loading…</div></nav>
+      <article class="hb-content markdown" id="hb-content"></article>
     </div>
   </div>
 

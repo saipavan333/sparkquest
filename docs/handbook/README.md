@@ -44,29 +44,25 @@ specific configs against the docs for *your* runtime.
   **checkpointing**, **exactly-once** via idempotent/transactional sinks, output
   modes, triggers, stream-stream joins, and Kafka integration.
 
-### Part IV — Storage, modeling & the lakehouse *(expanding)*
-- File formats deep-dive — row vs columnar, **Parquet** internals (row groups,
-  column chunks, pages, encodings, predicate/column pushdown), ORC, Avro.
-- **Partitioning vs bucketing** — write-time layout, the small-files problem,
-  compaction, file sizing (~128 MB–1 GB targets).
-- **Delta Lake deep** — transaction log, `OPTIMIZE` + Z-order, `VACUUM`,
-  Change Data Feed, deletion vectors; **Delta vs Iceberg vs Hudi**.
-- **Dimensional modeling** — star/snowflake schemas, fact/dimension tables,
-  **Slowly Changing Dimensions (SCD types 1/2/3)**, normalization tradeoffs.
+### Part IV — Storage, modeling & the lakehouse
+- **[04 · File Formats & Physical Layout](04-file-formats-and-layout.md)** — row vs
+  columnar, **Parquet** internals (row groups, pages, encodings, predicate/column
+  pushdown), partitioning vs bucketing, the small-files problem.
+- **[05 · Lakehouse & Delta Lake](05-lakehouse-and-delta.md)** — the transaction
+  log, ACID, `MERGE`, `OPTIMIZE`+Z-order, `VACUUM`, CDF; **Delta vs Iceberg vs
+  Hudi**; medallion architecture.
+- **[06 · Data Modeling](06-data-modeling.md)** — star/snowflake schemas,
+  fact/dimension design, **Slowly Changing Dimensions (SCD 1/2/3)**.
 
 ### Part V — Pipeline & system design
-- **Batch vs streaming**, **Lambda vs Kappa** architectures.
-- **Idempotency, exactly-once, and backfills** — designing for re-runs.
-- **Data quality** — contracts, expectations, quarantine, observability.
-- **Orchestration** — DAGs, dependencies, retries, SLAs (Airflow mental model).
-- **The data-pipeline system-design interview** — a repeatable framework.
+- **[07 · Pipeline System Design](07-system-design.md)** — a repeatable framework;
+  batch vs streaming; **Lambda vs Kappa**; **idempotency, exactly-once & backfills**;
+  data quality; orchestration (Airflow).
 
 ### Part VI — Python & SQL mastery for DE
-- **Python deep** — generators/iterators, decorators, context managers,
-  **concurrency** (threading vs multiprocessing vs asyncio, the GIL), memory,
-  typing, testing, packaging.
-- **SQL deep** — window functions, CTEs & recursion, advanced aggregation,
-  query-plan reading, the classic interview SQL patterns.
+- **[08 · Python & SQL Mastery](08-python-and-sql-deep.md)** — the GIL & concurrency
+  models, generators, decorators, typing, testing; SQL **window functions**, CTEs,
+  advanced aggregation, the classic interview patterns, and query optimization.
 
 ### Part VII — Interview craft
 - **[Interview Question Bank](interview-questions.md)** — conceptual Spark,
@@ -76,8 +72,8 @@ specific configs against the docs for *your* runtime.
 
 ## Status & rollout
 
-This handbook is being written in phases alongside the lessons. **Live now:**
-Parts I–III (architecture, performance, streaming), the question bank, and
-resources. **Next:** Parts IV–VI as full chapters (the syllabus above is the
-contract for what's coming). The lessons already cover the *hands-on* side of
-Parts IV–VI; the handbook adds the depth an interviewer will dig for.
+**All eight deep-dive chapters are live** (Parts I–VI) plus the question bank and
+resources — and they're readable **inside the app** via the 📖 **Handbook** button,
+not just on GitHub. The lessons give the hands-on reps; the handbook gives the depth
+an interviewer digs for. It keeps growing — open an issue with the topic you want
+next.

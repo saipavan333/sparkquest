@@ -35,6 +35,7 @@ RUN pip install -r requirements.txt
 COPY --chown=user:user app ./app
 COPY --chown=user:user lessons ./lessons
 COPY --chown=user:user data ./data
+COPY --chown=user:user docs/handbook ./docs/handbook
 
 USER user
 

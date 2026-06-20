@@ -44,7 +44,7 @@ def main() -> None:
         folder_path=str(ROOT),
         repo_id=repo_id,
         repo_type="space",
-        allow_patterns=["app/**", "lessons/**", "data/**", "Dockerfile", "requirements.txt"],
+        allow_patterns=["app/**", "lessons/**", "data/**", "docs/handbook/**", "Dockerfile", "requirements.txt"],
         ignore_patterns=["**/__pycache__/**", "data/raw/**"],
         commit_message="Deploy SparkQuest",
     )

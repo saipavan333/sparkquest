@@ -35,6 +35,9 @@ class Settings(BaseSettings):
 
     # --- Content ---
     lessons_dir: str = Field(str(REPO_ROOT / "lessons"), validation_alias="SQ_LESSONS_DIR")
+    handbook_dir: str = Field(
+        str(REPO_ROOT / "docs" / "handbook"), validation_alias="SQ_HANDBOOK_DIR"
+    )
 
     @property
     def is_production(self) -> bool:
