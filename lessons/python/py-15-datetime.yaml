@@ -1,0 +1,42 @@
+id: py-15-datetime
+track: python
+order: 15
+title: "Dates & Times"
+difficulty: 3
+concepts: ["datetime", "strptime", "parsing"]
+needs_spark: false
+brief: |
+  Almost every pipeline is time-aware. `datetime.strptime` parses a string into a
+  real date object you can compare, subtract, and extract parts from.
+
+  **Mission:** Parse `"2026-01-15"` with `strptime` into `d`, then store its `year`
+  and `month`.
+
+  Expected: `year == 2026`, `month == 1`.
+starter_code: |
+  from datetime import datetime
+
+  # TODO: parse "2026-01-15" into d, then read year and month
+  d = ...
+  year = ...
+  month = ...
+  print(d, year, month)
+solution_code: |
+  from datetime import datetime
+
+  d = datetime.strptime("2026-01-15", "%Y-%m-%d")
+  year = d.year
+  month = d.month
+  print(d, year, month)
+checks:
+  - type: var_equals
+    name: year
+    expected: 2026
+    message: "year should be 2026"
+  - type: var_equals
+    name: month
+    expected: 1
+    message: "month should be 1"
+hints:
+  - "datetime.strptime(text, \"%Y-%m-%d\") parses the string."
+  - "Access parts with d.year and d.month."

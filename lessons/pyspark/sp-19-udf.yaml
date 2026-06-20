@@ -1,0 +1,37 @@
+id: sp-19-udf
+track: pyspark
+order: 19
+title: "User-Defined Functions (UDFs)"
+difficulty: 4
+concepts: ["UDF", "custom logic", "types"]
+needs_spark: true
+brief: |
+  When a built-in won't do, a **UDF** wraps your own Python function as a column
+  operation. (Prefer built-ins when you can — UDFs are slower because they cross
+  the JVM↔Python boundary — but they're essential for custom logic.)
+
+  `F` and the types module `T` are available.
+
+  **Mission:** Write a UDF `classify` that returns `"big"` when `amount >= 1000`
+  else `"small"`, and apply it as a new column `band`. Store the result in `out`.
+starter_code: |
+  df = spark.createDataFrame([("AAPL", 1200), ("GOOG", 800)], ["ticker", "amount"])
+  # TODO: define a string-returning UDF `classify` and add column `band`
+  classify = ...
+  out = ...
+  out.show()
+solution_code: |
+  df = spark.createDataFrame([("AAPL", 1200), ("GOOG", 800)], ["ticker", "amount"])
+  classify = F.udf(lambda amount: "big" if amount >= 1000 else "small", T.StringType())
+  out = df.withColumn("band", classify(F.col("amount")))
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "amount": 1200, "band": "big"}
+      - {"ticker": "GOOG", "amount": 800, "band": "small"}
+    message: "band should come from your UDF: 'big' if amount >= 1000 else 'small'"
+hints:
+  - "F.udf(lambda amount: ..., T.StringType()) wraps your function."
+  - "Apply it like any function: classify(F.col(\"amount\"))."

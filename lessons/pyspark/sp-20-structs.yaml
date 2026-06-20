@@ -1,0 +1,52 @@
+id: sp-20-structs
+track: pyspark
+order: 20
+title: "Nested Structs"
+difficulty: 4
+concepts: ["struct", "nested data", "dot access"]
+needs_spark: true
+brief: |
+  Semi-structured data often nests fields inside a **struct**. You reach into them
+  with dot notation: `F.col("trade.price")`.
+
+  The types module is available as `T`.
+
+  **Mission:** Each row has a nested `trade` struct of `price` and `qty`. Flatten it
+  into top-level `price` and `qty` columns (keeping `ticker`). Store it in `flat`.
+starter_code: |
+  schema = T.StructType([
+      T.StructField("ticker", T.StringType()),
+      T.StructField("trade", T.StructType([
+          T.StructField("price", T.DoubleType()),
+          T.StructField("qty", T.LongType()),
+      ])),
+  ])
+  df = spark.createDataFrame([("AAPL", (190.0, 100)), ("GOOG", (142.0, 50))], schema)
+  # TODO: pull trade.price and trade.qty up to top-level columns -> flat
+  flat = ...
+  flat.show()
+solution_code: |
+  schema = T.StructType([
+      T.StructField("ticker", T.StringType()),
+      T.StructField("trade", T.StructType([
+          T.StructField("price", T.DoubleType()),
+          T.StructField("qty", T.LongType()),
+      ])),
+  ])
+  df = spark.createDataFrame([("AAPL", (190.0, 100)), ("GOOG", (142.0, 50))], schema)
+  flat = df.select(
+      "ticker",
+      F.col("trade.price").alias("price"),
+      F.col("trade.qty").alias("qty"),
+  )
+  flat.show()
+checks:
+  - type: df_equals
+    name: flat
+    expected:
+      - {"ticker": "AAPL", "price": 190.0, "qty": 100}
+      - {"ticker": "GOOG", "price": 142.0, "qty": 50}
+    message: "flat should lift price and qty out of the nested struct"
+hints:
+  - "Reach into a struct with dot notation: F.col(\"trade.price\")."
+  - "Alias each to a clean top-level name."

@@ -1,0 +1,44 @@
+id: py-13-sets-tuples
+track: python
+order: 13
+title: "Sets, Tuples & Unpacking"
+difficulty: 2
+concepts: ["set", "tuple", "unpacking"]
+needs_spark: false
+brief: |
+  Sets hold **unique** items (instant deduplication and membership tests); tuples
+  are immutable records; unpacking pulls values apart in one line — all daily tools.
+
+  **Mission:**
+  1. Deduplicate `tickers` into a set and store its size in `n_unique`.
+  2. Unpack `[1, 2, 3, 4]` so `first` is the head and `rest` is the remaining list.
+
+  Expected: `n_unique == 3`, `first == 1`, `rest == [2, 3, 4]`.
+starter_code: |
+  tickers = ["AAPL", "GOOG", "AAPL", "MSFT", "GOOG"]
+  # TODO: n_unique = number of distinct tickers
+  n_unique = ...
+  # TODO: unpack head/tail of [1, 2, 3, 4]
+  first, rest = ...
+  print(n_unique, first, rest)
+solution_code: |
+  tickers = ["AAPL", "GOOG", "AAPL", "MSFT", "GOOG"]
+  n_unique = len(set(tickers))
+  first, *rest = [1, 2, 3, 4]
+  print(n_unique, first, rest)
+checks:
+  - type: var_equals
+    name: n_unique
+    expected: 3
+    message: "n_unique should be the count of distinct tickers"
+  - type: var_equals
+    name: first
+    expected: 1
+    message: "first should be the head of the list"
+  - type: var_equals
+    name: rest
+    expected: [2, 3, 4]
+    message: "rest should be the remaining items"
+hints:
+  - "set(tickers) drops duplicates; len(...) gives the count."
+  - "Star-unpacking: first, *rest = [1, 2, 3, 4]"

@@ -1,0 +1,70 @@
+id: cap-03-streaming-pipeline
+track: capstone
+order: 3
+title: "Streaming Pipeline Capstone"
+difficulty: 5
+concepts: ["streaming ETL", "filter", "join", "aggregation"]
+needs_spark: true
+brief: |
+  The real-time finale: an end-to-end streaming pipeline that **filters**,
+  **enriches** with reference data, and **aggregates** — all on a live stream.
+
+  **Mission:** Stream `data/sample/stream_events`, keep only events with
+  `amount >= 500`, join the static `sectors` table, then count events per sector
+  (complete mode). Land it in a memory table and load `out`.
+
+  Sectors: AAPL & GOOG are `Tech`, MSFT is `Software`. Expected: Tech 4, Software 1.
+starter_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+  sectors = spark.createDataFrame(
+      [("AAPL", "Tech"), ("GOOG", "Tech"), ("MSFT", "Software")],
+      ["ticker", "sector"],
+  )
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  # TODO: filter amount >= 500, join sectors, count per sector (complete) -> out
+  out = ...
+  out.show()
+solution_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+  sectors = spark.createDataFrame(
+      [("AAPL", "Tech"), ("GOOG", "Tech"), ("MSFT", "Software")],
+      ["ticker", "sector"],
+  )
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  pipeline = (
+      stream.filter(F.col("amount") >= 500)
+      .join(sectors, "ticker")
+      .groupBy("sector")
+      .count()
+  )
+  query = (
+      pipeline.writeStream.format("memory").queryName("pipeline_out")
+      .outputMode("complete").trigger(availableNow=True).start()
+  )
+  query.awaitTermination()
+  out = spark.table("pipeline_out")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"sector": "Tech", "count": 4}
+      - {"sector": "Software", "count": 1}
+    message: "after filtering amount >= 500 and joining sectors, count per sector"
+hints:
+  - "Filter first, then join sectors on ticker, then groupBy(\"sector\").count()."
+  - "Use outputMode(\"complete\") with trigger(availableNow=True)."

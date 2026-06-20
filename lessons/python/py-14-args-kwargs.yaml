@@ -1,0 +1,42 @@
+id: py-14-args-kwargs
+track: python
+order: 14
+title: "*args, **kwargs & lambda"
+difficulty: 3
+concepts: ["args", "varargs", "lambda"]
+needs_spark: false
+brief: |
+  `*args` lets a function take any number of positional arguments; `lambda` makes
+  a tiny anonymous function. Both show up constantly in framework APIs.
+
+  **Mission:**
+  1. Write `total(*nums)` that returns the sum of all arguments passed.
+  2. Write a `lambda` named `sq` that squares its input.
+
+  Examples: `total(1, 2, 3, 4) == 10` and `sq(5) == 25`.
+starter_code: |
+  def total(*nums):
+      # TODO: return the sum of all arguments
+      ...
+
+  # TODO: sq = a lambda that squares its input
+  sq = ...
+solution_code: |
+  def total(*nums):
+      return sum(nums)
+
+  sq = lambda x: x * x
+checks:
+  - type: callable_returns
+    name: total
+    args: [1, 2, 3, 4]
+    expected: 10
+    message: "total(1, 2, 3, 4) should return 10"
+  - type: callable_returns
+    name: sq
+    args: [5]
+    expected: 25
+    message: "sq(5) should return 25"
+hints:
+  - "*nums collects all positional args into a tuple; sum(nums) adds them."
+  - "sq = lambda x: x * x"

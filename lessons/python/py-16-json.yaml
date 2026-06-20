@@ -1,0 +1,48 @@
+id: py-16-json
+track: python
+order: 16
+title: "JSON"
+difficulty: 3
+concepts: ["json", "parsing", "serialisation"]
+needs_spark: false
+brief: |
+  JSON is the lingua franca of data pipelines — APIs, Kafka messages, log lines.
+  `json.loads` turns a JSON string into a Python dict.
+
+  **Mission:** Parse the JSON string `raw` into a dict `rec`, then pull out
+  `ticker` and `qty`.
+
+  Expected: `ticker == "AAPL"`, `qty == 100`.
+starter_code: |
+  import json
+
+  raw = '{"ticker": "AAPL", "qty": 100}'
+  # TODO: parse raw into rec, then read ticker and qty
+  rec = ...
+  ticker = ...
+  qty = ...
+  print(rec, ticker, qty)
+solution_code: |
+  import json
+
+  raw = '{"ticker": "AAPL", "qty": 100}'
+  rec = json.loads(raw)
+  ticker = rec["ticker"]
+  qty = rec["qty"]
+  print(rec, ticker, qty)
+checks:
+  - type: var_type
+    name: rec
+    type_name: dict
+    message: "rec should be a dict parsed from the JSON string"
+  - type: var_equals
+    name: ticker
+    expected: "AAPL"
+    message: "ticker should be read from the parsed JSON"
+  - type: var_equals
+    name: qty
+    expected: 100
+    message: "qty should be read from the parsed JSON"
+hints:
+  - "json.loads(raw) returns a dict."
+  - "Index it like any dict: rec[\"ticker\"], rec[\"qty\"]."

@@ -1,0 +1,44 @@
+id: sp-16-join-types
+track: pyspark
+order: 16
+title: "Join Types: left & anti"
+difficulty: 4
+concepts: ["left join", "left_anti", "unmatched rows"]
+needs_spark: true
+brief: |
+  Beyond inner joins: a **left** join keeps every left row (nulls where no match),
+  and a **left_anti** join keeps only left rows with **no** match — perfect for
+  finding orphans and reconciling datasets.
+
+  **Mission:** Find trades whose ticker has **no** sector in the lookup, using a
+  `left_anti` join. Store them in `unmatched`.
+
+  Expected: only XYZ (it isn't in `sectors`).
+starter_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 100), ("JPM", 75), ("XYZ", 10)], ["ticker", "qty"]
+  )
+  sectors = spark.createDataFrame(
+      [("AAPL", "Tech"), ("JPM", "Fin")], ["ticker", "sector"]
+  )
+  # TODO: keep only trades with no matching sector (left_anti) -> unmatched
+  unmatched = ...
+  unmatched.show()
+solution_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 100), ("JPM", 75), ("XYZ", 10)], ["ticker", "qty"]
+  )
+  sectors = spark.createDataFrame(
+      [("AAPL", "Tech"), ("JPM", "Fin")], ["ticker", "sector"]
+  )
+  unmatched = trades.join(sectors, "ticker", "left_anti")
+  unmatched.show()
+checks:
+  - type: df_equals
+    name: unmatched
+    expected:
+      - {"ticker": "XYZ", "qty": 10}
+    message: "unmatched should hold only trades with no sector (XYZ)"
+hints:
+  - "trades.join(sectors, \"ticker\", \"left_anti\")"
+  - "left_anti returns left rows with no match and keeps only the left columns."

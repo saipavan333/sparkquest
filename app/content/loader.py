@@ -78,6 +78,7 @@ class Catalog:
                 "challenges": by_track.get(t.id, []),
             }
             for t in sorted(TRACKS, key=lambda t: t.order)
+            if by_track.get(t.id)  # hide tracks that have no lessons yet
         ]
 
     def public_challenge(self, challenge_id: str) -> dict | None:

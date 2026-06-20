@@ -1,0 +1,44 @@
+id: cap-02-data-quality
+track: capstone
+order: 2
+title: "Data-Quality Checks"
+difficulty: 4
+concepts: ["data quality", "validation", "quarantine"]
+needs_spark: true
+brief: |
+  Never trust raw data. A good pipeline measures quality: it counts the **valid**
+  rows it will keep and **quarantines** the rest for review.
+
+  **Mission:** A row is valid only if `qty` is **not null** and **greater than 0**.
+  Compute `n_valid` (count of valid rows) and `n_bad` (everything else).
+
+  Expected: `n_valid == 2`, `n_bad == 2`.
+starter_code: |
+  df = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", None), ("MSFT", -5), ("JPM", 75)],
+      ["ticker", "qty"],
+  )
+  # TODO: n_valid = rows with qty not null and > 0; n_bad = the rest
+  n_valid = ...
+  n_bad = ...
+  print(n_valid, n_bad)
+solution_code: |
+  df = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", None), ("MSFT", -5), ("JPM", 75)],
+      ["ticker", "qty"],
+  )
+  n_valid = df.filter(F.col("qty").isNotNull() & (F.col("qty") > 0)).count()
+  n_bad = df.count() - n_valid
+  print(n_valid, n_bad)
+checks:
+  - type: var_equals
+    name: n_valid
+    expected: 2
+    message: "n_valid should count rows with qty not null and > 0"
+  - type: var_equals
+    name: n_bad
+    expected: 2
+    message: "n_bad should be the remaining (quarantined) rows"
+hints:
+  - "Combine conditions with &: F.col(\"qty\").isNotNull() & (F.col(\"qty\") > 0)."
+  - "n_bad = total count minus valid count."

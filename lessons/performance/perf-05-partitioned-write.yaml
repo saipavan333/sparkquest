@@ -1,0 +1,48 @@
+id: perf-05-partitioned-write
+track: performance
+order: 5
+title: "Partitioned Writes & Pruning"
+difficulty: 4
+concepts: ["partitionBy", "partition pruning", "parquet"]
+needs_spark: true
+brief: |
+  Writing data partitioned by a column lays it out in per-value folders. When you
+  later filter on that column, Spark reads **only** the matching folders —
+  *partition pruning* — skipping the rest. It's one of the biggest real-world wins.
+
+  **Mission:** Write `df` to Parquet **partitioned by `sector`**, then read it back
+  and filter to `sector == "Tech"`. Store the result in `tech`.
+
+  Expected: the two Tech rows (AAPL, GOOG).
+starter_code: |
+  import os, tempfile
+
+  df = spark.createDataFrame(
+      [("AAPL", "Tech", 100), ("JPM", "Fin", 75), ("GOOG", "Tech", 50)],
+      ["ticker", "sector", "qty"],
+  )
+  path = os.path.join(tempfile.mkdtemp(), "by_sector")
+  # TODO: write partitioned by sector, then read back and keep only Tech -> tech
+  tech = ...
+  tech.show()
+solution_code: |
+  import os, tempfile
+
+  df = spark.createDataFrame(
+      [("AAPL", "Tech", 100), ("JPM", "Fin", 75), ("GOOG", "Tech", 50)],
+      ["ticker", "sector", "qty"],
+  )
+  path = os.path.join(tempfile.mkdtemp(), "by_sector")
+  df.write.mode("overwrite").partitionBy("sector").parquet(path)
+  tech = spark.read.parquet(path).filter(F.col("sector") == "Tech")
+  tech.show()
+checks:
+  - type: df_equals
+    name: tech
+    expected:
+      - {"ticker": "AAPL", "sector": "Tech", "qty": 100}
+      - {"ticker": "GOOG", "sector": "Tech", "qty": 50}
+    message: "tech should be only the Tech-sector rows, read from the partitioned data"
+hints:
+  - "df.write.partitionBy(\"sector\").parquet(path) lays out per-sector folders."
+  - "Filtering sector == 'Tech' after reading prunes to just that folder."

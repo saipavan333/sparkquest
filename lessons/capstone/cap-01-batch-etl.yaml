@@ -1,0 +1,49 @@
+id: cap-01-batch-etl
+track: capstone
+order: 1
+title: "Batch ETL: Clean → Enrich → Aggregate"
+difficulty: 4
+concepts: ["ETL", "filter", "withColumn", "groupBy", "pipeline"]
+needs_spark: true
+brief: |
+  Time to put it together. A batch ETL job typically: **extracts** raw data,
+  **transforms** it (clean → enrich → aggregate), and **loads** the result.
+
+  **Mission:** From `raw` trades:
+  1. Drop invalid rows where `price <= 0`.
+  2. Add `notional = price * qty`.
+  3. Aggregate **total notional per sector** into a column `total`.
+
+  Store the final report in `report`. Expected: Tech 26100.0, Fin 15000.0.
+starter_code: |
+  raw = spark.createDataFrame(
+      [("AAPL", "Tech", 190.0, 100), ("GOOG", "Tech", 142.0, 50),
+       ("JPM", "Fin", 200.0, 75), ("AAPL", "Tech", -5.0, 10)],
+      ["ticker", "sector", "price", "qty"],
+  )
+  # TODO: drop price <= 0, add notional = price*qty, sum notional per sector -> report
+  report = ...
+  report.show()
+solution_code: |
+  raw = spark.createDataFrame(
+      [("AAPL", "Tech", 190.0, 100), ("GOOG", "Tech", 142.0, 50),
+       ("JPM", "Fin", 200.0, 75), ("AAPL", "Tech", -5.0, 10)],
+      ["ticker", "sector", "price", "qty"],
+  )
+  report = (
+      raw.filter(F.col("price") > 0)
+      .withColumn("notional", F.col("price") * F.col("qty"))
+      .groupBy("sector")
+      .agg(F.sum("notional").alias("total"))
+  )
+  report.show()
+checks:
+  - type: df_equals
+    name: report
+    expected:
+      - {"sector": "Tech", "total": 26100.0}
+      - {"sector": "Fin", "total": 15000.0}
+    message: "report should be total notional per sector, with the bad row removed"
+hints:
+  - "Chain filter -> withColumn -> groupBy().agg()."
+  - "F.sum(\"notional\").alias(\"total\") names the aggregate."
