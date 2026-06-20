@@ -7,9 +7,10 @@ own grader checks. Run with an optional track filter:
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
-from app.catalog import get_catalog
-from app.core.grader import grade
+# Make the repo root importable when run directly (python scripts/validate_lessons.py).
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 def _included(challenge, filters: list[str]) -> bool:
@@ -19,6 +20,9 @@ def _included(challenge, filters: list[str]) -> bool:
 
 
 def main(filters: list[str] | None = None) -> int:
+    from app.catalog import get_catalog
+    from app.core.grader import grade
+
     filters = filters or []
     catalog = get_catalog()
     failures = 0
