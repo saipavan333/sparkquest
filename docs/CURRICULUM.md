@@ -23,6 +23,10 @@ How it's taught: every challenge gives you a brief, starter code, and an AI tuto
 you write real code, it executes against a real engine, and an auto-grader checks
 your output. Tracks are ordered — finish one before the next.
 
+> **For interview-grade depth**, pair these lessons with the **[SparkQuest
+> Handbook](handbook/)** — book-quality deep dives on internals, performance, and
+> streaming, plus an interview question bank with model answers.
+
 ---
 
 ## Track 1 — Python for Data Engineering (16 live)

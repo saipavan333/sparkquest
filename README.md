@@ -55,6 +55,9 @@ streaming with watermarks.
   GitHub Actions CI, Docker, and one-command deploy to Hugging Face Spaces.
 - **A real paper + real benchmarks** — reproducible PySpark benchmarks (optionally
   tracked in Weights & Biases) write the figures in [the paper](paper/sparkquest.pdf).
+- **Interview-grade handbook** — book-quality deep dives on Spark internals,
+  performance, and streaming, plus an interview question bank with model answers
+  ([docs/handbook](docs/handbook/)).
 
 ## 🏗️ Architecture
 
@@ -120,6 +123,17 @@ The full syllabus — every topic with official-doc links — lives in
 | **Capstone ETL** | 3 | end-to-end batch ETL, data-quality checks, a live streaming pipeline |
 
 Lessons are plain YAML in [`lessons/`](lessons/) — add your own without touching code.
+
+## 📖 The Handbook — interview-grade depth
+
+The lessons build muscle memory; the **[SparkQuest Handbook](docs/handbook/)** builds
+the mental models senior data-engineering interviews probe — deep dives on
+[Spark architecture & execution](docs/handbook/01-spark-architecture-and-execution.md),
+[performance tuning & debugging](docs/handbook/02-performance-tuning.md), and
+[Structured Streaming internals](docs/handbook/03-streaming-internals.md), plus an
+[interview question bank](docs/handbook/interview-questions.md) with model answers and
+a curated [reading list & 6-week study plan](docs/handbook/resources.md). Grounded in
+the official Spark docs and the canonical books.
 
 ## 📊 Benchmarks (2 vCPU / 3.8 GiB host)
 
