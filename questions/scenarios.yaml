@@ -1,0 +1,60 @@
+- id: scn-01
+  difficulty: 4
+  q: "A Spark job that ran in 20 min now takes 3 hours after a data spike. Where do you start?"
+  a: "Spark UI → find the slow stage → task-time distribution. A spike usually means a hot key (skew) or a now-huge shuffle. Check shuffle read/spill. Fix: de-skew (AQE skew join / salt), broadcast a small side, or raise/repartition. Re-measure; confirm it's not just more data needing more partitions."
+  tags: [skew, debugging]
+- id: scn-02
+  difficulty: 4
+  q: "Executors keep dying with OOM. What do you check and change?"
+  a: "Look at which task/partition is huge and GC time on the Executors tab. Likely skew, oversized partitions, or a wide UDF buffering rows. Fix by increasing partitions / de-skewing rather than blindly raising memory; remove driver-side collects; switch RocksDB state store if it's streaming."
+  tags: [oom]
+- id: scn-03
+  difficulty: 4
+  q: "Your output is thousands of tiny files and reads are slow. Why and fix?"
+  a: "Too many shuffle/output partitions or over-partitioning on write. Coalesce/repartition before writing, use the REBALANCE hint, schedule Delta/Iceberg OPTIMIZE compaction, and target ~128 MB–1 GB files. Reduce partition-column cardinality."
+  tags: [small-files]
+- id: scn-04
+  difficulty: 4
+  q: "A streaming job's state keeps growing until it crashes. Diagnose."
+  a: "Almost certainly a missing or too-loose watermark on a stateful op (aggregation/dedup/stream-stream join), so state is never dropped. Add/tighten withWatermark; ensure stream-stream joins are time-bounded; consider the RocksDB state store for large legitimate state."
+  tags: [streaming, state]
+- id: scn-05
+  difficulty: 3
+  q: "Numbers in a daily report are double-counted after a re-run. Why?"
+  a: "The pipeline appends instead of upserting, so a re-run added rows again. Make writes idempotent: partition-overwrite the run-date or Delta MERGE on a unique key, so re-running replaces rather than duplicates."
+  tags: [idempotency]
+- id: scn-06
+  difficulty: 3
+  q: "A join silently dropped rows you expected to keep. What happened?"
+  a: "Probably an inner join where some keys don't match (or null keys, which don't equal anything). Use a left join to keep all left rows, check for null/whitespace key mismatches, and validate row counts before/after with a DQ check."
+  tags: [joins]
+- id: scn-07
+  difficulty: 4
+  q: "A broadcast join started failing with a driver OOM. Why?"
+  a: "The 'small' side grew past what fits in the driver/executors being broadcast. Spark tried to broadcast a too-big table. Raise the table's size estimate awareness (it shouldn't auto-broadcast), drop the broadcast hint, or switch to a sort-merge join; verify autoBroadcastJoinThreshold."
+  tags: [broadcast, oom]
+- id: scn-08
+  difficulty: 3
+  q: "Upstream added a new column and your job broke. How do you prevent this?"
+  a: "Enforce schema on write (Delta rejects drift) and read with an explicit schema, route unexpected data to quarantine, and use schema evolution (mergeSchema) deliberately rather than inferring. Add a contract/DQ gate so a producer change can't silently break you."
+  tags: [schema, data-quality]
+- id: scn-09
+  difficulty: 4
+  q: "One partition's task is the last to finish every run (a straggler). Fix?"
+  a: "Skew. Enable/verify AQE skew join (auto-splits skewed partitions), filter junk keys, salt the hot key, or broadcast the other side. Speculative execution can mask transient stragglers but won't fix true data skew."
+  tags: [skew, straggler]
+- id: scn-10
+  difficulty: 3
+  q: "A query reads the whole table despite a date filter. Why no pruning?"
+  a: "The table isn't partitioned/clustered on date, or the filter isn't pushdown-able (e.g. a function on the column, or stats missing). Partition by date (or Z-order), keep the filter directly on the column, and check EXPLAIN for PushedFilters / partition filters."
+  tags: [pruning]
+- id: scn-11
+  difficulty: 4
+  q: "A streaming query can't restart after a code change. Why?"
+  a: "The checkpoint is tied to the query's plan/state schema; an incompatible change (new aggregation, changed keys, different shuffle-partition count) makes it refuse to resume. Plan state-schema changes carefully; sometimes you must start a new checkpoint and reprocess."
+  tags: [streaming, checkpoint]
+- id: scn-12
+  difficulty: 3
+  q: "Costs are spiking on a cloud Spark cluster. What do you investigate?"
+  a: "Idle resources (enable dynamic allocation), oversized executors, excessive shuffles/re-computation (cache reused data, broadcast joins), small-files read overhead, and over-frequent streaming triggers. Right-size partitions and the cluster to the workload; reprocess less."
+  tags: [cost]

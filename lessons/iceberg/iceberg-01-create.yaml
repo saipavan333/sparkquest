@@ -1,0 +1,36 @@
+id: iceberg-01-create
+track: iceberg
+order: 1
+title: "Your First Iceberg Table"
+difficulty: 3
+concepts: ["iceberg", "table format", "SQL"]
+needs_spark: true
+needs_iceberg: true
+brief: |
+  **Apache Iceberg** is an open table format (like Delta) that brings ACID
+  transactions, snapshots, hidden partitioning, and engine-agnostic metadata to
+  data lakes. An Iceberg catalog named `local` is already configured for you.
+
+  **Mission:** Create an Iceberg table `local.db.trades (ticker STRING, qty
+  BIGINT)`, insert two rows, then read it back into `out`.
+starter_code: |
+  # TODO: CREATE the Iceberg table, INSERT two rows, then read it into `out`
+  spark.sql("CREATE TABLE local.db.trades (ticker STRING, qty BIGINT) USING iceberg")
+  ...
+  out = ...
+  out.show()
+solution_code: |
+  spark.sql("CREATE TABLE local.db.trades (ticker STRING, qty BIGINT) USING iceberg")
+  spark.sql("INSERT INTO local.db.trades VALUES ('AAPL', 100), ('GOOG', 50)")
+  out = spark.table("local.db.trades")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "qty": 100}
+      - {"ticker": "GOOG", "qty": 50}
+    message: "out should read back the rows inserted into the Iceberg table"
+hints:
+  - "Create with USING iceberg, then INSERT INTO local.db.trades VALUES (...)."
+  - "Read it with spark.table(\"local.db.trades\")."

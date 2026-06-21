@@ -14,7 +14,8 @@ engineering loop at FAANG-tier and high-paying product companies.
 2. **Read each deep-dive** and re-derive the diagrams from memory.
 3. **Drill the [interview question bank](interview-questions.md)** — say answers
    out loud; an interviewer wants reasoning, not recitation. Or fire up the in-app
-   **🎤 Mock Interview** for randomized, self-scored drilling over 96 questions.
+   **🎤 Mock Interview** for randomized, self-scored drilling over a **201-question
+   bank**, with a **timed, scored exam mode** when you want interview-day pressure.
 4. **Build the capstones** and be ready to whiteboard a pipeline end-to-end.
 
 Every claim here is grounded in the official Apache Spark docs and the canonical
@@ -75,8 +76,9 @@ specific configs against the docs for *your* runtime.
 
 **All eight deep-dive chapters are live** (Parts I–VI) plus the question bank and
 resources — and they're readable **inside the app** via the 📖 **Handbook** button,
-not just on GitHub. A **🎤 Mock Interview** mode drills you through a 96-question bank
-(Spark, performance, streaming, lakehouse, modeling, SQL, Python, system design,
-behavioral) with self-scoring, also in the app. The lessons give the hands-on reps;
-the handbook gives the depth an interviewer digs for. It keeps growing — open an
-issue with the topic you want next.
+not just on GitHub. A **🎤 Mock Interview** mode drills you through a **201-question
+bank** (Spark core, performance, streaming, Kafka, file formats, lakehouse, modeling,
+SQL, Python, system design, orchestration, coding, scenarios, behavioral) with
+self-scoring — and a **timed, scored exam mode** — also in the app. The lessons give
+the hands-on reps; the handbook gives the depth an interviewer digs for. It keeps
+growing — open an issue with the topic you want next.

@@ -1,0 +1,50 @@
+- id: orch-01
+  difficulty: 2
+  q: "What does an orchestrator like Airflow give you?"
+  a: "Scheduling (cron or data-aware), dependencies as a DAG, retries with backoff, SLAs/alerting, backfills over a date range, and observability. It runs and monitors your pipeline tasks in the right order with failure handling."
+  tags: [airflow]
+- id: orch-02
+  difficulty: 3
+  q: "Why must orchestrated tasks be idempotent and parameterized by run-date?"
+  a: "So retries and backfills are safe: re-running a task for a date produces the same result (no duplicates). Parameterizing by execution_date lets one task definition run for any historical date during a backfill."
+  tags: [idempotency]
+- id: orch-03
+  difficulty: 3
+  q: "What is a DAG and why acyclic?"
+  a: "A directed acyclic graph of tasks with dependencies. Acyclic guarantees a valid execution order with no deadlocks/infinite loops; the scheduler topologically sorts it and runs independent tasks in parallel."
+  tags: [dag]
+- id: orch-04
+  difficulty: 3
+  q: "How do you design a backfill?"
+  a: "Parameterize by run-date, write idempotently (partition overwrite / MERGE), and run the DAG over the historical date range. A clean design makes backfill 'delete the date partition(s), re-run' with no duplicates."
+  tags: [backfill]
+- id: orch-05
+  difficulty: 3
+  q: "How do you handle dependencies between datasets/pipelines?"
+  a: "Data-aware scheduling: trigger downstream when upstream data lands (sensors / dataset triggers / events) rather than guessing with a fixed time offset. This avoids both stale runs and wasteful polling."
+  tags: [dependencies]
+- id: orch-06
+  difficulty: 3
+  q: "What's the difference between an SLA and a schedule?"
+  a: "A schedule is when a task starts; an SLA is when it must finish/deliver. Missing an SLA should alert even if the task eventually succeeds — it signals the pipeline is too slow or stuck."
+  tags: [sla]
+- id: orch-07
+  difficulty: 3
+  q: "How do you make a pipeline observable in production?"
+  a: "Track freshness (is data on time?), volume (row counts vs expected), schema/quality, and lineage; emit metrics and alert on anomalies. Data-downtime monitoring catches issues before consumers notice wrong numbers."
+  tags: [observability]
+- id: orch-08
+  difficulty: 4
+  q: "A nightly job sometimes overlaps with the next run. What do you do?"
+  a: "Prevent concurrent runs of the same logical job (max_active_runs=1 / a lock), make it idempotent so an overlap can't corrupt data, and investigate why it runs long (skew, data growth, resource contention) rather than just widening the window."
+  tags: [scheduling]
+- id: orch-09
+  difficulty: 2
+  q: "Retries: how should they behave?"
+  a: "Exponential backoff with a cap and a max-retry count, only for transient failures. Non-transient failures (bad data, code bug) should fail fast and alert, not retry forever. Idempotency makes retries safe."
+  tags: [retries]
+- id: orch-10
+  difficulty: 3
+  q: "Where do orchestrators stop and processing engines begin?"
+  a: "The orchestrator decides what runs when and in what order (control plane); the engine (Spark) does the heavy data processing (data plane). Don't process big data in the orchestrator — submit a Spark job from it."
+  tags: [architecture]

@@ -1,0 +1,38 @@
+id: iceberg-02-update
+track: iceberg
+order: 2
+title: "Row-Level UPDATE"
+difficulty: 4
+concepts: ["iceberg", "UPDATE", "row-level", "copy-on-write"]
+needs_spark: true
+needs_iceberg: true
+brief: |
+  Plain Parquet can't update a row in place — you'd rewrite files by hand. Iceberg
+  (like Delta) supports **row-level `UPDATE`/`DELETE`/`MERGE`** via SQL, handling
+  the file rewrite for you (copy-on-write or merge-on-read).
+
+  **Mission:** Create `local.db.pos`, insert AAPL@100 and GOOG@50, then **UPDATE**
+  AAPL's `qty` to `999`. Read the result into `out`.
+starter_code: |
+  spark.sql("CREATE TABLE local.db.pos (ticker STRING, qty BIGINT) USING iceberg")
+  spark.sql("INSERT INTO local.db.pos VALUES ('AAPL', 100), ('GOOG', 50)")
+  # TODO: UPDATE AAPL's qty to 999, then read the table into `out`
+  ...
+  out = ...
+  out.show()
+solution_code: |
+  spark.sql("CREATE TABLE local.db.pos (ticker STRING, qty BIGINT) USING iceberg")
+  spark.sql("INSERT INTO local.db.pos VALUES ('AAPL', 100), ('GOOG', 50)")
+  spark.sql("UPDATE local.db.pos SET qty = 999 WHERE ticker = 'AAPL'")
+  out = spark.table("local.db.pos")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "qty": 999}
+      - {"ticker": "GOOG", "qty": 50}
+    message: "AAPL's qty should be updated to 999; GOOG unchanged"
+hints:
+  - "UPDATE local.db.pos SET qty = 999 WHERE ticker = 'AAPL'"
+  - "Iceberg performs the row-level update; read back with spark.table(...)."

@@ -21,6 +21,7 @@ BADGES: dict[str, tuple[str, str, str]] = {
     "speed_demon": ("Speed Demon", "Completed the Performance & Internals track", "🚀"),
     "stream_master": ("Stream Master", "Completed the Structured Streaming track", "🌊"),
     "lake_keeper": ("Lake Keeper", "Completed the Lakehouse & Delta Lake track", "🏞️"),
+    "iceberg_explorer": ("Iceberg Explorer", "Completed the Apache Iceberg track", "🧊"),
     "pipeline_pro": ("Pipeline Pro", "Completed the Capstone ETL track", "🛠️"),
     "rising_star": ("Rising Star", "Reached level 5", "⭐"),
     "grand_master": ("Grand Master", "Solved every challenge in SparkQuest", "👑"),
@@ -65,6 +66,7 @@ def evaluate_badges(progress: UserProgress, by_track: dict[str, list[str]], all_
         "performance": "speed_demon",
         "streaming": "stream_master",
         "delta": "lake_keeper",
+        "iceberg": "iceberg_explorer",
         "capstone": "pipeline_pro",
     }
     for track, badge in track_badge.items():

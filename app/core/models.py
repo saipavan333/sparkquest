@@ -21,6 +21,7 @@ class Challenge(BaseModel):
     brief: str = ""
     needs_spark: bool = False
     needs_delta: bool = False
+    needs_iceberg: bool = False
     starter_code: str = ""
     solution_code: str = ""
     checks: list[dict[str, Any]] = Field(default_factory=list)

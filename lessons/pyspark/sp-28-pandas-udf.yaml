@@ -1,0 +1,38 @@
+id: sp-28-pandas-udf
+track: pyspark
+order: 28
+title: "pandas UDFs (vectorized)"
+difficulty: 4
+concepts: ["pandas_udf", "Arrow", "vectorized UDF"]
+needs_spark: true
+brief: |
+  A plain Python UDF processes one row at a time across the slow JVM↔Python
+  boundary. A **pandas UDF** receives a whole **batch** as a pandas `Series` via
+  Apache **Arrow** and returns one — far faster, and the right tool when you must
+  drop into Python.
+
+  `F` and the types module `T` are available.
+
+  **Mission:** Define a `pandas_udf` named `double` that returns each value times
+  two, and apply it to `qty` as a new column `doubled`. Store the result in `out`.
+starter_code: |
+  df = spark.createDataFrame([("AAPL", 100), ("GOOG", 50)], ["ticker", "qty"])
+  # TODO: a vectorized pandas_udf that doubles a Series; apply to qty -> doubled
+  double = ...
+  out = ...
+  out.show()
+solution_code: |
+  df = spark.createDataFrame([("AAPL", 100), ("GOOG", 50)], ["ticker", "qty"])
+  double = F.pandas_udf(lambda s: s * 2, T.LongType())
+  out = df.withColumn("doubled", double(F.col("qty")))
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "qty": 100, "doubled": 200}
+      - {"ticker": "GOOG", "qty": 50, "doubled": 100}
+    message: "doubled should be qty * 2, computed by the vectorized pandas UDF"
+hints:
+  - "F.pandas_udf(lambda s: s * 2, T.LongType()) — the lambda gets a pandas Series."
+  - "Apply it like any column function: double(F.col(\"qty\"))."

@@ -1,0 +1,50 @@
+- id: sql-13
+  difficulty: 3
+  q: "ROWS vs RANGE in a window frame?"
+  a: "ROWS counts physical rows (e.g. the 6 preceding rows). RANGE is value-based on the ORDER BY column (e.g. all rows within a value distance, ties included). For a 7-day moving average over a true date column, RANGE INTERVAL handles missing days; ROWS assumes one row per day."
+  tags: [windows, frames]
+- id: sql-14
+  difficulty: 3
+  q: "GROUPING SETS / ROLLUP / CUBE — what do they do?"
+  a: "Compute multiple aggregation levels in one query. ROLLUP gives hierarchical subtotals + grand total; CUBE gives all combinations; GROUPING SETS lets you list exactly which groupings you want. Great for OLAP summary tables."
+  tags: [aggregation]
+- id: sql-15
+  difficulty: 4
+  q: "How do you pivot dynamically when you don't know the column values?"
+  a: "SQL pivot needs known values; for dynamic ones, query the distinct values first and build the pivot/CASE expression programmatically, or use Spark's df.groupBy(...).pivot(col) which discovers values at runtime (optionally pass the value list for speed)."
+  tags: [pivot]
+- id: sql-16
+  difficulty: 3
+  q: "What's a correlated subquery and its cost?"
+  a: "A subquery that references the outer row, evaluated per outer row — readable but potentially O(n·m). The optimizer often rewrites it as a join; if not, rewrite it yourself as a join/window for performance on big data."
+  tags: [subquery]
+- id: sql-17
+  difficulty: 3
+  q: "EXISTS vs IN vs JOIN for membership?"
+  a: "EXISTS short-circuits on first match (good with correlated checks); IN materializes a set (watch NULLs — NOT IN with a null is a trap); a semi-join (LEFT SEMI) is often the clearest/fastest in Spark. Prefer anti/semi joins over NOT IN."
+  tags: [joins, membership]
+- id: sql-18
+  difficulty: 2
+  q: "Why can NOT IN give wrong results?"
+  a: "If the subquery returns any NULL, NOT IN evaluates to UNKNOWN for every row and returns nothing. Use NOT EXISTS or a LEFT ANTI JOIN, which handle nulls correctly."
+  tags: [nulls, gotcha]
+- id: sql-19
+  difficulty: 4
+  q: "How would you find the median in SQL/Spark?"
+  a: "Exact: percentile() / percentile_approx(col, 0.5) (approx is cheaper at scale). Or window with row_number and pick the middle row(s). True exact median needs a sort/shuffle, so approx is preferred on big data."
+  tags: [aggregation, percentile]
+- id: sql-20
+  difficulty: 3
+  q: "Difference between WHERE and a window's PARTITION BY?"
+  a: "WHERE filters rows out of the result. PARTITION BY defines the groups a window function computes within, without removing rows — every input row still appears with its per-partition computed value."
+  tags: [windows]
+- id: sql-21
+  difficulty: 4
+  q: "How do you de-duplicate while keeping a deterministic 'winner'?"
+  a: "row_number() over (partition by key order by <tiebreakers>) and keep = 1. Make the ORDER BY total (add a unique tiebreaker) so the winner is deterministic across runs — important for reproducibility."
+  tags: [dedup]
+- id: sql-22
+  difficulty: 3
+  q: "What's the execution order of a SQL query (logical)?"
+  a: "FROM/JOIN → WHERE → GROUP BY → HAVING → window functions → SELECT → DISTINCT → ORDER BY → LIMIT. That's why you can't reference a SELECT alias in WHERE but can in ORDER BY."
+  tags: [semantics]

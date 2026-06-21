@@ -1,0 +1,60 @@
+- id: kafka-01
+  difficulty: 2
+  q: "What is a Kafka topic, partition, and offset?"
+  a: "A topic is a named log of messages. It's split into partitions (the unit of parallelism and ordering); each message in a partition has a monotonic offset. Order is guaranteed only within a partition, not across them."
+  tags: [basics]
+- id: kafka-02
+  difficulty: 3
+  q: "How do consumer groups and partition assignment work?"
+  a: "Consumers in a group share the partitions — each partition is consumed by exactly one consumer in the group, so parallelism is capped by partition count. Adding consumers beyond the partition count leaves some idle. Rebalancing reassigns partitions when membership changes."
+  tags: [consumers]
+- id: kafka-03
+  difficulty: 3
+  q: "How does Spark Structured Streaming read from Kafka and manage offsets?"
+  a: "Via format('kafka') with startingOffsets. Crucially, Spark stores offsets in its own checkpoint (not Kafka consumer groups), so it can replay exactly for exactly-once. maxOffsetsPerTrigger caps records per batch (backpressure)."
+  tags: [spark, offsets]
+- id: kafka-04
+  difficulty: 3
+  q: "The Kafka value is binary — how do you parse it?"
+  a: "Cast value to string, then from_json with an explicit schema to get structured columns. Key, topic, partition, offset, and timestamp are also available as columns."
+  tags: [parsing]
+- id: kafka-05
+  difficulty: 3
+  q: "What does the replication factor do?"
+  a: "Each partition has one leader and N-1 follower replicas on other brokers. Producers/consumers talk to the leader; followers replicate for fault tolerance. RF=3 tolerates 2 broker failures. acks=all waits for in-sync replicas before acknowledging."
+  tags: [replication, durability]
+- id: kafka-06
+  difficulty: 4
+  q: "Explain acks=0/1/all and the durability tradeoff."
+  a: "acks=0: fire-and-forget (fastest, can lose data). acks=1: leader ack only (lost if leader dies before replication). acks=all: wait for all in-sync replicas (most durable, slowest). Pair acks=all with min.insync.replicas for strong guarantees."
+  tags: [producer, durability]
+- id: kafka-07
+  difficulty: 3
+  q: "How do you key messages and why does it matter?"
+  a: "The producer hashes the key to choose a partition, so all messages with the same key go to the same partition — preserving per-key ordering and enabling stateful keyed processing downstream. No key → round-robin, losing ordering."
+  tags: [partitioning]
+- id: kafka-08
+  difficulty: 4
+  q: "How do you get exactly-once from Kafka to a sink?"
+  a: "Replayable source (Kafka offsets) + checkpointed offsets in Spark + an idempotent/transactional sink. To Kafka, use the idempotent producer / transactions; to a lake, foreachBatch + Delta MERGE keyed on a unique id so a replayed batch doesn't duplicate."
+  tags: [exactly-once]
+- id: kafka-09
+  difficulty: 3
+  q: "Log compaction vs time/size retention?"
+  a: "Time/size retention deletes old segments after a window. Log compaction instead keeps the latest message per key forever — perfect for changelog/CDC topics where you want the current state of every key, not full history."
+  tags: [retention]
+- id: kafka-10
+  difficulty: 3
+  q: "How do you handle a Kafka consumer that's falling behind (lag)?"
+  a: "Diagnose consumer lag (offsets behind log end). Options: add partitions + consumers to parallelize, speed up processing, cap maxOffsetsPerTrigger so batches stay bounded, or scale the sink. Persistent lag means consumption can't keep up with production."
+  tags: [lag, scaling]
+- id: kafka-11
+  difficulty: 2
+  q: "Why use Kafka in front of a Spark pipeline at all?"
+  a: "It decouples producers from consumers, buffers bursts, provides a replayable durable log (so you can reprocess), and lets multiple independent consumers read the same stream. It's the shock absorber and source of truth for streaming ingestion."
+  tags: [architecture]
+- id: kafka-12
+  difficulty: 4
+  q: "What is a schema registry and why use one?"
+  a: "A central store of message schemas (often Avro) with compatibility rules. Producers register schemas and send a schema id; consumers fetch it to deserialize. It enforces safe schema evolution across teams so a producer change can't silently break consumers."
+  tags: [schema-registry]

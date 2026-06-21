@@ -42,9 +42,9 @@ streaming with watermarks.
 - **Real execution, real feedback** — submissions run in a process-isolated sandbox
   with timeouts and output caps; grading inspects program state and DataFrame
   contents.
-- **Zero → pro curriculum** — 61 finance-themed challenges across 6 tracks (and
+- **Zero → pro curriculum** — 64 finance-themed challenges across 7 tracks (and
   growing): Python for DE → PySpark & DataFrames → Performance → Structured
-  Streaming → Lakehouse/Delta → Capstone ETL. Full [syllabus](docs/CURRICULUM.md).
+  Streaming → Lakehouse/Delta → Apache Iceberg → Capstone ETL. Full [syllabus](docs/CURRICULUM.md).
 - **AI tutor** — Socratic hints powered by your choice of Anthropic/OpenAI/HF, with
   a fully offline rule-based fallback so the demo is free.
 - **Gamification** — XP, levels, badges (First Blood, Pythonista, Spark Wrangler,
@@ -55,10 +55,10 @@ streaming with watermarks.
   GitHub Actions CI, Docker, and one-command deploy to Hugging Face Spaces.
 - **A real paper + real benchmarks** — reproducible PySpark benchmarks (optionally
   tracked in Weights & Biases) write the figures in [the paper](paper/sparkquest.pdf).
-- **Interview-grade handbook + Mock Interview** — eight book-quality deep dives
+- **Interview-grade handbook + Mock Interview** — book-quality deep dives
   (internals, performance, streaming, lakehouse, modeling, system design, Python/SQL),
-  readable **in-app**, plus a **🎤 Mock Interview** drill over a 96-question bank with
-  self-scoring ([docs/handbook](docs/handbook/)).
+  readable **in-app**, plus a **🎤 Mock Interview** drill over a **201-question bank**
+  with self-scoring and a **timed, scored exam mode** ([docs/handbook](docs/handbook/)).
 
 ## 🏗️ Architecture
 
@@ -112,15 +112,16 @@ Without a key, the tutor uses its built-in offline hint engine.
 ## 📚 Curriculum
 
 The full syllabus — every topic with official-doc links — lives in
-**[docs/CURRICULUM.md](docs/CURRICULUM.md)**. Six ordered tracks:
+**[docs/CURRICULUM.md](docs/CURRICULUM.md)**. Seven ordered tracks:
 
 | Track | Live | You'll learn |
 |-------|:----:|--------------|
 | **Python for Data Engineering** | 16 | collections, comprehensions, errors, generators, decorators, dataclasses, sets/tuples, args/kwargs, datetime, json, stdlib |
-| **PySpark Foundations & DataFrames** | 27 | schemas, Parquet, select/filter, when/otherwise, string/date/null/cast, all join types, **windows (rank/dense_rank/lag/lead/running totals)**, set ops, maps/structs, pivot, `explode`, UDFs, selectExpr, **sessionization** |
+| **PySpark Foundations & DataFrames** | 28 | schemas, Parquet, select/filter, when/otherwise, string/date/null/cast, all join types, **windows (rank/dense_rank/lag/lead/running totals)**, set ops, maps/structs, pivot, `explode`, UDFs, selectExpr, **sessionization**, **pandas UDFs** |
 | **Performance & Internals** | 5 | repartition/coalesce, caching, broadcast joins, data skew & salting, partitioned writes & pruning |
 | **Structured Streaming** | 6 | sources/sinks, aggregations, event-time windows, watermarks, dedup, `foreachBatch`, stream-static joins |
 | **Lakehouse & Delta Lake** | 4 | create Delta tables, `MERGE`/upsert (CDC), time travel, schema evolution |
+| **Apache Iceberg** | 2 | create Iceberg tables, row-level `UPDATE`/`DELETE` (copy-on-write) |
 | **Capstone ETL** | 3 | end-to-end batch ETL, data-quality checks, a live streaming pipeline |
 
 Lessons are plain YAML in [`lessons/`](lessons/) — add your own without touching code.
@@ -144,7 +145,7 @@ the official Spark docs and the canonical books.
 | Structured Streaming ingestion | **~11,989 events/s** |
 | Auto-grade, Python challenge | **~1 ms** |
 | Auto-grade, Spark challenge (end-to-end) | **~8.6 s** (3.5 s Spark cold start) |
-| Reference solutions passing their grader | **57/57 sandbox + 4 Delta (CI)** |
+| Reference solutions passing their grader | **58/58 sandbox + 6 Delta & Iceberg (CI)** |
 
 Reproduce: `python benchmarks/run_benchmarks.py --all`. Details and discussion in
 [the paper](paper/sparkquest.pdf).
@@ -171,7 +172,7 @@ configs — see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 - Warm Spark Connect pool to remove cold-start latency
 - Persistent progress + accounts
 - Randomized-input grading to deter hard-coding
-- Delta Lake & shuffle-tuning tracks; a capstone ETL on a real Kaggle dataset
+- Expand the Apache Iceberg track (time travel, hidden partitioning, MERGE)
 
 ## 📄 License
 

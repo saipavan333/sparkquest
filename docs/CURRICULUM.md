@@ -5,11 +5,12 @@ topic below maps to a **graded, runnable challenge** (✅ = live now, 🔜 = on 
 roadmap). The structure mirrors the official documentation so you can always go
 deeper at the source.
 
-**Status:** 61 graded lessons across all 6 tracks. The 57 Python / PySpark /
+**Status:** 64 graded lessons across all 7 tracks. The 58 Python / PySpark /
 Performance / Streaming / Capstone lessons are verified in the offline sandbox; the
-4 Delta lessons are verified by a dedicated Maven-enabled CI job (Delta needs an
-internet JAR fetch). Every reference solution passes its own auto-grader. Pair the
-lessons with the [Handbook](handbook/) and the in-app **🎤 Mock Interview** drill.
+6 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
+need an internet JAR fetch). Every reference solution passes its own auto-grader.
+Pair the lessons with the [Handbook](handbook/) and the in-app **🎤 Mock Interview**
+drill — now with a **timed, scored exam mode** over a **201-question bank**.
 
 **Primary references (always current):**
 - Python — <https://docs.python.org/3/tutorial/> · <https://docs.python.org/3/library/>
@@ -19,6 +20,7 @@ lessons with the [Handbook](handbook/) and the in-app **🎤 Mock Interview** dr
 - Structured Streaming — <https://spark.apache.org/docs/latest/streaming/index.html>
 - Performance tuning — <https://spark.apache.org/docs/latest/sql-performance-tuning.html>
 - Delta Lake — <https://docs.delta.io/latest/index.html>
+- Apache Iceberg — <https://iceberg.apache.org/docs/latest/spark-getting-started/>
 
 How it's taught: every challenge gives you a brief, starter code, and an AI tutor;
 you write real code, it executes against a real engine, and an auto-grader checks
@@ -64,7 +66,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 2 — PySpark Foundations & DataFrames (27 live)
+## Track 2 — PySpark Foundations & DataFrames (28 live)
 
 > *Goal: think in distributed DataFrames; read, transform, and write any data.*
 > Docs: <https://spark.apache.org/docs/latest/sql-getting-started.html>
@@ -104,7 +106,7 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Structs — nested columns, dot access
 - ✅ UDFs — custom logic (and why to prefer built-ins)
 - ✅ Maps — key/value access by key
-- 🔜 pandas UDFs — vectorised UDFs with Arrow
+- ✅ pandas UDFs — vectorised UDFs with Arrow (`@pandas_udf`)
 
 ---
 
@@ -162,7 +164,24 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 6 — Capstone ETL Projects (3 live)
+## Track 6 — Apache Iceberg (2 live)
+
+> *Goal: the other open table format senior interviews ask about — know how it
+> compares to Delta.*
+> Docs: <https://iceberg.apache.org/docs/latest/spark-getting-started/>
+> *Note: like Delta, Iceberg needs a Maven-fetched runtime JAR, so these lessons run
+> in CI / Docker / your machine. They're verified by the same Maven-enabled CI job,
+> isolated so it can never block the main check.*
+
+- ✅ Your first Iceberg table — `CREATE TABLE … USING iceberg`, insert, read back
+- ✅ Row-level `UPDATE` — copy-on-write mutation of a single row via SQL
+- 🔜 Time travel & snapshots — `VERSION AS OF`, snapshot expiry
+- 🔜 Hidden partitioning — partition transforms without query-side `WHERE` gymnastics
+- 🔜 `MERGE INTO` — upserts and CDC, contrasted with Delta's semantics
+
+---
+
+## Track 7 — Capstone ETL Projects (3 live)
 
 > *Goal: combine everything into production-shaped pipelines.*
 

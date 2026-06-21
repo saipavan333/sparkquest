@@ -89,6 +89,7 @@ def main() -> None:
     user_code = job["user_code"]
     needs_spark = job.get("needs_spark", False)
     needs_delta = job.get("needs_delta", False)
+    needs_iceberg = job.get("needs_iceberg", False)
     master = job.get("spark_master", "local[2]")
     checks = job.get("checks", [])
     max_output = int(job.get("max_output_chars", 20000))
@@ -119,7 +120,7 @@ def main() -> None:
 
             ts = time.time()
             spark = build_spark_session(
-                master=master, app_name="sparkquest-grader", delta=needs_delta
+                master=master, app_name="sparkquest-grader", delta=needs_delta, iceberg=needs_iceberg
             )
             result["spark_startup_ms"] = int((time.time() - ts) * 1000)
             from pyspark.sql import functions as F  # noqa: N812

@@ -31,7 +31,7 @@ def main(filters: list[str] | None = None) -> int:
     failures = 0
     checked = 0
     for challenge in catalog.challenges:
-        if skip_delta and challenge.needs_delta:
+        if skip_delta and (challenge.needs_delta or challenge.needs_iceberg):
             continue
         if not _included(challenge, filters):
             continue

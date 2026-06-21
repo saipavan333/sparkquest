@@ -7,11 +7,15 @@ you would swap a fresh ``local[*]`` session for a thin Spark Connect client
 """
 from __future__ import annotations
 
+import tempfile
+
 from pyspark.sql import SparkSession
 
 # Delta Lake (Scala 2.12, matching PySpark 3.5). The JAR is fetched from Maven on
 # first use; the Docker image pre-caches it so the live app needs no network.
 DELTA_PACKAGE = "io.delta:delta-spark_2.12:3.2.0"
+# Apache Iceberg runtime for Spark 3.5 (also Maven-fetched / image-cached).
+ICEBERG_PACKAGE = "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.2"
 
 # Defaults tuned for fast startup and a small memory footprint, suitable for
 # interactive learning and CI. Override per call via ``extra``.
@@ -34,6 +38,7 @@ def build_spark_session(
     app_name: str = "sparkquest",
     extra: dict | None = None,
     delta: bool = False,
+    iceberg: bool = False,
 ) -> SparkSession:
     """Build (or fetch) a configured SparkSession. Set ``delta=True`` to enable
     Delta Lake (adds the Delta extension, catalog, and JAR package)."""
@@ -48,6 +53,17 @@ def build_spark_session(
                 "spark.sql.catalog.spark_catalog",
                 "org.apache.spark.sql.delta.catalog.DeltaCatalog",
             )
+        )
+    if iceberg:
+        builder = (
+            builder.config("spark.jars.packages", ICEBERG_PACKAGE)
+            .config(
+                "spark.sql.extensions",
+                "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",
+            )
+            .config("spark.sql.catalog.local", "org.apache.iceberg.spark.SparkCatalog")
+            .config("spark.sql.catalog.local.type", "hadoop")
+            .config("spark.sql.catalog.local.warehouse", tempfile.mkdtemp(prefix="iceberg_wh_"))
         )
     for key, value in (extra or {}).items():
         builder = builder.config(key, str(value))

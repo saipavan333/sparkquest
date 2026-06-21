@@ -1,0 +1,40 @@
+- id: stream-13
+  difficulty: 4
+  q: "Tumbling vs sliding vs session windows?"
+  a: "Tumbling: fixed, non-overlapping intervals (every event in exactly one). Sliding: fixed size but overlapping (an event can be in several), via window(ts, size, slide). Session: dynamic, gap-based windows that grow until an inactivity gap — group bursts of activity."
+  tags: [windows]
+- id: stream-14
+  difficulty: 4
+  q: "How does allowed lateness interact with append mode?"
+  a: "In append mode a windowed result is emitted only once it's final — i.e. once the watermark passes window-end + allowed lateness. Larger lateness = more correct late handling but more retained state and higher latency to emit."
+  tags: [watermark, append]
+- id: stream-15
+  difficulty: 3
+  q: "What's the difference between mapGroupsWithState and flatMapGroupsWithState?"
+  a: "Arbitrary stateful processing keyed by group. mapGroupsWithState emits one row per group per batch; flatMapGroupsWithState can emit zero or many, and supports richer timeouts. Use them when windowed aggregations can't express your custom state logic."
+  tags: [state]
+- id: stream-16
+  difficulty: 3
+  q: "Why is foreachBatch preferred over foreach for sinks?"
+  a: "foreachBatch hands you the whole micro-batch as a DataFrame, so you use normal batch APIs (Delta MERGE, multi-sink writes, bulk JDBC) and get idempotency easily. foreach is per-row and lower-level — only when you truly need row-level control."
+  tags: [sinks]
+- id: stream-17
+  difficulty: 4
+  q: "What happens to state if you change spark.sql.shuffle.partitions on restart?"
+  a: "State is partitioned by that value when the query first starts; changing it on restart invalidates the state layout and the query won't resume correctly. Set it deliberately before first run and don't change it."
+  tags: [state, partitions]
+- id: stream-18
+  difficulty: 3
+  q: "How do you test a streaming query deterministically?"
+  a: "Use a file source plus trigger(availableNow=True): it drains all available input then stops, so the result is deterministic. Write to the memory sink and assert the in-memory table — exactly how SparkQuest grades streaming lessons."
+  tags: [testing]
+- id: stream-19
+  difficulty: 4
+  q: "Micro-batch vs continuous processing — tradeoffs?"
+  a: "Micro-batch: ~100 ms–seconds latency, exactly-once, full feature set — the default. Continuous: ~1 ms latency but at-least-once and limited operations (experimental). Almost always choose micro-batch unless you truly need sub-10 ms latency."
+  tags: [model]
+- id: stream-20
+  difficulty: 3
+  q: "How do you bound resource use when a stream has a big backlog?"
+  a: "maxOffsetsPerTrigger (Kafka) or maxFilesPerTrigger (files) caps how much each batch ingests, so a backlog is processed in steady chunks instead of one giant batch that OOMs. It's the backpressure knob."
+  tags: [backpressure]

@@ -1,0 +1,40 @@
+- id: py-11
+  difficulty: 3
+  q: "What is a pandas UDF and why is it faster than a regular UDF?"
+  a: "A vectorized UDF (@pandas_udf) that receives a batch of rows as a pandas Series/DataFrame via Apache Arrow and returns one, instead of row-at-a-time Python calls. Arrow's zero-copy transfer and batch processing make it much faster than a plain Python UDF."
+  tags: [pandas-udf, arrow]
+- id: py-12
+  difficulty: 3
+  q: "How does Apache Arrow speed up PySpark?"
+  a: "Arrow is a columnar in-memory format. It makes JVM↔Python transfer near zero-copy and columnar, accelerating toPandas(), createDataFrame from pandas, and pandas UDFs — avoiding slow row-by-row pickling."
+  tags: [arrow]
+- id: py-13
+  difficulty: 2
+  q: "What's the difference between is and ==?"
+  a: "== compares values (calls __eq__); is compares identity (same object in memory). Use is only for singletons like None/True/False. Comparing values with is is a classic bug."
+  tags: [gotchas]
+- id: py-14
+  difficulty: 3
+  q: "Shallow vs deep copy?"
+  a: "copy.copy makes a new container but shares the nested objects (shallow); copy.deepcopy recursively copies everything. Mutating a nested object after a shallow copy affects both — a frequent source of bugs."
+  tags: [memory]
+- id: py-15
+  difficulty: 3
+  q: "What does __slots__ do?"
+  a: "Declaring __slots__ on a class stops per-instance __dict__ creation, cutting memory for many small objects and slightly speeding attribute access — useful for millions of record objects."
+  tags: [memory, performance]
+- id: py-16
+  difficulty: 3
+  q: "How do you manage dependencies and environments reproducibly?"
+  a: "Pin versions (requirements.txt / lock files / Poetry), isolate per project with a virtualenv, and build a container so the runtime is identical everywhere. Reproducibility prevents 'works on my machine' pipeline failures."
+  tags: [packaging]
+- id: py-17
+  difficulty: 4
+  q: "When does multiprocessing beat threading in a data task?"
+  a: "For CPU-bound work (heavy parsing/computation in pure Python), because processes sidestep the GIL for true parallelism. For I/O-bound work (API/DB calls), threads/asyncio win since they release the GIL while waiting. (And Spark handles distributed parallelism for you.)"
+  tags: [concurrency]
+- id: py-18
+  difficulty: 2
+  q: "What does enumerate / zip give you, and a generator equivalent?"
+  a: "enumerate yields (index, item); zip pairs multiple iterables. Both are lazy iterators. itertools (islice, chain, groupby) extends this for memory-efficient streaming over large data."
+  tags: [iterators]

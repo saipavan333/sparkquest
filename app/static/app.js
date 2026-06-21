@@ -306,7 +306,7 @@
   }
 
   // ---- Mock interview ----
-  const mock = { all: [], pool: [], current: null, seen: 0, got: 0 };
+  const mock = { all: [], pool: [], current: null, seen: 0, got: 0, session: null, timer: null };
   let mockLoaded = false;
   function shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
@@ -320,7 +320,7 @@
       const sel = $("mock-cat");
       sel.innerHTML = `<option value="">Mixed · all ${data.total}</option>` +
         data.categories.map(c => `<option value="${c.slug}">${c.title} · ${c.count}</option>`).join("");
-      sel.addEventListener("change", () => { mock.seen = 0; mock.got = 0; buildMockPool(); nextMock(); });
+      sel.addEventListener("change", () => { endMockSession(); mock.seen = 0; mock.got = 0; buildMockPool(); nextMock(); });
       mockLoaded = true;
       buildMockPool();
       nextMock();
@@ -335,6 +335,8 @@
   }
   function nextMock() {
     if (!mock.pool.length) buildMockPool();
+    $("mock-report").hidden = true;
+    $("mock-q").hidden = false;
     mock.current = mock.pool.pop();
     const q = mock.current;
     $("mock-cattag").textContent = q.category_title;
@@ -353,8 +355,70 @@
     $("mock-rate").hidden = false;
   }
   function rateMock(r) {
+    if (mock.session) {
+      mock.session.results.push({ category: mock.current.category_title, rate: r });
+      mock.session.idx++;
+      showSessionQuestion();
+      return;
+    }
     mock.seen++; if (r === "got") mock.got++;
     nextMock();
+  }
+  function endMockSession() {
+    mock.session = null;
+    if (mock.timer) { clearInterval(mock.timer); mock.timer = null; }
+  }
+  function startSession(n) {
+    buildMockPool();
+    mock.session = { qs: mock.pool.slice(0, Math.min(n, mock.pool.length)), idx: 0, results: [], start: Date.now() };
+    if (mock.timer) clearInterval(mock.timer);
+    mock.timer = setInterval(updateSessionTimer, 1000);
+    showSessionQuestion();
+  }
+  function showSessionQuestion() {
+    const s = mock.session;
+    if (!s) return;
+    if (s.idx >= s.qs.length) { finishSession(); return; }
+    mock.current = s.qs[s.idx];
+    $("mock-report").hidden = true;
+    $("mock-q").hidden = false;
+    $("mock-cattag").textContent = mock.current.category_title;
+    $("mock-diff").textContent = "★".repeat(mock.current.difficulty) + "☆".repeat(5 - mock.current.difficulty);
+    $("mock-q").textContent = mock.current.q;
+    $("mock-a").hidden = true; $("mock-a").innerHTML = "";
+    $("mock-reveal").hidden = false;
+    $("mock-rate").hidden = true;
+    updateSessionTimer();
+  }
+  function updateSessionTimer() {
+    if (!mock.session) return;
+    const secs = Math.floor((Date.now() - mock.session.start) / 1000);
+    const mm = String(Math.floor(secs / 60)).padStart(2, "0");
+    const ss = String(secs % 60).padStart(2, "0");
+    $("mock-progress").textContent =
+      `· Q ${Math.min(mock.session.idx + 1, mock.session.qs.length)}/${mock.session.qs.length} · ⏱ ${mm}:${ss}`;
+  }
+  function finishSession() {
+    const s = mock.session;
+    if (mock.timer) { clearInterval(mock.timer); mock.timer = null; }
+    const secs = Math.floor((Date.now() - s.start) / 1000);
+    const score = s.results.reduce((a, r) => a + (r.rate === "got" ? 1 : r.rate === "partial" ? 0.5 : 0), 0);
+    const n = s.qs.length;
+    const acc = n ? Math.round((score / n) * 100) : 0;
+    const byCat = {};
+    s.results.forEach(r => { (byCat[r.category] = byCat[r.category] || { got: 0, total: 0 }).total++; if (r.rate === "got") byCat[r.category].got++; });
+    const rows = Object.entries(byCat).map(([c, v]) => `<tr><td>${escapeHtml(c)}</td><td>${v.got}/${v.total}</td></tr>`).join("");
+    $("mock-q").hidden = true; $("mock-a").hidden = true; $("mock-reveal").hidden = true; $("mock-rate").hidden = true;
+    $("mock-cattag").textContent = "Session complete"; $("mock-diff").textContent = ""; $("mock-progress").textContent = "";
+    $("mock-report").hidden = false;
+    $("mock-report").innerHTML =
+      `<div class="report-score">${acc}%</div>` +
+      `<div class="muted">scored ${score} / ${n} in ${Math.floor(secs / 60)}m ${secs % 60}s</div>` +
+      `<table class="report-table"><tbody><tr><th>Topic</th><th>Got it</th></tr>${rows}</tbody></table>` +
+      `<div class="report-actions"><button class="btn btn-run" id="report-again">New session</button> <button class="btn" id="report-free">Free drill</button></div>`;
+    mock.session = null;
+    $("report-again").addEventListener("click", () => startSession(n));
+    $("report-free").addEventListener("click", () => { endMockSession(); mock.seen = 0; mock.got = 0; buildMockPool(); nextMock(); });
   }
 
   // ---- Buttons ----
@@ -380,6 +444,7 @@
     $("btn-mock").addEventListener("click", openMock);
     $("mock-close").addEventListener("click", () => { $("mock").hidden = true; });
     $("mock-reveal").addEventListener("click", revealMock);
+    $("mock-session").addEventListener("click", () => startSession(10));
     document.querySelectorAll("#mock-rate button[data-rate]").forEach(b =>
       b.addEventListener("click", () => rateMock(b.dataset.rate)));
     $("modal-close").addEventListener("click", () => $("modal").hidden = true);

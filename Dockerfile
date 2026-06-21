@@ -44,6 +44,8 @@ USER user
 # runtime. Needs Maven access at build time (CI / Docker builders have it).
 RUN SPARK_LOCAL_IP=127.0.0.1 python -c "from app.core.spark_session import build_spark_session; s = build_spark_session(delta=True); s.range(1).write.format('delta').mode('overwrite').save('/tmp/_delta_warm'); s.stop()" \
     || echo "WARN: Delta warm-up skipped (no Maven access at build time)"
+RUN SPARK_LOCAL_IP=127.0.0.1 python -c "from app.core.spark_session import build_spark_session; s = build_spark_session(iceberg=True); s.sql('CREATE TABLE local.db.warm (id BIGINT) USING iceberg'); s.stop()" \
+    || echo "WARN: Iceberg warm-up skipped (no Maven access at build time)"
 
 EXPOSE 7860
 

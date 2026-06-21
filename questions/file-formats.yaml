@@ -1,0 +1,50 @@
+- id: fmt-01
+  difficulty: 2
+  q: "Row vs columnar storage — when each?"
+  a: "Row formats (CSV, JSON, Avro) store a record's fields together — good for writes and streaming. Columnar (Parquet, ORC) store each column together — analytics reads few columns of many, so columnar gives 10–100× less I/O and far better compression."
+  tags: [columnar]
+- id: fmt-02
+  difficulty: 4
+  q: "Describe Parquet's internal structure."
+  a: "File → row groups (horizontal slices, ~128 MB) → column chunks → pages (encoded + compressed). Each row group stores per-column min/max stats, and the footer holds schema + metadata. This enables column pruning (read needed columns) and predicate pushdown (skip row groups)."
+  tags: [parquet]
+- id: fmt-03
+  difficulty: 3
+  q: "How does predicate pushdown work with Parquet?"
+  a: "A filter like amount > 1000 uses each row group's max(amount) stat to skip entire row groups that can't match — without decoding them. Combined with column pruning, often a huge I/O win."
+  tags: [pushdown]
+- id: fmt-04
+  difficulty: 3
+  q: "What encodings and compression does Parquet use?"
+  a: "Encodings (before compression): dictionary (great for low-cardinality), run-length, delta. Compression: Snappy (default, fast) or Zstd/Gzip (smaller, slower). Dictionary + Snappy is the common analytics default."
+  tags: [encoding, compression]
+- id: fmt-05
+  difficulty: 2
+  q: "When would you choose Avro over Parquet?"
+  a: "Avro (row-based, compact binary, first-class schema evolution) for streaming and message payloads (Kafka), where you write/read whole records and evolve schemas. Parquet for analytical tables you scan by column."
+  tags: [avro]
+- id: fmt-06
+  difficulty: 3
+  q: "What is the small-files problem and how do you fix it?"
+  a: "Thousands of tiny files cause per-file open cost, metadata overhead, slow listing, and NameNode pressure. Fix by coalescing/repartitioning before write, the REBALANCE hint, or Delta/Iceberg OPTIMIZE compaction; target ~128 MB–1 GB per file."
+  tags: [small-files]
+- id: fmt-07
+  difficulty: 3
+  q: "Partitioning vs bucketing on write?"
+  a: "Partitioning writes one folder per value for partition pruning on filter columns (low cardinality). Bucketing hashes rows into a fixed number of buckets by key so later joins/aggregations on that key skip the shuffle (high-cardinality join keys)."
+  tags: [layout]
+- id: fmt-08
+  difficulty: 4
+  q: "How do you choose a partition column?"
+  a: "Low cardinality, frequently filtered (date, region). Avoid high-cardinality columns (user_id, fine-grained timestamps) which create millions of tiny folders/files. Aim for partitions of at least ~1 GB."
+  tags: [partitioning]
+- id: fmt-09
+  difficulty: 3
+  q: "ORC vs Parquet?"
+  a: "Both columnar with stats/pushdown. ORC (stripes, built-in indexes, lightweight bloom filters) is native to the Hive/Hadoop world and sometimes compresses better; Parquet is the broader default across Spark and cloud engines. Often a tie — pick by ecosystem."
+  tags: [orc]
+- id: fmt-10
+  difficulty: 3
+  q: "Why avoid SELECT * on a columnar table?"
+  a: "It defeats column pruning — you read every column instead of the few you need, multiplying I/O. Select only required columns so Parquet/ORC can skip the rest."
+  tags: [optimization]

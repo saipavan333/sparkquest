@@ -1,0 +1,50 @@
+- id: perf-16
+  difficulty: 4
+  q: "What is the advisoryPartitionSizeInBytes and how does AQE use it?"
+  a: "It's AQE's target post-shuffle partition size (default 64 MB). AQE coalesces small shuffle partitions toward it and splits skewed ones around it, so you set spark.sql.shuffle.partitions large and let AQE right-size."
+  tags: [aqe]
+- id: perf-17
+  difficulty: 4
+  q: "When does AQE convert a sort-merge join to a broadcast join?"
+  a: "When runtime stats show a join side is smaller than the adaptive broadcast threshold. It's not as good as planning a broadcast up front, but it avoids sorting both sides and reads shuffle data locally — fixing the stale-stats problem."
+  tags: [aqe, joins]
+- id: perf-18
+  difficulty: 5
+  q: "Explain bucketing and its main limitation."
+  a: "bucketBy(n, key) hashes rows into n buckets at write time so a later join/aggregation on that key skips the shuffle. Limitation: the bucket count is fixed at write, both sides must share it, and re-bucketing means a full rewrite — rigid compared to AQE."
+  tags: [bucketing]
+- id: perf-19
+  difficulty: 4
+  q: "What is speculative execution and when does it help/hurt?"
+  a: "Spark relaunches slow 'straggler' task copies and takes whichever finishes first — good for transient slowness (a flaky node). It doesn't fix data skew (the duplicate is equally slow) and wastes resources if mis-tuned."
+  tags: [speculation]
+- id: perf-20
+  difficulty: 4
+  q: "How many cores/memory per executor, and why not one giant executor?"
+  a: "Aim for ~4–5 cores and several GB/core. One giant executor suffers long GC pauses and underuses parallelism; hundreds of 1-core executors add overhead and can't share a broadcast. Multi-core executors cache a broadcast once across cores."
+  tags: [sizing]
+- id: perf-21
+  difficulty: 3
+  q: "What does coalesce do that repartition doesn't, and the catch?"
+  a: "coalesce(n) reduces partitions without a full shuffle by merging adjacent ones — cheap. Catch: it can create imbalance, and coalescing to very few partitions reduces upstream parallelism (the whole lineage runs at that width)."
+  tags: [partitions]
+- id: perf-22
+  difficulty: 4
+  q: "How does caching interact with memory pressure?"
+  a: "Cached (storage) blocks share the unified pool with execution memory; under pressure, execution can evict cached blocks (execution wins). So an over-aggressive cache can be evicted anyway and just adds churn — cache deliberately."
+  tags: [memory, cache]
+- id: perf-23
+  difficulty: 3
+  q: "Why is repartitioning by a column before a join sometimes useful?"
+  a: "If both sides are repartitioned by the join key (or bucketed), the join can avoid an extra shuffle since matching keys are co-located. For one-off joins AQE/broadcast usually handle it; for repeated joins, bucketing wins."
+  tags: [joins, partitions]
+- id: perf-24
+  difficulty: 4
+  q: "What's the cost of a Python UDF vs a pandas UDF vs a built-in?"
+  a: "Built-ins: vectorized, in-JVM, fully optimized (best). pandas/vectorized UDFs: batch rows to Python via Arrow (much faster than row-at-a-time). Plain Python UDFs: serialize row-by-row across the JVM↔Python boundary and block codegen (slowest) — avoid when a built-in exists."
+  tags: [udf]
+- id: perf-25
+  difficulty: 3
+  q: "How do you reduce shuffle in a multi-stage aggregation?"
+  a: "Push filters early (less data to shuffle), rely on map-side combine, pre-aggregate at a coarser key, broadcast small dimension joins, and ensure partitioning matches the group key. Each removed/expensive Exchange in the plan is a target."
+  tags: [shuffle]

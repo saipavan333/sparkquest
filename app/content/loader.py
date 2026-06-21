@@ -13,7 +13,8 @@ TRACKS: list[TrackMeta] = [
     TrackMeta(id="performance", title="Performance & Internals", subtitle="Make Spark fast", order=3),
     TrackMeta(id="streaming", title="Structured Streaming", subtitle="Real-time pipelines", order=4),
     TrackMeta(id="delta", title="Lakehouse & Delta Lake", subtitle="ACID on the lake", order=5),
-    TrackMeta(id="capstone", title="Capstone ETL Projects", subtitle="Put it all together", order=6),
+    TrackMeta(id="iceberg", title="Apache Iceberg", subtitle="Open table format", order=6),
+    TrackMeta(id="capstone", title="Capstone ETL Projects", subtitle="Put it all together", order=7),
 ]
 _TRACK_ORDER = {t.id: t.order for t in TRACKS}
 

@@ -1,0 +1,75 @@
+- id: code-01
+  difficulty: 3
+  q: "Top-N rows per group in PySpark — how?"
+  a: "Window.partitionBy(group).orderBy(desc(metric)) with row_number() (or dense_rank for ties), then filter rk <= N. Lessons sp-07/sp-17/sp-21."
+  tags: [window]
+- id: code-02
+  difficulty: 4
+  q: "Deduplicate keeping the latest record per key."
+  a: "row_number() over partitionBy(key).orderBy(desc(updated_at)), keep == 1. In streaming, dropDuplicates([key]) with a watermark (sp-04 idea)."
+  tags: [dedup]
+- id: code-03
+  difficulty: 5
+  q: "Sessionize events with a 30-min inactivity gap."
+  a: "lag the timestamp per user (ordered window); flag a new session when ts - prev_ts > 30 min or prev is null; cumulative-sum the flags into a session id. The gaps-and-islands pattern (lesson sp-27)."
+  tags: [sessionization]
+- id: code-04
+  difficulty: 3
+  q: "Running total / cumulative sum?"
+  a: "F.sum(x).over(Window.partitionBy(k).orderBy(t).rowsBetween(Window.unboundedPreceding, Window.currentRow)). Mind ROWS vs RANGE frames (lesson sp-22)."
+  tags: [window]
+- id: code-05
+  difficulty: 3
+  q: "Day-over-day change of a metric?"
+  a: "value - F.lag(value).over(Window.partitionBy(k).orderBy(date)); first row is null. lead() for next-day (lessons sp-17/sp-23)."
+  tags: [window, lag]
+- id: code-06
+  difficulty: 3
+  q: "Pivot side (BUY/SELL) into columns of summed qty."
+  a: "df.groupBy('ticker').pivot('side').sum('qty'); or conditional aggregation sum(when(side=='BUY', qty)). Lesson sp-15."
+  tags: [pivot]
+- id: code-07
+  difficulty: 3
+  q: "Explode a JSON array column into rows."
+  a: "Parse with from_json(schema) if it's a string, then F.explode(arrayCol). One row per element (lesson sp-14)."
+  tags: [explode, arrays]
+- id: code-08
+  difficulty: 4
+  q: "Upsert (insert-or-update) into a table."
+  a: "Delta MERGE: DeltaTable.forPath(...).merge(updates, cond).whenMatchedUpdate(...).whenNotMatchedInsert(...).execute() (lesson delta-02). Without Delta you'd overwrite a partition or anti-join + union."
+  tags: [merge, upsert]
+- id: code-09
+  difficulty: 4
+  q: "Find users active on N consecutive days."
+  a: "Row_number per user ordered by date; subtract it from the date — consecutive days share the same date−rn 'island'. Group by (user, island) and filter COUNT(*) >= N. Classic gaps-and-islands."
+  tags: [gaps-islands]
+- id: code-10
+  difficulty: 3
+  q: "Second-highest salary per department."
+  a: "dense_rank() over partitionBy(dept).orderBy(desc(salary)), filter rnk == 2 (dense_rank so ties at the top don't skip rank 2). Lesson sp-21."
+  tags: [ranking]
+- id: code-11
+  difficulty: 3
+  q: "Join a fact stream to a dimension and count per dimension attribute."
+  a: "Stream-static join: stream.join(dim, key), then groupBy(attribute).count() with outputMode complete (lessons st-06, cap-03)."
+  tags: [streaming, join]
+- id: code-12
+  difficulty: 2
+  q: "Replace nulls and drop bad rows."
+  a: "df.na.fill({'col': 0}) to fill; df.na.drop() / df.filter(col.isNotNull() & (col > 0)) to drop. Quarantine the dropped rows for review (lessons sp-12, cap-02)."
+  tags: [nulls]
+- id: code-13
+  difficulty: 4
+  q: "Compute a 7-day moving average."
+  a: "F.avg(x).over(Window.partitionBy(k).orderBy(date).rowsBetween(-6, 0)) — a 7-row trailing window (assuming one row per day)."
+  tags: [window, moving-average]
+- id: code-14
+  difficulty: 3
+  q: "Count distinct users per day cheaply at scale."
+  a: "F.approx_count_distinct('user') (HyperLogLog) — far cheaper than exact COUNT(DISTINCT) and mergeable across days, with ~1–2% error. Use exact only when the business demands it."
+  tags: [approximation]
+- id: code-15
+  difficulty: 4
+  q: "Explode a map column / extract a value by key."
+  a: "Access by key: F.col('meta')['sector'] (lesson sp-25); or F.explode(mapCol) to get key/value rows; element_at(map, key) also works."
+  tags: [maps]

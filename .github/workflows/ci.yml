@@ -38,10 +38,10 @@ jobs:
       - name: Run test suite (Spark; Delta excluded)
         env:
           SPARK_LOCAL_IP: 127.0.0.1
-        run: pytest -m "not delta" --cov=app --cov-report=term-missing
+        run: pytest -m "not delta and not iceberg" --cov=app --cov-report=term-missing
 
   delta:
-    name: Delta Lake lessons (Maven-gated)
+    name: Delta + Iceberg lessons (Maven-gated)
     runs-on: ubuntu-latest
     continue-on-error: true   # Delta needs a Maven JAR fetch; never blocks the main check
     steps:
@@ -58,7 +58,7 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
-      - name: Validate Delta lessons (fetches the Delta JAR from Maven)
+      - name: Validate Delta + Iceberg lessons (Maven JARs)
         env:
           SPARK_LOCAL_IP: 127.0.0.1
-        run: pytest -m delta -q
+        run: pytest -m "delta or iceberg" -q

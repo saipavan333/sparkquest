@@ -1,0 +1,50 @@
+- id: core-16
+  difficulty: 3
+  q: "What is data locality and why does it matter?"
+  a: "The scheduler prefers to run a task where its data already lives (PROCESS_LOCAL > NODE_LOCAL > RACK_LOCAL > ANY) to avoid network transfer. Poor locality (lots of ANY) means data is being fetched remotely, slowing tasks."
+  tags: [scheduling, locality]
+- id: core-17
+  difficulty: 3
+  q: "Difference between cache() and persist()?"
+  a: "cache() is persist(MEMORY_AND_DISK) — a shorthand. persist(level) lets you choose the storage level (memory/disk, serialized, replication). Both are lazy: the data is stored on the first action."
+  tags: [cache]
+- id: core-18
+  difficulty: 3
+  q: "What is a broadcast variable (the low-level kind)?"
+  a: "A read-only value shipped once to each executor and cached there, instead of with every task — useful for lookup tables. F.broadcast(df) for joins is the DataFrame-level version of the same idea."
+  tags: [broadcast]
+- id: core-19
+  difficulty: 3
+  q: "What are accumulators and a caveat?"
+  a: "Write-only-from-tasks, read-on-driver counters/sums for metrics. Caveat: they're only guaranteed exactly-once inside actions; in transformations a task retry/speculation can double-count, so don't rely on them for correctness."
+  tags: [accumulators]
+- id: core-20
+  difficulty: 4
+  q: "How does map-side combine work and why does it help?"
+  a: "For combinable aggregations (sum/count/avg), Spark pre-aggregates within each partition before shuffling, so it ships small partial results instead of every row — drastically cutting shuffle volume. groupBy().count() benefits; collect_list() can't combine."
+  tags: [aggregation, shuffle]
+- id: core-21
+  difficulty: 3
+  q: "select vs selectExpr vs expr?"
+  a: "select takes column objects; selectExpr takes SQL expression strings (concise for arithmetic/casts/functions); F.expr('...') turns a SQL string into a column usable anywhere. They compile to the same Catalyst plan."
+  tags: [api]
+- id: core-22
+  difficulty: 3
+  q: "What's the difference between orderBy and sortWithinPartitions?"
+  a: "orderBy is a global sort (a full shuffle/range-partition). sortWithinPartitions sorts each partition independently (no shuffle) — cheaper when you only need local order, e.g. before a windowed write."
+  tags: [sort]
+- id: core-23
+  difficulty: 2
+  q: "What does df.explain('cost') show?"
+  a: "The optimized plan annotated with the optimizer's row/size estimates per node — useful to see whether stats are driving good join/broadcast decisions."
+  tags: [explain, statistics]
+- id: core-24
+  difficulty: 3
+  q: "How do you handle reading a folder of mixed/evolving schema files?"
+  a: "Provide an explicit schema (don't infer), or use mergeSchema for Parquet to union compatible schemas; columns missing in some files become null. Quarantine files that don't conform."
+  tags: [schema]
+- id: core-25
+  difficulty: 4
+  q: "Why can repartition() before a write reduce skew in output files?"
+  a: "repartition(n) or repartition(col) reshuffles rows evenly (or by key) into n partitions, so each output file is balanced — avoiding both giant and tiny files that a skewed upstream layout would produce."
+  tags: [partitions, write]
