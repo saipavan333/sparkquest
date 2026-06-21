@@ -1,0 +1,50 @@
+- id: py-01
+  difficulty: 3
+  q: "Threading vs multiprocessing vs asyncio — and the GIL?"
+  a: "The GIL lets only one thread run Python bytecode at a time. Threads help only I/O-bound work (they release the GIL on I/O). multiprocessing uses separate processes for true CPU-bound parallelism. asyncio is single-threaded cooperative concurrency for massive I/O fan-out. DE ingestion is usually I/O-bound → threads/asyncio."
+  tags: [concurrency, gil]
+- id: py-02
+  difficulty: 3
+  q: "Why do data pipelines love generators?"
+  a: "Generators (yield) produce values lazily, holding one at a time, so they process huge or infinite sequences in constant memory — the same lazy philosophy as Spark. Lists materialize everything."
+  tags: [generators]
+- id: py-03
+  difficulty: 3
+  q: "What is a decorator and a real DE use?"
+  a: "A callable that wraps a function to add behavior without editing it — retry-with-backoff on a flaky API, timing/logging a task, or caching (functools.lru_cache). functools.wraps preserves the wrapped function's metadata."
+  tags: [decorators]
+- id: py-04
+  difficulty: 2
+  q: "What does a context manager guarantee?"
+  a: "with + __enter__/__exit__ runs teardown even on exception — closing files, releasing locks, committing/rolling back. Every resource a pipeline touches should be in a with."
+  tags: [context-manager]
+- id: py-05
+  difficulty: 2
+  q: "Why do mature DE teams enforce type hints?"
+  a: "Hints don't run but enable static checking (mypy/pyright), better IDE help, and self-documenting interfaces — catching errors before a pipeline runs on 10 TB. They're cheap insurance in CI."
+  tags: [typing]
+- id: py-06
+  difficulty: 3
+  q: "How do you test a data pipeline?"
+  a: "Keep transformations as small pure functions taking/returning DataFrames, unit-test them on tiny fixtures with known expected output, assert schema and row-level equality, and add data-quality assertions (counts/nulls/ranges) as runtime gates. Mock external systems."
+  tags: [testing]
+- id: py-07
+  difficulty: 2
+  q: "What's the mutable default argument bug?"
+  a: "def f(x=[]) creates the list once at definition, so it persists and accumulates across calls. Use x=None and set x = x or [] inside."
+  tags: [gotchas]
+- id: py-08
+  difficulty: 2
+  q: "list vs tuple vs set vs dict — when?"
+  a: "list: ordered, mutable sequence. tuple: immutable record (hashable, usable as a dict key). set: unique items with O(1) membership/dedup. dict: key→value with O(1) lookup (the basis of joins/caches)."
+  tags: [collections]
+- id: py-09
+  difficulty: 3
+  q: "What does Counter / defaultdict give you?"
+  a: "collections.Counter counts occurrences in one line (like a local groupBy().count()); defaultdict supplies a default for missing keys so you skip existence checks when grouping/accumulating."
+  tags: [stdlib]
+- id: py-10
+  difficulty: 2
+  q: "What happens with collect()/toPandas() on a big DataFrame?"
+  a: "Both pull all data to the driver, which isn't sized for it → driver OOM. Aggregate or take(n) first; write to storage for full results."
+  tags: [spark, driver]

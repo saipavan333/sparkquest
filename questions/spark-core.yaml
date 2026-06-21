@@ -1,0 +1,75 @@
+- id: core-01
+  difficulty: 1
+  q: "Transformation vs action — what's the difference?"
+  a: "Transformations (select, filter, join) are lazy: they build lineage and run nothing. Actions (count, collect, write) trigger a job that plans and executes the lineage. Laziness lets Catalyst optimize the whole query before running."
+  tags: [lazy, actions]
+- id: core-02
+  difficulty: 2
+  q: "Narrow vs wide transformation?"
+  a: "Narrow: each output partition depends on one input partition, no data movement (map, filter). Wide: depends on many input partitions and requires a shuffle across the network (groupBy, join, distinct). Stage boundaries fall on shuffles."
+  tags: [shuffle, stages]
+- id: core-03
+  difficulty: 2
+  q: "What is a shuffle and why is it expensive?"
+  a: "Repartitioning data by key across the cluster. It costs disk (map-side spill files), network (reduce-side fetch), and serialization, and it's where skew and spill bite. Minimize it via broadcast joins, bucketing, and fewer wide ops."
+  tags: [shuffle, performance]
+- id: core-04
+  difficulty: 2
+  q: "Walk me from an action to running tasks."
+  a: "Action → job. The DAG scheduler splits the job into stages at each shuffle boundary. Each stage becomes one task per partition. The task scheduler ships tasks to executor cores honoring data locality. Parallelism = min(partitions, total cores)."
+  tags: [jobs, stages, tasks]
+- id: core-05
+  difficulty: 2
+  q: "Driver vs executor — who does what?"
+  a: "The driver runs your code, builds plans, and schedules work but doesn't process data. Executors are JVM processes that run tasks and hold cached data. collect() pulls data to the driver, which is why it can OOM the driver."
+  tags: [architecture]
+- id: core-06
+  difficulty: 3
+  q: "RDD vs DataFrame vs Dataset — which and why?"
+  a: "DataFrame almost always: Catalyst optimizes it and Tungsten executes it in compact binary memory. RDDs are opaque to the optimizer and, in PySpark, pay a JVM↔Python serialization tax. There's no typed Dataset in Python. Use RDDs only for logic the DataFrame API can't express."
+  tags: [rdd, dataframe]
+- id: core-07
+  difficulty: 3
+  q: "What does Catalyst do, in phases?"
+  a: "Analysis (resolve names/types), logical optimization (predicate pushdown, column pruning, join reorder), physical planning (pick a join strategy via a cost model), and code generation (Tungsten whole-stage codegen)."
+  tags: [catalyst, optimizer]
+- id: core-08
+  difficulty: 3
+  q: "Explain predicate pushdown and column pruning."
+  a: "With columnar sources like Parquet, Spark reads only the columns you select (pruning) and skips row groups whose min/max stats can't satisfy the filter (pushdown). Together often a 10–100× I/O reduction."
+  tags: [parquet, optimization]
+- id: core-09
+  difficulty: 4
+  q: "What is Tungsten and whole-stage code generation?"
+  a: "Tungsten stores rows in compact off-heap binary (UnsafeRow) to cut GC, and uses cache-aware algorithms. Whole-stage codegen compiles a whole stage of operators into one tight Java loop instead of chained iterator next() calls — often an order-of-magnitude speedup over RDD-era Spark."
+  tags: [tungsten, codegen]
+- id: core-10
+  difficulty: 3
+  q: "How do you read a physical plan?"
+  a: "Use df.explain(). Look for Exchange (a shuffle), the join type (BroadcastHashJoin vs SortMergeJoin), `*(n)` whole-stage-codegen markers, PushedFilters, and partition counts. Spotting an unexpected Exchange or a sort-merge where a broadcast should be is the key skill."
+  tags: [explain, plan]
+- id: core-11
+  difficulty: 2
+  q: "When should you cache, and when not?"
+  a: "Cache a DataFrame you reuse across multiple actions; it also cuts lineage so you don't recompute from source each time. Don't cache single-use data — it wastes memory and can evict useful blocks. Always unpersist() when done."
+  tags: [cache, persist]
+- id: core-12
+  difficulty: 3
+  q: "repartition vs coalesce?"
+  a: "repartition(n) is a full shuffle to exactly n partitions (or by column) — use to increase or redistribute. coalesce(n) merges to ≤ n with no shuffle — use to cheaply reduce partitions, e.g. before writing."
+  tags: [partitions]
+- id: core-13
+  difficulty: 3
+  q: "Why is groupBy().count() cheap but groupBy().collect_list() risky?"
+  a: "count/sum do a map-side combine (partial aggregate before shuffling), so they ship little data. collect_list has no combine — it shuffles every row, so a skewed key can OOM."
+  tags: [aggregation, combine]
+- id: core-14
+  difficulty: 2
+  q: "Why did my job OOM on the driver?"
+  a: "Almost always collect()/toPandas() on a big result, or broadcasting a too-large table. The driver isn't sized for data. Use write, take(n), or aggregate first."
+  tags: [oom, driver]
+- id: core-15
+  difficulty: 4
+  q: "Explain the unified memory model in an executor."
+  a: "Execution memory (shuffles/joins/sorts/aggs) and storage memory (cached blocks) share one pool and borrow from each other; execution can evict cached blocks under pressure. Beyond that is user memory and a small reserved region. When execution runs short it spills to disk; truly out → OOM."
+  tags: [memory]

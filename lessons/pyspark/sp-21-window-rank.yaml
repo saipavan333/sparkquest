@@ -1,0 +1,51 @@
+id: sp-21-window-rank
+track: pyspark
+order: 21
+title: "Window: rank & dense_rank"
+difficulty: 4
+concepts: ["Window", "dense_rank", "ranking", "ties"]
+needs_spark: true
+brief: |
+  `rank`, `dense_rank`, and `row_number` all number rows within a window — they
+  differ on **ties**. `row_number` is always unique; `rank` leaves gaps after ties
+  (1,1,3); `dense_rank` doesn't (1,1,2). Knowing which to use is a classic SQL
+  interview point.
+
+  You'll need `from pyspark.sql.window import Window`. `F` is imported.
+
+  **Mission:** Rank trades by `amount` **descending** within each `ticker` using
+  `dense_rank`, as column `rnk`. Store the result in `ranked`.
+
+  Note the two AAPL @ 300 rows share rank 1, and AAPL @ 100 is rank 2.
+starter_code: |
+  from pyspark.sql.window import Window
+
+  trades = spark.createDataFrame(
+      [("AAPL", 300), ("AAPL", 300), ("AAPL", 100), ("GOOG", 80)],
+      ["ticker", "amount"],
+  )
+  # TODO: dense_rank by amount desc within ticker -> column rnk -> `ranked`
+  ranked = ...
+  ranked.show()
+solution_code: |
+  from pyspark.sql.window import Window
+
+  trades = spark.createDataFrame(
+      [("AAPL", 300), ("AAPL", 300), ("AAPL", 100), ("GOOG", 80)],
+      ["ticker", "amount"],
+  )
+  w = Window.partitionBy("ticker").orderBy(F.col("amount").desc())
+  ranked = trades.withColumn("rnk", F.dense_rank().over(w))
+  ranked.show()
+checks:
+  - type: df_equals
+    name: ranked
+    expected:
+      - {"ticker": "AAPL", "amount": 300, "rnk": 1}
+      - {"ticker": "AAPL", "amount": 300, "rnk": 1}
+      - {"ticker": "AAPL", "amount": 100, "rnk": 2}
+      - {"ticker": "GOOG", "amount": 80, "rnk": 1}
+    message: "tied amounts should share a dense_rank with no gap"
+hints:
+  - "Window.partitionBy(\"ticker\").orderBy(F.col(\"amount\").desc())"
+  - "F.dense_rank().over(w) — ties share a rank, next is +1 (no gap)."

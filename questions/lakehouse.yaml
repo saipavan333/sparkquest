@@ -1,0 +1,50 @@
+- id: lake-01
+  difficulty: 2
+  q: "What does Delta give you that plain Parquet doesn't?"
+  a: "ACID transactions, upserts/MERGE, time travel, schema enforcement & evolution, and concurrent-writer safety — all via a transaction log over the Parquet files. Plain Parquet is just dumb files: a failed write leaves partial data and there's no atomicity or upsert."
+  tags: [delta]
+- id: lake-02
+  difficulty: 4
+  q: "How does the Delta transaction log work?"
+  a: "A _delta_log directory holds atomic JSON commits, each listing add/remove/metaData actions; table state = replay commits (or the latest checkpoint Parquet + a few commits). A write stages Parquet files then atomically writes commit N; readers see N-1 until it lands, so they never see partial data."
+  tags: [delta, transaction-log]
+- id: lake-03
+  difficulty: 4
+  q: "How does Delta handle concurrent writers?"
+  a: "Optimistic concurrency control: both writers try to write commit N; the log's atomic put means one wins, and the loser re-reads and retries (or fails on a true conflict). That gives serializable isolation without locks."
+  tags: [delta, concurrency]
+- id: lake-04
+  difficulty: 3
+  q: "OPTIMIZE vs VACUUM?"
+  a: "OPTIMIZE compacts many small files into few right-sized ones (performance). VACUUM physically deletes old tombstoned files no longer referenced, after a retention window (storage). Running VACUUM too aggressively breaks time travel."
+  tags: [delta, maintenance]
+- id: lake-05
+  difficulty: 4
+  q: "What is Z-ordering and when do you use it?"
+  a: "OPTIMIZE ... ZORDER BY (col) co-locates rows with similar values of a high-cardinality filter column into the same files, so predicate pushdown skips far more files. Use it on columns you filter/join on but can't partition by."
+  tags: [delta, z-order]
+- id: lake-06
+  difficulty: 3
+  q: "How does time travel work in Delta?"
+  a: "Because every version is recorded in the log, you read the exact file set as of a commit with versionAsOf or timestampAsOf — for audits, reproducibility, and debugging. VACUUM can remove old files and break it."
+  tags: [delta, time-travel]
+- id: lake-07
+  difficulty: 4
+  q: "Schema enforcement vs schema evolution?"
+  a: "Enforcement: Delta rejects writes whose schema doesn't match, preventing silent corruption. Evolution: you opt into changes (e.g. a new column) with mergeSchema on write, and older rows get null for the added column."
+  tags: [delta, schema]
+- id: lake-08
+  difficulty: 4
+  q: "Delta vs Iceberg vs Hudi?"
+  a: "All add ACID tables over Parquet. Delta (Databricks) is simplest and Spark-native with strong MERGE. Iceberg (Netflix) is the most engine-agnostic with hidden/evolving partitioning and metadata that scales to huge tables. Hudi (Uber) pioneered fast record-level upserts/CDC with copy-on-write or merge-on-read. Pick by ecosystem and upsert needs."
+  tags: [comparison]
+- id: lake-09
+  difficulty: 3
+  q: "What is Change Data Feed (CDF)?"
+  a: "Delta can emit the row-level changes (insert/update/delete) of each version, so downstream consumers process only what changed — native CDC straight out of a Delta table."
+  tags: [delta, cdc]
+- id: lake-10
+  difficulty: 2
+  q: "Explain the medallion architecture."
+  a: "Bronze = raw append-only ingestion (your replayable source of truth). Silver = cleaned, deduplicated, conformed business entities (where DQ gates and MERGE/CDC live). Gold = aggregated marts/features for BI/ML. Move data between layers with idempotent MERGEs so re-runs are safe."
+  tags: [medallion, architecture]

@@ -36,6 +36,7 @@ COPY --chown=user:user app ./app
 COPY --chown=user:user lessons ./lessons
 COPY --chown=user:user data ./data
 COPY --chown=user:user docs/handbook ./docs/handbook
+COPY --chown=user:user questions ./questions
 
 USER user
 

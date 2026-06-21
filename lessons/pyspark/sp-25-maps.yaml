@@ -1,0 +1,39 @@
+id: sp-25-maps
+track: pyspark
+order: 25
+title: "Map Columns"
+difficulty: 4
+concepts: ["MapType", "map access", "semi-structured"]
+needs_spark: true
+brief: |
+  A **map** column holds key→value pairs per row (think a JSON object). You read a
+  value by key with bracket access: `F.col("meta")["sector"]`.
+
+  **Mission:** Each row has a `meta` map. Pull the `sector` value into a top-level
+  column `sector` (keeping `ticker`). Store the result in `out`.
+starter_code: |
+  df = spark.createDataFrame(
+      [("AAPL", {"sector": "Tech"}), ("GOOG", {"sector": "Tech"}), ("JPM", {"sector": "Fin"})],
+      ["ticker", "meta"],
+  )
+  # TODO: extract meta["sector"] into a `sector` column -> out
+  out = ...
+  out.show()
+solution_code: |
+  df = spark.createDataFrame(
+      [("AAPL", {"sector": "Tech"}), ("GOOG", {"sector": "Tech"}), ("JPM", {"sector": "Fin"})],
+      ["ticker", "meta"],
+  )
+  out = df.select("ticker", F.col("meta")["sector"].alias("sector"))
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "sector": "Tech"}
+      - {"ticker": "GOOG", "sector": "Tech"}
+      - {"ticker": "JPM", "sector": "Fin"}
+    message: "sector should be read by key from the meta map"
+hints:
+  - "Access a map value by key: F.col(\"meta\")[\"sector\"]."
+  - "Alias it to a clean top-level column name."

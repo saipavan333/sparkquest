@@ -1,0 +1,40 @@
+- id: sd-01
+  difficulty: 4
+  q: "What framework do you use for a data-pipeline design question?"
+  a: "Requirements → Data model → Ingestion → Processing → Storage → Serving → Quality & Ops → Tradeoffs. Always clarify first: scale, latency/freshness, SLA, consistency (exact vs approximate), access pattern, and budget — before designing anything."
+  tags: [framework]
+- id: sd-02
+  difficulty: 3
+  q: "Batch vs streaming — how do you decide?"
+  a: "Batch (or incremental batch) when hours/days freshness is fine — simpler, cheaper, exact, easy to reprocess. Streaming when you need seconds–minutes latency (fraud, monitoring, live dashboards) — more complex (state, watermarks, exactly-once). Default to batch unless latency demands streaming."
+  tags: [batch-streaming]
+- id: sd-03
+  difficulty: 4
+  q: "Lambda vs Kappa architecture?"
+  a: "Lambda = a batch layer (accurate, slow) plus a speed layer (approximate, fast) merged at serving — robust but two codebases to maintain. Kappa = a single streaming pipeline; reprocess by replaying the log. Modern lakehouses make Kappa-style viable. Choose Lambda only if you truly need a separate batch truth layer."
+  tags: [lambda-kappa]
+- id: sd-04
+  difficulty: 4
+  q: "How do you make a pipeline idempotent and safe to backfill?"
+  a: "Upsert keyed by a deterministic business/event id (Delta MERGE) instead of blind append; partition by processing date so a re-run replaces exactly that partition (replaceWhere); record processed offsets/files; keep transforms deterministic (no now()/random in keys). Then a backfill is 'delete the date, re-run.'"
+  tags: [idempotency, backfill]
+- id: sd-05
+  difficulty: 3
+  q: "How do you build data quality into a pipeline?"
+  a: "Enforce schema/contracts on write; add expectations (row-count ranges, null rate, value sets, key uniqueness, referential integrity); quarantine failing rows to a side table instead of dropping/crashing; and monitor freshness, volume, and distribution drift. Tools: Great Expectations, dbt tests, Deequ."
+  tags: [data-quality]
+- id: sd-06
+  difficulty: 3
+  q: "What does an orchestrator (Airflow) give you, and what must tasks guarantee?"
+  a: "Scheduling, dependencies (DAG), retries with backoff, SLAs/alerts, and backfills over a date range. Tasks must be idempotent and parameterized by run-date so retries and backfills are safe."
+  tags: [orchestration]
+- id: sd-07
+  difficulty: 4
+  q: "Design a pipeline to compute daily active users from clickstream."
+  a: "Clarify scale/freshness (daily). Ingest to Kafka. Daily incremental batch (availableNow). Medallion: bronze raw events (Delta, partitioned by dt), silver dedup/sessionize, gold distinct users per dt. Handle late events with a look-back window + idempotent MERGE. Use approx_count_distinct (HLL) if approximate is OK to avoid a huge distinct shuffle. Add DQ checks and an Airflow DAG with partition-overwrite writes."
+  tags: [worked-example, dau]
+- id: sd-08
+  difficulty: 4
+  q: "Exact vs approximate aggregation — when do you trade?"
+  a: "COUNT(DISTINCT) is a large shuffle; HyperLogLog (approx_count_distinct) is far cheaper, mergeable across partitions/days, with ~1–2% error. If the business tolerates small error (most dashboards do), approximate wins on cost and speed at scale — call out the tradeoff in the interview."
+  tags: [approximation, hll]

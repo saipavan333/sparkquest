@@ -1,0 +1,50 @@
+id: sp-22-running-total
+track: pyspark
+order: 22
+title: "Window: running total"
+difficulty: 4
+concepts: ["Window", "frame", "cumulative sum"]
+needs_spark: true
+brief: |
+  A **running (cumulative) total** is a windowed `sum` with an explicit **frame**:
+  all rows from the start up to the current one. The frame
+  `rowsBetween(Window.unboundedPreceding, Window.currentRow)` is the key.
+
+  **Mission:** For `AAPL`, compute the cumulative `amt` ordered by date `d`, as
+  column `cum`. Select `ticker`, `d`, `cum` into `running`.
+
+  Expected cum: 100, 150, 180.
+starter_code: |
+  from pyspark.sql.window import Window
+
+  df = spark.createDataFrame(
+      [("AAPL", "2026-01-01", 100), ("AAPL", "2026-01-02", 50), ("AAPL", "2026-01-03", 30)],
+      ["ticker", "d", "amt"],
+  )
+  # TODO: cumulative sum of amt over (partition ticker, order d, running frame)
+  running = ...
+  running.show()
+solution_code: |
+  from pyspark.sql.window import Window
+
+  df = spark.createDataFrame(
+      [("AAPL", "2026-01-01", 100), ("AAPL", "2026-01-02", 50), ("AAPL", "2026-01-03", 30)],
+      ["ticker", "d", "amt"],
+  )
+  w = (
+      Window.partitionBy("ticker").orderBy("d")
+      .rowsBetween(Window.unboundedPreceding, Window.currentRow)
+  )
+  running = df.select("ticker", "d", F.sum("amt").over(w).alias("cum"))
+  running.show()
+checks:
+  - type: df_equals
+    name: running
+    expected:
+      - {"ticker": "AAPL", "d": "2026-01-01", "cum": 100}
+      - {"ticker": "AAPL", "d": "2026-01-02", "cum": 150}
+      - {"ticker": "AAPL", "d": "2026-01-03", "cum": 180}
+    message: "cum should accumulate amt in date order"
+hints:
+  - "Frame: .rowsBetween(Window.unboundedPreceding, Window.currentRow)"
+  - "F.sum(\"amt\").over(w) with that frame is the running total."

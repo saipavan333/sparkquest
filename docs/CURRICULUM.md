@@ -5,10 +5,11 @@ topic below maps to a **graded, runnable challenge** (✅ = live now, 🔜 = on 
 roadmap). The structure mirrors the official documentation so you can always go
 deeper at the source.
 
-**Status:** 54 graded lessons across all 6 tracks. The 50 Python / PySpark /
+**Status:** 61 graded lessons across all 6 tracks. The 57 Python / PySpark /
 Performance / Streaming / Capstone lessons are verified in the offline sandbox; the
 4 Delta lessons are verified by a dedicated Maven-enabled CI job (Delta needs an
-internet JAR fetch). Every reference solution passes its own auto-grader.
+internet JAR fetch). Every reference solution passes its own auto-grader. Pair the
+lessons with the [Handbook](handbook/) and the in-app **🎤 Mock Interview** drill.
 
 **Primary references (always current):**
 - Python — <https://docs.python.org/3/tutorial/> · <https://docs.python.org/3/library/>
@@ -63,7 +64,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 2 — PySpark Foundations & DataFrames (20 live)
+## Track 2 — PySpark Foundations & DataFrames (27 live)
 
 > *Goal: think in distributed DataFrames; read, transform, and write any data.*
 > Docs: <https://spark.apache.org/docs/latest/sql-getting-started.html>
@@ -94,13 +95,15 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Pivot — `groupBy().pivot()`
 - ✅ Spark SQL — temp views, `spark.sql(...)`
 - ✅ Window functions — `row_number`, ranking
-- ✅ More windows — `lag` / day-over-day change
+- ✅ More windows — `rank`/`dense_rank`, `lag`/`lead`, **running totals**, **sessionization** (gaps & islands)
+- ✅ Set operations — `unionByName`, `exceptAll`, `intersect`
+- ✅ `selectExpr` & SQL expression strings
 
 **Module 2.4 — Complex & semi-structured data**
 - ✅ Arrays — `explode`, flattening
 - ✅ Structs — nested columns, dot access
 - ✅ UDFs — custom logic (and why to prefer built-ins)
-- 🔜 Maps — `create_map`, key/value access
+- ✅ Maps — key/value access by key
 - 🔜 pandas UDFs — vectorised UDFs with Arrow
 
 ---
@@ -177,7 +180,8 @@ This is a living curriculum. **Phase 1** shipped the full syllabus plus Modules
 1.1–1.3 and the core of Track 2. **Phase 2** added the remaining Python stdlib
 topics, advanced DataFrame ops (joins, windows, Parquet, UDFs, structs),
 partitioned writes, and the entire Capstone track. **Phase 3** added the Delta Lake
-track (create, MERGE, time travel, schema evolution) — **54 graded lessons total**.
+track (create, MERGE, time travel, schema evolution) plus advanced PySpark
+windowing/sessionization and an in-app **Mock Interview** — **61 graded lessons total**.
 Remaining 🔜 topics (AQE, Spark UI, stream-stream joins, medallion, CDC) land in
 future phases. Track your progress in the app — solved counts and badges update per
 track.

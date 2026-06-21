@@ -1,0 +1,39 @@
+id: sp-26-selectexpr
+track: pyspark
+order: 26
+title: "selectExpr & SQL expressions"
+difficulty: 3
+concepts: ["selectExpr", "expr", "SQL expressions"]
+needs_spark: true
+brief: |
+  `selectExpr` lets you write **SQL expression strings** instead of column objects —
+  often more concise for arithmetic, casts, and function calls. (`F.expr(...)` does
+  the same inside `withColumn`.)
+
+  **Mission:** From `df`, produce `out` with: `ticker`, `total` = `price * qty`,
+  and `sym` = the uppercased ticker — all via `selectExpr`.
+starter_code: |
+  df = spark.createDataFrame(
+      [("aapl", 190, 100), ("goog", 142, 50)],
+      ["ticker", "price", "qty"],
+  )
+  # TODO: use selectExpr to build ticker, total (price*qty), sym (upper(ticker))
+  out = ...
+  out.show()
+solution_code: |
+  df = spark.createDataFrame(
+      [("aapl", 190, 100), ("goog", 142, 50)],
+      ["ticker", "price", "qty"],
+  )
+  out = df.selectExpr("ticker", "price * qty AS total", "upper(ticker) AS sym")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "aapl", "total": 19000, "sym": "AAPL"}
+      - {"ticker": "goog", "total": 7100, "sym": "GOOG"}
+    message: "out should have total = price*qty and sym = upper(ticker)"
+hints:
+  - "df.selectExpr(\"ticker\", \"price * qty AS total\", \"upper(ticker) AS sym\")"
+  - "Each string is a SQL expression with an optional AS alias."

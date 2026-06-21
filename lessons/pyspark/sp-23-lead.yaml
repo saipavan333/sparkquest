@@ -1,0 +1,45 @@
+id: sp-23-lead
+track: pyspark
+order: 23
+title: "Window: lead (next row)"
+difficulty: 4
+concepts: ["Window", "lead", "time series"]
+needs_spark: true
+brief: |
+  `lead` is `lag`'s mirror — it looks at the **next** row in an ordered window.
+  Handy for "what happened after this event" features and forward-looking diffs.
+
+  **Mission:** For each ticker ordered by date `d`, add `next_price` = the
+  following day's `price` (null on the last day). Select `ticker`, `d`,
+  `next_price` into `nxt`.
+starter_code: |
+  from pyspark.sql.window import Window
+
+  prices = spark.createDataFrame(
+      [("AAPL", "2026-01-01", 100), ("AAPL", "2026-01-02", 110), ("AAPL", "2026-01-03", 105)],
+      ["ticker", "d", "price"],
+  )
+  # TODO: next_price = lead(price) over (partition ticker, order d) -> `nxt`
+  nxt = ...
+  nxt.show()
+solution_code: |
+  from pyspark.sql.window import Window
+
+  prices = spark.createDataFrame(
+      [("AAPL", "2026-01-01", 100), ("AAPL", "2026-01-02", 110), ("AAPL", "2026-01-03", 105)],
+      ["ticker", "d", "price"],
+  )
+  w = Window.partitionBy("ticker").orderBy("d")
+  nxt = prices.select("ticker", "d", F.lead("price").over(w).alias("next_price"))
+  nxt.show()
+checks:
+  - type: df_equals
+    name: nxt
+    expected:
+      - {"ticker": "AAPL", "d": "2026-01-01", "next_price": 110}
+      - {"ticker": "AAPL", "d": "2026-01-02", "next_price": 105}
+      - {"ticker": "AAPL", "d": "2026-01-03", "next_price": null}
+    message: "next_price should be the following day's price, null on the last day"
+hints:
+  - "F.lead(\"price\").over(w) returns the next row's value."
+  - "The last row in each partition has no next row -> null."

@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app import __version__
-from app.api import handbook, lessons, progress, submit, tutor
+from app.api import handbook, interview, lessons, progress, submit, tutor
 from app.catalog import get_catalog
 from app.config import get_settings
 
@@ -45,6 +45,7 @@ app.include_router(submit.router)
 app.include_router(tutor.router)
 app.include_router(progress.router)
 app.include_router(handbook.router)
+app.include_router(interview.router)
 
 
 @app.get("/healthz", tags=["meta"])

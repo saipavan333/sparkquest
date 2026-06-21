@@ -1,0 +1,40 @@
+- id: model-01
+  difficulty: 2
+  q: "OLTP vs OLAP — how does modeling differ?"
+  a: "OLTP (apps) is normalized (3NF) for write consistency and no redundancy. OLAP (analytics) is denormalized for read speed (fewer joins). As a DE you model for OLAP — deliberately re-introducing some redundancy so dashboards don't join a dozen tables."
+  tags: [oltp, olap]
+- id: model-02
+  difficulty: 3
+  q: "Fact vs dimension table?"
+  a: "A fact table holds the numeric, mostly-additive measurements of a process plus foreign keys to dimensions (long and narrow). Dimensions hold descriptive context you filter and group by (short and wide). Example: fact_sales + dim_customer/dim_product/dim_date."
+  tags: [kimball]
+- id: model-03
+  difficulty: 3
+  q: "What is the grain of a fact table and why pin it first?"
+  a: "The grain is what one fact row means (e.g. one row per order line item per day). Everything — which dimensions and measures apply — follows from it, so you state it explicitly before designing anything else."
+  tags: [grain]
+- id: model-04
+  difficulty: 2
+  q: "Star vs snowflake schema?"
+  a: "Star: dimensions are denormalized (flat) — fast, simple, the default. Snowflake: dimensions are normalized into sub-tables — saves space but adds joins and slows queries. Use snowflake sparingly."
+  tags: [schema]
+- id: model-05
+  difficulty: 4
+  q: "Explain SCD Type 2 and how you implement it."
+  a: "Track full history by adding a new row per version of a dimension, with a surrogate key plus effective_date/end_date/is_current. The current row has end_date null and is_current true. Implement with a Delta MERGE: close the old version and insert a new current one when attributes change; insert outright for new keys."
+  tags: [scd]
+- id: model-06
+  difficulty: 3
+  q: "SCD Type 1 vs Type 2 vs Type 3?"
+  a: "Type 1 overwrites in place (no history). Type 2 adds a new row per change (full history) — the important one. Type 3 keeps a 'previous value' column (one prior). Choose by how much history the business needs."
+  tags: [scd]
+- id: model-07
+  difficulty: 3
+  q: "Why use surrogate keys instead of natural keys?"
+  a: "Business/natural keys change and can be reused; surrogate (meaningless integer) keys are stable and let you keep multiple versions of the same business entity — which is exactly what SCD Type 2 needs."
+  tags: [keys]
+- id: model-08
+  difficulty: 3
+  q: "Additive, semi-additive, non-additive measures?"
+  a: "Additive: summable across all dimensions (revenue). Semi-additive: summable across some but not time (account balance — take the latest, don't sum across days). Non-additive: ratios/percentages — sum the components then recompute, never sum the ratio."
+  tags: [measures]

@@ -305,6 +305,58 @@
     }
   }
 
+  // ---- Mock interview ----
+  const mock = { all: [], pool: [], current: null, seen: 0, got: 0 };
+  let mockLoaded = false;
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  }
+  async function openMock() {
+    $("mock").hidden = false;
+    if (mockLoaded) return;
+    try {
+      const data = await fetch("/api/interview").then(r => r.json());
+      mock.all = data.questions;
+      const sel = $("mock-cat");
+      sel.innerHTML = `<option value="">Mixed · all ${data.total}</option>` +
+        data.categories.map(c => `<option value="${c.slug}">${c.title} · ${c.count}</option>`).join("");
+      sel.addEventListener("change", () => { mock.seen = 0; mock.got = 0; buildMockPool(); nextMock(); });
+      mockLoaded = true;
+      buildMockPool();
+      nextMock();
+    } catch (e) {
+      $("mock-q").textContent = "Failed to load questions: " + e;
+    }
+  }
+  function buildMockPool() {
+    const cat = $("mock-cat").value;
+    mock.pool = mock.all.filter(q => !cat || q.category === cat);
+    shuffle(mock.pool);
+  }
+  function nextMock() {
+    if (!mock.pool.length) buildMockPool();
+    mock.current = mock.pool.pop();
+    const q = mock.current;
+    $("mock-cattag").textContent = q.category_title;
+    $("mock-diff").textContent = "★".repeat(q.difficulty) + "☆".repeat(5 - q.difficulty);
+    $("mock-q").textContent = q.q;
+    $("mock-a").hidden = true; $("mock-a").innerHTML = "";
+    $("mock-reveal").hidden = false;
+    $("mock-rate").hidden = true;
+    $("mock-progress").textContent = `· seen ${mock.seen} · got ${mock.got}`;
+  }
+  function revealMock() {
+    const a = mock.current ? mock.current.a : "";
+    $("mock-a").innerHTML = window.marked ? marked.parse(a) : escapeHtml(a);
+    $("mock-a").hidden = false;
+    $("mock-reveal").hidden = true;
+    $("mock-rate").hidden = false;
+  }
+  function rateMock(r) {
+    mock.seen++; if (r === "got") mock.got++;
+    nextMock();
+  }
+
   // ---- Buttons ----
   function wireButtons() {
     $("btn-run").addEventListener("click", doRun);
@@ -325,6 +377,11 @@
     $("btn-badges").addEventListener("click", openBadges);
     $("btn-handbook").addEventListener("click", openHandbook);
     $("hb-close").addEventListener("click", () => { $("handbook").hidden = true; });
+    $("btn-mock").addEventListener("click", openMock);
+    $("mock-close").addEventListener("click", () => { $("mock").hidden = true; });
+    $("mock-reveal").addEventListener("click", revealMock);
+    document.querySelectorAll("#mock-rate button[data-rate]").forEach(b =>
+      b.addEventListener("click", () => rateMock(b.dataset.rate)));
     $("modal-close").addEventListener("click", () => $("modal").hidden = true);
     $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) $("modal").hidden = true; });
   }

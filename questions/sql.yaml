@@ -1,0 +1,60 @@
+- id: sql-01
+  difficulty: 3
+  q: "What's the difference between a window function and GROUP BY?"
+  a: "GROUP BY collapses rows into one per group. A window function computes across a set of related rows (PARTITION BY ... ORDER BY ... frame) without collapsing them — so you keep every row plus a per-row computed value like a rank or running total."
+  tags: [windows]
+- id: sql-02
+  difficulty: 3
+  q: "ROW_NUMBER vs RANK vs DENSE_RANK?"
+  a: "ROW_NUMBER gives a unique 1..n with no ties. RANK leaves gaps after ties (1,1,3). DENSE_RANK has no gaps (1,1,2). Pick based on how ties should be numbered."
+  tags: [ranking]
+- id: sql-03
+  difficulty: 3
+  q: "How do you get the top-N rows per group?"
+  a: "ROW_NUMBER() (or DENSE_RANK for ties) OVER (PARTITION BY group ORDER BY metric DESC) in a subquery/CTE, then filter rk <= N. In PySpark it's the Window + row_number pattern."
+  tags: [top-n]
+- id: sql-04
+  difficulty: 4
+  q: "How do you deduplicate keeping the latest record per key?"
+  a: "ROW_NUMBER() OVER (PARTITION BY key ORDER BY updated_at DESC), keep rows where the number = 1. In streaming, dropDuplicates with a watermark."
+  tags: [dedup]
+- id: sql-05
+  difficulty: 5
+  q: "Explain the gaps-and-islands problem and a solution."
+  a: "Finding consecutive runs (sessions, streaks). One approach: assign ROW_NUMBER over the ordering, subtract it from the value/date sequence — equal differences form an 'island'; group by that difference. Or LAG the timestamp, flag a new group when the gap exceeds a threshold, and cumulative-sum the flags into a session id."
+  tags: [gaps-islands, sessionization]
+- id: sql-06
+  difficulty: 3
+  q: "How do you compute a running/cumulative total?"
+  a: "SUM(x) OVER (PARTITION BY k ORDER BY t ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW). Mind ROWS (row-count frame) vs RANGE (value-based frame)."
+  tags: [running-total, frames]
+- id: sql-07
+  difficulty: 2
+  q: "WHERE vs HAVING?"
+  a: "WHERE filters rows before aggregation; HAVING filters groups after aggregation (e.g. HAVING COUNT(*) > 1)."
+  tags: [aggregation]
+- id: sql-08
+  difficulty: 3
+  q: "What are CTEs and recursive CTEs?"
+  a: "WITH t AS (...) names a subquery for readability and reuse. Recursive CTEs (WITH RECURSIVE) walk hierarchies/graphs — org charts, paths, bill-of-materials — by repeatedly joining the result to itself until no new rows."
+  tags: [cte]
+- id: sql-09
+  difficulty: 3
+  q: "How do you find duplicate rows?"
+  a: "GROUP BY the candidate-key columns HAVING COUNT(*) > 1. To see the duplicates themselves, window: COUNT(*) OVER (PARTITION BY cols) > 1."
+  tags: [duplicates]
+- id: sql-10
+  difficulty: 3
+  q: "How do you pivot rows into columns in SQL?"
+  a: "Conditional aggregation: SUM(CASE WHEN side='BUY' THEN qty END) AS buy, SUM(CASE WHEN side='SELL' THEN qty END) AS sell, grouped by the key. (Spark also has a native pivot().)"
+  tags: [pivot]
+- id: sql-11
+  difficulty: 4
+  q: "How do you optimize a slow analytical query?"
+  a: "Warehouses/lakehouses have no traditional indexes — speed comes from partition pruning, predicate/column pushdown, good file layout (Z-order), broadcast joins, and accurate statistics. Avoid SELECT * (kills column pruning), filter early, and read EXPLAIN to confirm pushdown and a sane join strategy."
+  tags: [optimization]
+- id: sql-12
+  difficulty: 2
+  q: "INNER vs LEFT vs ANTI join — give a use for each."
+  a: "INNER keeps only matches. LEFT keeps all left rows (nulls where no match) — enrichment that must not drop rows. LEFT ANTI keeps left rows with no match — finding orphans/unmatched records for reconciliation."
+  tags: [joins]

@@ -1,0 +1,60 @@
+- id: stream-01
+  difficulty: 2
+  q: "What's the core model of Structured Streaming?"
+  a: "A stream is an unbounded table that grows forever; you write the same DataFrame query as for batch and Spark incrementally maintains the result. Execution is micro-batch by default (exactly-once); a continuous mode offers ~1 ms latency at at-least-once."
+  tags: [model]
+- id: stream-02
+  difficulty: 3
+  q: "Event time vs processing time — why does it matter?"
+  a: "Event time is when the event happened (a timestamp in the data); processing time is when Spark saw it. Events arrive late and out of order, so processing-time windows are wrong for analytics. Aggregate by event time."
+  tags: [event-time]
+- id: stream-03
+  difficulty: 4
+  q: "What is a watermark and what breaks without one?"
+  a: "A moving 'accept events up to T late' threshold = max event time seen − allowed lateness. It bounds state: without it, Spark keeps every window's state forever (memory leak → job death) and can't finalize append-mode results. It also drops too-late events."
+  tags: [watermark, state]
+- id: stream-04
+  difficulty: 4
+  q: "How does Spark achieve exactly-once?"
+  a: "Replayable source (Kafka offsets / files) + checkpointed offsets written ahead + idempotent or transactional sink. Spark guarantees replay and state recovery; the sink must dedupe — canonically foreachBatch + a Delta MERGE on a unique key."
+  tags: [exactly-once]
+- id: stream-05
+  difficulty: 3
+  q: "Append vs update vs complete output mode?"
+  a: "Append: only finalized new rows (needs a watermark for aggregations). Update: only rows that changed this batch. Complete: the entire result table each batch — aggregations only, and only when small (it never forgets state)."
+  tags: [output-mode]
+- id: stream-06
+  difficulty: 3
+  q: "What do the trigger options do?"
+  a: "Default fires a micro-batch as soon as the previous finishes; processingTime sets a fixed cadence; availableNow (or once) processes all available data then stops (great for incremental batch and deterministic tests); continuous is experimental low-latency."
+  tags: [triggers]
+- id: stream-07
+  difficulty: 4
+  q: "Where does streaming state live, and HDFS vs RocksDB?"
+  a: "Stateful ops (aggregations, dedup, stream-stream joins) keep state in the state store, checkpointed each batch. The default HDFS-backed store keeps state in JVM heap → GC pressure at scale; the RocksDB store keeps it off-heap on local disk → far larger state with stable GC."
+  tags: [state]
+- id: stream-08
+  difficulty: 4
+  q: "What's in a streaming checkpoint?"
+  a: "The offset log (write-ahead: which offsets belong to each batch), the state store files, and the commit log (which batches finished). On restart Spark resumes from the last committed batch, replays the source, and restores state. Don't delete it or change the query shape."
+  tags: [checkpoint]
+- id: stream-09
+  difficulty: 5
+  q: "What's the catch with stream-stream joins?"
+  a: "Both sides buffer in state until matches can arrive, so you must set watermarks on both sides and a time-bound on the join, or state grows unbounded. Outer joins emit unmatched rows only once the watermark guarantees no match can still come. Prefer stream-static joins (stateless) when enriching."
+  tags: [joins]
+- id: stream-10
+  difficulty: 3
+  q: "When and why use foreachBatch?"
+  a: "It hands you each micro-batch as a normal DataFrame, so you can do anything — upsert via Delta MERGE, write to multiple sinks, or call an API. It's the standard way to build idempotent/exactly-once custom sinks."
+  tags: [foreachbatch, sinks]
+- id: stream-11
+  difficulty: 4
+  q: "How does Kafka integration handle offsets and backpressure?"
+  a: "Spark stores offsets in its own checkpoint (not Kafka consumer groups), enabling exactly-once replay. maxOffsetsPerTrigger caps records per batch so a backlog doesn't create one monster batch. The value is binary — cast to string and from_json to parse."
+  tags: [kafka]
+- id: stream-12
+  difficulty: 3
+  q: "Why must you fix the shuffle partition count before a stateful query starts?"
+  a: "State is partitioned by spark.sql.shuffle.partitions at the time the query first starts, and you can't change it later without losing state. A classic production footgun — set it deliberately up front."
+  tags: [state, partitions]

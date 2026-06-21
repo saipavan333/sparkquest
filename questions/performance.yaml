@@ -1,0 +1,75 @@
+- id: perf-01
+  difficulty: 3
+  q: "A job is slow. What's your method?"
+  a: "Open the Spark UI, find the slow stage, check the task-time distribution (max vs median) and shuffle/spill metrics. Classify: skew, too few/many partitions, big shuffle, bad join strategy, spill/GC, or small files. Fix the specific cause and re-measure — never tune blind."
+  tags: [diagnosis, ui]
+- id: perf-02
+  difficulty: 3
+  q: "How do you size partitions?"
+  a: "Parallelism = min(partitions, cores). Target ~128–200 MB per partition. Read side splits by spark.sql.files.maxPartitionBytes (128 MB default); shuffle side by spark.sql.shuffle.partitions (200 default). With AQE, set the initial count large and let it coalesce."
+  tags: [partitions]
+- id: perf-03
+  difficulty: 3
+  q: "Name the four join strategies and when each is used."
+  a: "Broadcast hash (small side < ~10 MB, no shuffle, fastest), sort-merge (two large tables), shuffle hash (one side fits in memory, no sort), broadcast nested loop (non-equi, tiny side). Auto-broadcast uses stats; force with F.broadcast or /*+ BROADCAST */."
+  tags: [joins]
+- id: perf-04
+  difficulty: 3
+  q: "Auto-broadcast didn't trigger even though one side is small. Why?"
+  a: "Broadcast relies on statistics. A freshly written path may have no stats, so Spark overestimates and picks sort-merge. Fix: ANALYZE TABLE to compute stats, hint the broadcast, or rely on AQE which re-decides from actual runtime shuffle sizes."
+  tags: [joins, statistics]
+- id: perf-05
+  difficulty: 4
+  q: "One task runs 100× longer than the rest. Diagnose and fix."
+  a: "Data skew — one key holds most rows. In order: filter junk/NULL keys; broadcast the other side if small; rely on AQE skew join (splits skewed partitions); salt the hot key (random 0..N-1 on the big side, explode the small side across salts, join on (key, salt), aggregate the salt away)."
+  tags: [skew, salting]
+- id: perf-06
+  difficulty: 4
+  q: "Why does salting fix skew?"
+  a: "It turns one hot partition into N partitions handled by N tasks in parallel, trading a slightly larger (N×-replicated) small side for balanced reduce tasks."
+  tags: [skew, salting]
+- id: perf-07
+  difficulty: 3
+  q: "What is spill and what does it tell you?"
+  a: "Spill means execution memory ran out and Spark wrote intermediate shuffle/sort data to disk. Some spill is fine; heavy spill means partitions are too big — increase partition count or executor memory, or de-skew."
+  tags: [spill, memory]
+- id: perf-08
+  difficulty: 4
+  q: "How would you size executors?"
+  a: "Prefer fat-enough executors (e.g. 4–5 cores, several GB per core), not one giant executor (GC pauses) nor hundreds of 1-core ones (overhead, no shared broadcast). Leave ~1 core/1 GB per node for the OS. Multi-core executors share a broadcast once across cores."
+  tags: [sizing, executors]
+- id: perf-09
+  difficulty: 4
+  q: "What is AQE and what three things does it do?"
+  a: "Adaptive Query Execution (default since 3.2) re-optimizes mid-query from runtime stats: it coalesces post-shuffle partitions (auto-tuning the 200 default), converts sort-merge to broadcast/shuffle-hash when a side is small, and splits skewed partitions to handle skew joins."
+  tags: [aqe]
+- id: perf-10
+  difficulty: 3
+  q: "Partitioning vs bucketing?"
+  a: "Partitioning writes one folder per value, enabling partition pruning when you filter on it — use on low-cardinality filter columns. Bucketing hashes rows into a fixed number of buckets by key at write time so later joins/aggregations on that key skip the shuffle — use on high-cardinality join keys."
+  tags: [layout]
+- id: perf-11
+  difficulty: 3
+  q: "What's the small-files problem and how do you fix it?"
+  a: "Thousands of tiny files cause per-file open cost, metadata overhead, and slow listing/NameNode pressure. Fix by coalescing/repartitioning before write, the REBALANCE hint, or Delta OPTIMIZE compaction; target ~128 MB–1 GB per file."
+  tags: [small-files]
+- id: perf-12
+  difficulty: 2
+  q: "Storage levels — what are the tradeoffs?"
+  a: "MEMORY_ONLY (fast, may not fit), MEMORY_AND_DISK (default for cache, spills to disk), *_SER (serialized: smaller but CPU to deserialize), DISK_ONLY. Trade memory for CPU/disk based on data size and reuse pattern."
+  tags: [cache, persist]
+- id: perf-13
+  difficulty: 4
+  q: "How do you debug an executor OOM?"
+  a: "Find which partition/task is too large in the UI. Common causes: skew, a partition too big, or a wide UDF buffering rows. Fix by increasing partitions or de-skewing rather than blindly raising memory. Check GC time on the Executors tab for memory pressure."
+  tags: [oom, debugging]
+- id: perf-14
+  difficulty: 3
+  q: "Why prefer built-in functions over Python UDFs?"
+  a: "Python UDFs cross the JVM↔Python boundary (serialization per row) and are opaque to Catalyst, so no pushdown/codegen. Built-ins are vectorized and optimized. If you must, prefer pandas/vectorized UDFs which batch via Arrow."
+  tags: [udf]
+- id: perf-15
+  difficulty: 3
+  q: "What does dynamic allocation do?"
+  a: "spark.dynamicAllocation.enabled scales executors up and down with load (needs an external shuffle service or shuffle tracking). Great for bursty or shared clusters so idle resources are released."
+  tags: [resources]

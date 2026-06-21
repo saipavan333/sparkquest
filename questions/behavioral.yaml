@@ -1,0 +1,30 @@
+- id: beh-01
+  difficulty: 2
+  q: "Tell me about a data pipeline you built end to end."
+  a: "Use STAR: Situation (the business need + scale), Task (your ownership), Action (architecture: ingestion → medallion processing → serving; key decisions and tradeoffs), Result (metrics: latency, cost, reliability, impact). Lead with the problem and your decisions, quantify the result, and own the tradeoffs you made."
+  tags: [star]
+- id: beh-02
+  difficulty: 2
+  q: "Describe a time you debugged a hard production data issue."
+  a: "Pick a real incident: symptom (wrong numbers / a stuck job), how you diagnosed it (Spark UI, logs, lineage, narrowing the data), the root cause (skew, late data, a schema change), the fix, and the prevention you added (a DQ check, idempotency, an alert). Emphasize systematic diagnosis and the lasting safeguard."
+  tags: [debugging]
+- id: beh-03
+  difficulty: 2
+  q: "How do you handle a disagreement on a technical design?"
+  a: "Show you argue with data, not ego: lay out the tradeoffs explicitly, prototype/benchmark the contested point, defer to requirements (latency, cost, SLA), and commit to the decision once made. Interviewers want collaborative, evidence-driven judgment."
+  tags: [collaboration]
+- id: beh-04
+  difficulty: 2
+  q: "A stakeholder needs data faster than your pipeline delivers. What do you do?"
+  a: "Clarify the real freshness requirement and the cost of being late, then propose options with tradeoffs: incremental batch, a faster schedule, a streaming path for just the critical metric, or approximate results. Right-size the solution to the need rather than over-engineering everything to real-time."
+  tags: [stakeholders]
+- id: beh-05
+  difficulty: 2
+  q: "Tell me about a time you improved a pipeline's performance or cost."
+  a: "Quantify before/after. Name the bottleneck (a huge shuffle, skew, small files, an unbroadcast join), the fix (broadcast, partition/bucket layout, OPTIMIZE, AQE), and the result (runtime down X%, cost down Y%). Tie it to how you measured (the Spark UI / job metrics)."
+  tags: [impact]
+- id: beh-06
+  difficulty: 2
+  q: "How do you ensure data you deliver is trustworthy?"
+  a: "Talk about contracts and DQ gates (schema enforcement, expectations, quarantine), idempotent/backfillable design, observability (freshness/volume/drift alerts), and lineage. The theme: build trust into the pipeline by default, don't rely on someone noticing bad numbers later."
+  tags: [data-quality, trust]

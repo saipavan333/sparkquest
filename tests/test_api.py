@@ -53,3 +53,17 @@ def test_tutor_rule_based_fallback():
 
 def test_unknown_challenge_returns_404():
     assert client.get("/api/challenge/does-not-exist").status_code == 404
+
+
+def test_handbook_toc_and_chapter():
+    chapters = client.get("/api/handbook").json()["chapters"]
+    assert len(chapters) >= 8
+    first = client.get(f"/api/handbook/{chapters[0]['slug']}").json()
+    assert len(first["markdown"]) > 100
+
+
+def test_interview_bank():
+    body = client.get("/api/interview").json()
+    assert body["total"] >= 90
+    assert len(body["categories"]) >= 8
+    assert all("q" in q and "a" in q for q in body["questions"])

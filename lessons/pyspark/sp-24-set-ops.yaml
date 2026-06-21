@@ -1,0 +1,37 @@
+id: sp-24-set-ops
+track: pyspark
+order: 24
+title: "Set Operations"
+difficulty: 3
+concepts: ["exceptAll", "union", "intersect", "set difference"]
+needs_spark: true
+brief: |
+  Spark supports SQL set operations: `unionByName` (stack rows), `intersect`
+  (common rows), and `exceptAll`/`subtract` (rows in A not in B). They're the
+  reconciliation toolkit — "which records did we lose/gain?".
+
+  **Mission:** Find the tickers present in `a` but **not** in `b`, using
+  `exceptAll`. Store the result in `only_in_a`.
+
+  Expected: AAPL and MSFT (GOOG is in both; JPM is only in b).
+starter_code: |
+  a = spark.createDataFrame([("AAPL",), ("GOOG",), ("MSFT",)], ["ticker"])
+  b = spark.createDataFrame([("GOOG",), ("JPM",)], ["ticker"])
+  # TODO: rows in a but not in b -> only_in_a
+  only_in_a = ...
+  only_in_a.show()
+solution_code: |
+  a = spark.createDataFrame([("AAPL",), ("GOOG",), ("MSFT",)], ["ticker"])
+  b = spark.createDataFrame([("GOOG",), ("JPM",)], ["ticker"])
+  only_in_a = a.exceptAll(b)
+  only_in_a.show()
+checks:
+  - type: df_equals
+    name: only_in_a
+    expected:
+      - {"ticker": "AAPL"}
+      - {"ticker": "MSFT"}
+    message: "only_in_a should hold tickers in a that are absent from b"
+hints:
+  - "a.exceptAll(b) returns rows of a not in b (subtract is similar)."
+  - "intersect would give the common rows; unionByName would stack them."

@@ -22,6 +22,7 @@
         <div class="xp-text"><span id="xp-num">0</span> XP <span id="xp-next" class="muted"></span></div>
       </div>
       <button class="nav-btn" id="btn-handbook" title="The interview-prep handbook">📖 Handbook</button>
+      <button class="nav-btn" id="btn-mock" title="Mock interview drill">🎤 Mock</button>
       <button class="nav-btn" id="btn-badges" title="Your badges">🏅 <span id="badge-count">0</span></button>
       <button class="nav-btn" id="btn-leaderboard">Leaderboard</button>
     </div>
@@ -116,6 +117,33 @@
     <div class="hb-body">
       <nav class="hb-nav" id="hb-nav"><div class="loading">Loading…</div></nav>
       <article class="hb-content markdown" id="hb-content"></article>
+    </div>
+  </div>
+
+  <!-- Mock interview -->
+  <div class="mock" id="mock" hidden>
+    <div class="hb-head">
+      <span class="hb-brand">🎤 Mock Interview <span class="muted" id="mock-progress"></span></span>
+      <div class="mock-head-right">
+        <select id="mock-cat" class="mock-select" title="Topic"></select>
+        <button class="icon-btn" id="mock-close" title="Close">✕</button>
+      </div>
+    </div>
+    <div class="mock-body">
+      <div class="mock-card">
+        <div class="mock-meta"><span class="mock-cattag" id="mock-cattag"></span><span class="mock-diff" id="mock-diff"></span></div>
+        <div class="mock-q" id="mock-q">Loading…</div>
+        <div class="mock-a markdown" id="mock-a" hidden></div>
+      </div>
+      <div class="mock-controls">
+        <button class="btn btn-run" id="mock-reveal">Reveal answer</button>
+        <div class="mock-rate" id="mock-rate" hidden>
+          <span class="muted">Rate yourself:</span>
+          <button class="btn" data-rate="miss">Missed</button>
+          <button class="btn" data-rate="partial">Partial</button>
+          <button class="btn btn-submit" data-rate="got">Got it →</button>
+        </div>
+      </div>
     </div>
   </div>
 

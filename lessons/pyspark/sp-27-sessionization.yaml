@@ -1,0 +1,59 @@
+id: sp-27-sessionization
+track: pyspark
+order: 27
+title: "Sessionization (gaps & islands)"
+difficulty: 5
+concepts: ["Window", "lag", "cumulative sum", "sessionization"]
+needs_spark: true
+brief: |
+  A senior favourite: group a user's events into **sessions**, starting a new
+  session whenever the gap since the previous event exceeds a threshold. The
+  classic **gaps-and-islands** technique:
+
+  1. `lag` the timestamp to get the previous event's time.
+  2. Flag a **new session** when the gap > threshold (or there's no previous row).
+  3. **Cumulative-sum** the flags into a `session` id.
+
+  **Mission:** For `events` (a `ts` in minutes), start a new session when the gap
+  is **greater than 5**. Produce `out` with `user`, `ts`, `session`.
+
+  Expected: ts 1,2 → session 1; ts 10,11 → session 2.
+starter_code: |
+  from pyspark.sql.window import Window
+
+  events = spark.createDataFrame(
+      [("u1", 1), ("u1", 2), ("u1", 10), ("u1", 11)],
+      ["user", "ts"],
+  )
+  # TODO: assign session ids via lag + new-session flag + cumulative sum -> out
+  out = ...
+  out.show()
+solution_code: |
+  from pyspark.sql.window import Window
+
+  events = spark.createDataFrame(
+      [("u1", 1), ("u1", 2), ("u1", 10), ("u1", 11)],
+      ["user", "ts"],
+  )
+  w = Window.partitionBy("user").orderBy("ts")
+  prev = F.lag("ts").over(w)
+  is_new = F.when(prev.isNull() | (F.col("ts") - prev > 5), 1).otherwise(0)
+  w_cum = w.rowsBetween(Window.unboundedPreceding, Window.currentRow)
+  out = (
+      events.withColumn("is_new", is_new)
+      .withColumn("session", F.sum("is_new").over(w_cum))
+      .select("user", "ts", "session")
+  )
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"user": "u1", "ts": 1, "session": 1}
+      - {"user": "u1", "ts": 2, "session": 1}
+      - {"user": "u1", "ts": 10, "session": 2}
+      - {"user": "u1", "ts": 11, "session": 2}
+    message: "a gap > 5 should start a new session id"
+hints:
+  - "Flag new sessions: F.when(prev.isNull() | (ts - prev > 5), 1).otherwise(0)."
+  - "Cumulative-sum the flags over a running frame to get the session id."
