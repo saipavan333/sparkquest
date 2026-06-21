@@ -1,0 +1,49 @@
+id: iceberg-03-merge
+track: iceberg
+order: 3
+title: "MERGE / Upsert (CDC)"
+difficulty: 4
+concepts: ["iceberg", "MERGE", "upsert", "CDC"]
+needs_spark: true
+needs_iceberg: true
+brief: |
+  `MERGE INTO` is the upsert workhorse — the heart of change-data-capture: update
+  rows that exist, insert the ones that don't, in a single atomic statement. It's
+  identical in spirit to Delta's `MERGE` and is the most-asked lakehouse operation.
+
+  **Mission:** Create `local.db.accounts` with `(1, 100)` and `(2, 50)`. Then
+  `MERGE` the `updates` source (id `1` → `999`, new id `3` → `30`): update matches,
+  insert non-matches. Read the result into `out`.
+starter_code: |
+  spark.sql("CREATE TABLE local.db.accounts (id BIGINT, bal BIGINT) USING iceberg")
+  spark.sql("INSERT INTO local.db.accounts VALUES (1, 100), (2, 50)")
+  updates = spark.createDataFrame([(1, 999), (3, 30)], ["id", "bal"])
+  updates.createOrReplaceTempView("updates")
+  # TODO: MERGE updates into local.db.accounts (update matched, insert not-matched)
+  ...
+  out = spark.table("local.db.accounts")
+  out.show()
+solution_code: |
+  spark.sql("CREATE TABLE local.db.accounts (id BIGINT, bal BIGINT) USING iceberg")
+  spark.sql("INSERT INTO local.db.accounts VALUES (1, 100), (2, 50)")
+  updates = spark.createDataFrame([(1, 999), (3, 30)], ["id", "bal"])
+  updates.createOrReplaceTempView("updates")
+  spark.sql("""
+      MERGE INTO local.db.accounts t USING updates s ON t.id = s.id
+      WHEN MATCHED THEN UPDATE SET t.bal = s.bal
+      WHEN NOT MATCHED THEN INSERT *
+  """)
+  out = spark.table("local.db.accounts")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"id": 1, "bal": 999}
+      - {"id": 2, "bal": 50}
+      - {"id": 3, "bal": 30}
+    message: "id 1 updated to 999, id 2 unchanged, id 3 inserted"
+hints:
+  - "MERGE INTO target t USING source s ON t.id = s.id ..."
+  - "WHEN MATCHED THEN UPDATE SET t.bal = s.bal handles existing ids."
+  - "WHEN NOT MATCHED THEN INSERT * adds the new rows."

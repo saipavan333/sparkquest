@@ -5,12 +5,14 @@ topic below maps to a **graded, runnable challenge** (✅ = live now, 🔜 = on 
 roadmap). The structure mirrors the official documentation so you can always go
 deeper at the source.
 
-**Status:** 64 graded lessons across all 7 tracks. The 58 Python / PySpark /
+**Status:** 71 graded lessons across all 7 tracks. The 64 Python / PySpark /
 Performance / Streaming / Capstone lessons are verified in the offline sandbox; the
-6 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
+7 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
 need an internet JAR fetch). Every reference solution passes its own auto-grader.
-Pair the lessons with the [Handbook](handbook/) and the in-app **🎤 Mock Interview**
-drill — now with a **timed, scored exam mode** over a **201-question bank**.
+Pair the lessons with the **[Handbook](handbook/)** — now **14 deep-dive chapters**
+(incl. joins & AQE, RDDs, config & cluster sizing, debugging & the Spark UI, Kafka,
+and Iceberg) — and the in-app **🎤 Mock Interview** drill with a **timed, scored
+exam mode** over a **201-question bank**.
 
 **Primary references (always current):**
 - Python — <https://docs.python.org/3/tutorial/> · <https://docs.python.org/3/library/>
@@ -66,7 +68,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 2 — PySpark Foundations & DataFrames (28 live)
+## Track 2 — PySpark Foundations & DataFrames (32 live)
 
 > *Goal: think in distributed DataFrames; read, transform, and write any data.*
 > Docs: <https://spark.apache.org/docs/latest/sql-getting-started.html>
@@ -108,9 +110,18 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Maps — key/value access by key
 - ✅ pandas UDFs — vectorised UDFs with Arrow (`@pandas_udf`)
 
+**Module 2.5 — The RDD layer (low-level API, interview staple)**
+- ✅ RDD basics — `parallelize`, `map`, `filter`, `collect` (lazy + actions)
+- ✅ `reduceByKey` — pair RDDs, map-side combine, the word-count pattern
+- ✅ Broadcast variables — ship a read-only lookup once per executor
+- ✅ `mapPartitions` — amortise per-partition setup (connections, models)
+- 🔜 Accumulators — add-only metrics (and the exactly-once caveat)
+
+> Deep dive: [Handbook ch.10 — RDDs & the Low-Level API](handbook/10-rdd-and-low-level-api.md).
+
 ---
 
-## Track 3 — Performance & Internals (5 live)
+## Track 3 — Performance & Internals (6 live)
 
 > *Goal: understand what Spark does under the hood and make it fast.*
 > Docs: <https://spark.apache.org/docs/latest/sql-performance-tuning.html>
@@ -119,16 +130,20 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Caching & persistence — `cache`/`persist`, storage levels
 - ✅ Broadcast joins — `broadcast()`, avoiding shuffles
 - ✅ Data skew & salting — spreading hot keys
-- ✅ Partitioned writes & pruning — `partitionBy`, predicate pushdown
-- 🔜 Lazy evaluation & the DAG — transformations vs actions
-- 🔜 Narrow vs wide transformations — what triggers a shuffle
-- 🔜 Catalyst & Adaptive Query Execution (AQE)
+- ✅ Partitioned writes — `partitionBy` on write
+- ✅ Partition pruning — filter a partition column, read only matching dirs
 - 🔜 Bucketing — write-time hash layout
-- 🔜 Reading the Spark UI — stages, tasks, shuffle read/write
+- ✅ Catalyst & Adaptive Query Execution — *deep dive:* [Handbook ch.9](handbook/09-joins-shuffle-aqe.md)
+- ✅ Reading the Spark UI — stages, tasks, shuffle, spill, skew — [Handbook ch.12](handbook/12-debugging-and-spark-ui.md)
+- ✅ Cluster sizing & config — executors/cores/memory math — [Handbook ch.11](handbook/11-configuration-and-cluster-sizing.md)
+
+> Deep dives: [ch.9 Joins & AQE](handbook/09-joins-shuffle-aqe.md) ·
+> [ch.11 Config & Sizing](handbook/11-configuration-and-cluster-sizing.md) ·
+> [ch.12 Debugging & Spark UI](handbook/12-debugging-and-spark-ui.md).
 
 ---
 
-## Track 4 — Structured Streaming (6 live)
+## Track 4 — Structured Streaming (7 live)
 
 > *Goal: build real-time pipelines with the same DataFrame API.*
 > Docs: <https://spark.apache.org/docs/latest/streaming/index.html>
@@ -139,11 +154,14 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Streaming deduplication — `dropDuplicates` with a watermark
 - ✅ Custom sinks with `foreachBatch` — per-batch DataFrames, upserts
 - ✅ Stream-static joins — enriching a stream with reference data
-- 🔜 Sources & sinks — file, rate, socket, Kafka; console/file
+- ✅ Parsing a Kafka value — `from_json` over the `value` column (the universal step)
 - 🔜 Output modes & triggers — append/update/complete, `processingTime`
 - 🔜 Sliding & session windows — overlapping and gap-based windows
 - 🔜 Stream-stream joins — joining two live streams with watermarks
-- 🔜 Checkpointing & fault tolerance — exactly-once, recovery
+
+> Deep dives: [ch.3 Streaming Internals](handbook/03-streaming-internals.md) ·
+> [ch.13 Kafka & Streaming I/O](handbook/13-kafka-and-streaming-io.md) (offsets,
+> exactly-once, `foreachBatch`+`MERGE`).
 
 ---
 
@@ -164,7 +182,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 6 — Apache Iceberg (2 live)
+## Track 6 — Apache Iceberg (3 live)
 
 > *Goal: the other open table format senior interviews ask about — know how it
 > compares to Delta.*
@@ -175,9 +193,12 @@ your output. Tracks are ordered — finish one before the next.
 
 - ✅ Your first Iceberg table — `CREATE TABLE … USING iceberg`, insert, read back
 - ✅ Row-level `UPDATE` — copy-on-write mutation of a single row via SQL
+- ✅ `MERGE` / upsert (CDC) — update matches, insert non-matches atomically
 - 🔜 Time travel & snapshots — `VERSION AS OF`, snapshot expiry
 - 🔜 Hidden partitioning — partition transforms without query-side `WHERE` gymnastics
-- 🔜 `MERGE INTO` — upserts and CDC, contrasted with Delta's semantics
+
+> Deep dive: [Handbook ch.14 — Apache Iceberg](handbook/14-apache-iceberg.md)
+> (metadata tree, hidden partitioning, CoW vs MoR, Delta vs Iceberg vs Hudi).
 
 ---
 

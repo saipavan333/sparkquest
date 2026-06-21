@@ -1,0 +1,42 @@
+id: perf-06-partition-pruning
+track: performance
+order: 6
+title: "Partition Pruning on Write & Read"
+difficulty: 3
+concepts: ["partitionBy", "partition pruning", "parquet", "predicate pushdown"]
+needs_spark: true
+brief: |
+  Writing data **partitioned by a column** lays it out in one directory per value
+  (`region=US/`, `region=EU/`…). When you later **filter on that column**, Spark
+  reads only the matching directories — **partition pruning** — often a 10–100×
+  I/O win. It's the physical-layout half of predicate pushdown.
+
+  **Mission:** Write `df` to Parquet **partitioned by `region`**, then read it back
+  and keep only `region == "US"` into `out`.
+starter_code: |
+  import tempfile
+  path = tempfile.mkdtemp()
+  data = [("US", 1), ("US", 2), ("EU", 3), ("APAC", 4)]
+  df = spark.createDataFrame(data, ["region", "val"])
+  # TODO: write df partitioned by region to `path`, then read back filtering region == "US"
+  out = ...
+  out.show()
+solution_code: |
+  import tempfile
+  path = tempfile.mkdtemp()
+  data = [("US", 1), ("US", 2), ("EU", 3), ("APAC", 4)]
+  df = spark.createDataFrame(data, ["region", "val"])
+  df.write.mode("overwrite").partitionBy("region").parquet(path)
+  out = spark.read.parquet(path).filter(F.col("region") == "US")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"region": "US", "val": 1}
+      - {"region": "US", "val": 2}
+    message: "out should contain only the two US rows read from the pruned partition"
+hints:
+  - "df.write.partitionBy(\"region\").parquet(path) lays out one folder per region."
+  - "spark.read.parquet(path).filter(F.col(\"region\") == \"US\") prunes to that folder."
+  - "The region column is restored from the directory name on read."

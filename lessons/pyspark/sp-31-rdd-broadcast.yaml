@@ -1,0 +1,39 @@
+id: sp-31-rdd-broadcast
+track: pyspark
+order: 31
+title: "RDDs: broadcast variables"
+difficulty: 3
+concepts: ["broadcast variable", "shared variables", "RDD", "lookup"]
+needs_spark: true
+brief: |
+  When tasks need a large **read-only** lookup (a dimension map, a model), shipping
+  a copy with every task is wasteful. A **broadcast variable** caches the value
+  **once per executor**. Create it with `sc.broadcast(value)` and read it with
+  `.value` inside your transformation. (This is the RDD-level cousin of
+  `F.broadcast()` for DataFrame joins.)
+
+  **Mission:** Broadcast the `lookup` dict, then map each country code in `codes`
+  to its full name. Collect into a list named `result`.
+starter_code: |
+  sc = spark.sparkContext
+  lookup = {"US": "United States", "IN": "India", "GB": "United Kingdom"}
+  codes = sc.parallelize(["US", "IN", "US", "GB"])
+  # TODO: broadcast `lookup`, map each code to its name, collect into `result`
+  result = ...
+  print(result)
+solution_code: |
+  sc = spark.sparkContext
+  lookup = {"US": "United States", "IN": "India", "GB": "United Kingdom"}
+  codes = sc.parallelize(["US", "IN", "US", "GB"])
+  b = sc.broadcast(lookup)
+  result = codes.map(lambda c: b.value[c]).collect()
+  print(result)
+checks:
+  - type: var_equals
+    name: result
+    expected: ["United States", "India", "United States", "United Kingdom"]
+    message: "result should map each code to its full country name, in order"
+hints:
+  - "b = sc.broadcast(lookup) caches the dict on every executor."
+  - "Inside map, read it with b.value[c] (never reference `lookup` directly)."
+  - "map preserves input order, so collect() returns names in the codes' order."

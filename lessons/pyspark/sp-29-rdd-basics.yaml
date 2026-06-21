@@ -1,0 +1,37 @@
+id: sp-29-rdd-basics
+track: pyspark
+order: 29
+title: "RDDs: parallelize, map, filter"
+difficulty: 2
+concepts: ["RDD", "sparkContext", "map", "filter", "collect"]
+needs_spark: true
+brief: |
+  Beneath every DataFrame sits an **RDD** — a partitioned, immutable collection
+  you operate on in parallel. You rarely need it, but interviewers do. Reach the
+  low-level API through `spark.sparkContext` (conventionally `sc`).
+
+  RDD transformations (`map`, `filter`) are **lazy**; an **action** like
+  `collect()` runs the pipeline and pulls results to the driver.
+
+  **Mission:** From the integers 1..6, square each number, keep only the squares
+  **greater than 10**, and `collect()` them — sorted ascending — into `result`.
+starter_code: |
+  sc = spark.sparkContext
+  rdd = sc.parallelize(range(1, 7))
+  # TODO: square each value, keep squares > 10, collect into a sorted list `result`
+  result = ...
+  print(result)
+solution_code: |
+  sc = spark.sparkContext
+  rdd = sc.parallelize(range(1, 7))
+  result = sorted(rdd.map(lambda x: x * x).filter(lambda x: x > 10).collect())
+  print(result)
+checks:
+  - type: var_equals
+    name: result
+    expected: [16, 25, 36]
+    message: "result should be [16, 25, 36] — squares of 4, 5, 6"
+hints:
+  - "rdd.map(lambda x: x * x) squares each element (lazy)."
+  - ".filter(lambda x: x > 10) keeps matching elements; .collect() runs it."
+  - "Wrap the collected list in sorted(...) for a deterministic order."

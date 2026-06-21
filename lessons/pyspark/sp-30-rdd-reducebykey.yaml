@@ -1,0 +1,41 @@
+id: sp-30-rdd-reducebykey
+track: pyspark
+order: 30
+title: "RDDs: reduceByKey (word count)"
+difficulty: 3
+concepts: ["RDD", "reduceByKey", "map-side combine", "pair RDD"]
+needs_spark: true
+brief: |
+  The canonical RDD interview question: **`reduceByKey` vs `groupByKey`**.
+  `reduceByKey` combines values **map-side** before the shuffle, so each partition
+  ships one partial total per key — far less network, and no OOM on a hot key.
+  `groupByKey` shuffles *every* value. **Always prefer `reduceByKey`.**
+
+  **Mission:** Count the words below using a `(word, 1)` pair RDD and
+  `reduceByKey`. Collect the result into a Python dict named `counts`.
+
+  ```
+  ["spark", "data", "spark", "spark", "data", "etl"]
+  ```
+starter_code: |
+  sc = spark.sparkContext
+  words = ["spark", "data", "spark", "spark", "data", "etl"]
+  rdd = sc.parallelize(words)
+  # TODO: build (word, 1) pairs, reduceByKey to sum, collect into dict `counts`
+  counts = ...
+  print(counts)
+solution_code: |
+  sc = spark.sparkContext
+  words = ["spark", "data", "spark", "spark", "data", "etl"]
+  rdd = sc.parallelize(words)
+  counts = dict(rdd.map(lambda w: (w, 1)).reduceByKey(lambda a, b: a + b).collect())
+  print(counts)
+checks:
+  - type: var_equals
+    name: counts
+    expected: {"spark": 3, "data": 2, "etl": 1}
+    message: "counts should be {spark: 3, data: 2, etl: 1}"
+hints:
+  - "rdd.map(lambda w: (w, 1)) makes a pair RDD."
+  - ".reduceByKey(lambda a, b: a + b) sums counts per key with a map-side combine."
+  - "dict(...) on the collected list of (key, value) pairs gives the mapping."

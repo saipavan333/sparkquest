@@ -20,6 +20,12 @@ CHAPTERS: list[tuple[str, str, str]] = [
     ("modeling", "06-data-modeling.md", "6 · Data Modeling for Analytics"),
     ("system-design", "07-system-design.md", "7 · Pipeline System Design"),
     ("python-sql", "08-python-and-sql-deep.md", "8 · Python & SQL Mastery"),
+    ("joins-aqe", "09-joins-shuffle-aqe.md", "9 · Joins, Shuffle & AQE Deep-Dive"),
+    ("rdd", "10-rdd-and-low-level-api.md", "10 · RDDs & the Low-Level API"),
+    ("config", "11-configuration-and-cluster-sizing.md", "11 · Configuration & Cluster Sizing"),
+    ("debugging", "12-debugging-and-spark-ui.md", "12 · Debugging & the Spark UI"),
+    ("kafka", "13-kafka-and-streaming-io.md", "13 · Kafka & Streaming I/O"),
+    ("iceberg", "14-apache-iceberg.md", "14 · Apache Iceberg"),
     ("questions", "interview-questions.md", "Interview Question Bank"),
     ("resources", "resources.md", "Resources & Study Plan"),
 ]

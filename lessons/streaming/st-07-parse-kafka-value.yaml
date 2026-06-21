@@ -1,0 +1,46 @@
+id: st-07-parse-kafka-value
+track: streaming
+order: 7
+title: "Parsing a Kafka value (from_json)"
+difficulty: 3
+concepts: ["kafka", "from_json", "schema", "value parsing", "structured streaming"]
+needs_spark: true
+brief: |
+  Kafka hands you each record's payload as an opaque **`value`** (bytes). The
+  universal first step in every Kafka pipeline is: **cast to string**, then
+  **`from_json`** with a schema to get typed columns. This is the exact transform
+  you apply right after `spark.readStream.format("kafka")` — practised here on a
+  static frame so it's deterministic.
+
+  **Mission:** The `value` column holds JSON strings. Parse them with `from_json`
+  into typed columns `ticker` (STRING) and `qty` (LONG), selecting both into `out`.
+starter_code: |
+  data = [
+      ('{"ticker": "AAPL", "qty": 100}',),
+      ('{"ticker": "GOOG", "qty": 50}',),
+  ]
+  df = spark.createDataFrame(data, ["value"])
+  schema = "ticker STRING, qty LONG"
+  # TODO: parse the JSON in `value` into columns ticker and qty -> `out`
+  out = ...
+  out.show()
+solution_code: |
+  data = [
+      ('{"ticker": "AAPL", "qty": 100}',),
+      ('{"ticker": "GOOG", "qty": 50}',),
+  ]
+  df = spark.createDataFrame(data, ["value"])
+  schema = "ticker STRING, qty LONG"
+  out = df.select(F.from_json(F.col("value").cast("string"), schema).alias("d")).select("d.*")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "qty": 100}
+      - {"ticker": "GOOG", "qty": 50}
+    message: "out should have typed ticker/qty columns parsed from the JSON value"
+hints:
+  - "F.from_json(col, schema) turns a JSON string column into a struct."
+  - "Give it the schema string \"ticker STRING, qty LONG\"."
+  - "Alias the struct, then .select(\"d.*\") to flatten it into columns."

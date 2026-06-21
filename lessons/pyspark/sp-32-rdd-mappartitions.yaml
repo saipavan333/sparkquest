@@ -1,0 +1,39 @@
+id: sp-32-rdd-mappartitions
+track: pyspark
+order: 32
+title: "RDDs: mapPartitions (amortize setup)"
+difficulty: 3
+concepts: ["mapPartitions", "RDD", "per-partition", "optimization"]
+needs_spark: true
+brief: |
+  `map` runs your function **once per row**. `mapPartitions` runs it **once per
+  partition**, handing you an iterator of that partition's rows. That's the trick
+  for **amortizing expensive setup** — open one DB connection or load one model
+  per partition instead of per row.
+
+  Your function receives an iterator and must **return an iterator** (a list works).
+
+  **Mission:** Using `mapPartitions`, emit the **sum of each partition**, then add
+  them up into `total`. (Summing partials per partition, then combining, is the
+  shape of every efficient aggregation.)
+starter_code: |
+  sc = spark.sparkContext
+  rdd = sc.parallelize(range(1, 11), 4)   # 1..10 across 4 partitions
+  # TODO: use mapPartitions to yield each partition's sum, then sum those into `total`
+  total = ...
+  print(total)
+solution_code: |
+  sc = spark.sparkContext
+  rdd = sc.parallelize(range(1, 11), 4)
+  partial_sums = rdd.mapPartitions(lambda it: [sum(it)])
+  total = partial_sums.sum()
+  print(total)
+checks:
+  - type: var_equals
+    name: total
+    expected: 55
+    message: "total should be 55 (sum of 1..10), combined from per-partition sums"
+hints:
+  - "mapPartitions takes a function of one iterator and returns an iterable."
+  - "lambda it: [sum(it)] yields a single partial sum per partition."
+  - ".sum() on the partial sums RDD combines them (1..10 sums to 55)."
