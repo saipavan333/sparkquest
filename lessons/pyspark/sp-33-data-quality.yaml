@@ -1,0 +1,47 @@
+id: sp-33-data-quality
+track: pyspark
+order: 33
+title: "Data Quality: validate & quarantine"
+difficulty: 3
+concepts: ["data quality", "validation", "quarantine", "filter"]
+needs_spark: true
+brief: |
+  The senior move on dirty data isn't `dropna()` — it's **validate and quarantine**:
+  keep the clean rows flowing, route the bad ones somewhere visible (with a reason),
+  and never silently lose data. Here you build the **valid** half.
+
+  A row is **valid** when `amount >= 0` **and** `customer_id` is not null.
+
+  **Mission:** From `df`, select only the valid rows into `valid`.
+starter_code: |
+  data = [
+      (1, 100, "C1"),
+      (2, -5, "C2"),     # negative amount -> invalid
+      (3, 50, None),     # missing customer -> invalid
+      (4, 30, "C4"),
+  ]
+  df = spark.createDataFrame(data, ["id", "amount", "customer_id"])
+  # TODO: keep only rows where amount >= 0 AND customer_id is not null -> `valid`
+  valid = ...
+  valid.show()
+solution_code: |
+  data = [
+      (1, 100, "C1"),
+      (2, -5, "C2"),
+      (3, 50, None),
+      (4, 30, "C4"),
+  ]
+  df = spark.createDataFrame(data, ["id", "amount", "customer_id"])
+  valid = df.filter((F.col("amount") >= 0) & F.col("customer_id").isNotNull())
+  valid.show()
+checks:
+  - type: df_equals
+    name: valid
+    expected:
+      - {"id": 1, "amount": 100, "customer_id": "C1"}
+      - {"id": 4, "amount": 30, "customer_id": "C4"}
+    message: "valid should keep only ids 1 and 4 (non-negative amount, non-null customer)"
+hints:
+  - "Combine conditions with & and wrap each in parentheses."
+  - "F.col(\"customer_id\").isNotNull() filters out missing customers."
+  - "The two bad rows (negative amount, null customer) would go to a quarantine table."

@@ -26,6 +26,7 @@ CHAPTERS: list[tuple[str, str, str]] = [
     ("debugging", "12-debugging-and-spark-ui.md", "12 · Debugging & the Spark UI"),
     ("kafka", "13-kafka-and-streaming-io.md", "13 · Kafka & Streaming I/O"),
     ("iceberg", "14-apache-iceberg.md", "14 · Apache Iceberg"),
+    ("testing", "15-testing-and-data-quality.md", "15 · Testing & Data Quality"),
     ("questions", "interview-questions.md", "Interview Question Bank"),
     ("resources", "resources.md", "Resources & Study Plan"),
 ]

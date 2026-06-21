@@ -77,6 +77,10 @@ specific configs against the docs for *your* runtime.
 - **[07 · Pipeline System Design](07-system-design.md)** — a repeatable framework;
   batch vs streaming; **Lambda vs Kappa**; **idempotency, exactly-once & backfills**;
   data quality; orchestration (Airflow).
+- **[15 · Testing & Data Quality](15-testing-and-data-quality.md)** — the data
+  testing pyramid, unit-testing transforms (`chispa`), the **six DQ dimensions**,
+  schema enforcement, the **quarantine/dead-letter pattern**, and frameworks
+  (Great Expectations, Deequ, dbt tests, Delta `CHECK` constraints).
 
 ### Part VI — Python & SQL mastery for DE
 - **[08 · Python & SQL Mastery](08-python-and-sql-deep.md)** — the GIL & concurrency
@@ -91,7 +95,7 @@ specific configs against the docs for *your* runtime.
 
 ## Status & rollout
 
-**All 14 deep-dive chapters are live** (Parts I–VI) plus the question bank and
+**All 15 deep-dive chapters are live** (Parts I–VI) plus the question bank and
 resources — and they're readable **inside the app** via the 📖 **Handbook** button,
 not just on GitHub. A **🎤 Mock Interview** mode drills you through a **201-question
 bank** (Spark core, performance, streaming, Kafka, file formats, lakehouse, modeling,

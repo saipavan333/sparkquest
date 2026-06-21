@@ -5,14 +5,14 @@ topic below maps to a **graded, runnable challenge** (✅ = live now, 🔜 = on 
 roadmap). The structure mirrors the official documentation so you can always go
 deeper at the source.
 
-**Status:** 71 graded lessons across all 7 tracks. The 64 Python / PySpark /
+**Status:** 75 graded lessons across all 7 tracks. The 68 Python / PySpark /
 Performance / Streaming / Capstone lessons are verified in the offline sandbox; the
 7 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
 need an internet JAR fetch). Every reference solution passes its own auto-grader.
-Pair the lessons with the **[Handbook](handbook/)** — now **14 deep-dive chapters**
+Pair the lessons with the **[Handbook](handbook/)** — now **15 deep-dive chapters**
 (incl. joins & AQE, RDDs, config & cluster sizing, debugging & the Spark UI, Kafka,
-and Iceberg) — and the in-app **🎤 Mock Interview** drill with a **timed, scored
-exam mode** over a **201-question bank**.
+Iceberg, and testing & data quality) — and the in-app **🎤 Mock Interview** drill
+with a **timed, scored exam mode** over a **201-question bank**.
 
 **Primary references (always current):**
 - Python — <https://docs.python.org/3/tutorial/> · <https://docs.python.org/3/library/>
@@ -34,7 +34,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 1 — Python for Data Engineering (16 live)
+## Track 1 — Python for Data Engineering (17 live)
 
 > *Goal: write clean, idiomatic Python that's the backbone of every pipeline.*
 > Docs: <https://docs.python.org/3/tutorial/>
@@ -60,15 +60,16 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ `collections` & `itertools` — `Counter`, `defaultdict`, `groupby`
 - ✅ Dates & times — `datetime`, `strptime`, extracting parts
 - ✅ JSON — `json.loads`/`dumps`, parsing records
+- ✅ Context managers — `with`, `__enter__`/`__exit__`, guaranteed cleanup
 - 🔜 Type hints — `typing`, `Optional`, why DE teams enforce them
-- 🔜 Files & `pathlib` — context managers (`with`), reading/writing
+- 🔜 Files & `pathlib` — reading/writing paths
 - 🔜 CSV — the `csv` module, delimited records
 - 🔜 Logging — structured logs over `print`
 - 🔜 Testing — `assert`, designing for testability
 
 ---
 
-## Track 2 — PySpark Foundations & DataFrames (32 live)
+## Track 2 — PySpark Foundations & DataFrames (34 live)
 
 > *Goal: think in distributed DataFrames; read, transform, and write any data.*
 > Docs: <https://spark.apache.org/docs/latest/sql-getting-started.html>
@@ -102,6 +103,8 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ More windows — `rank`/`dense_rank`, `lag`/`lead`, **running totals**, **sessionization** (gaps & islands)
 - ✅ Set operations — `unionByName`, `exceptAll`, `intersect`
 - ✅ `selectExpr` & SQL expression strings
+- ✅ Spark SQL analytics — top-N per group with `ROW_NUMBER()` window in SQL
+- ✅ Data quality — validate & quarantine rows (don't `dropna()` silently)
 
 **Module 2.4 — Complex & semi-structured data**
 - ✅ Arrays — `explode`, flattening
@@ -202,15 +205,20 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 7 — Capstone ETL Projects (3 live)
+## Track 7 — Capstone ETL Projects (4 live)
 
 > *Goal: combine everything into production-shaped pipelines.*
 
 - ✅ Batch ETL pipeline — ingest → clean → enrich → aggregate
 - ✅ Data-quality checks — valid vs quarantined rows, null/range assertions
 - ✅ Streaming pipeline capstone — filter → enrich (join) → aggregate on a live stream
+- ✅ Slowly Changing Dimension (Type 2) — expire old rows, insert new current rows
 - 🔜 Incremental / CDC pattern — process only new data idempotently
 - 🔜 Orchestration — scheduling and dependencies (concept)
+
+> Deep dives: [ch.6 Data Modeling](handbook/06-data-modeling.md) (SCD 1/2/3) ·
+> [ch.15 Testing & Data Quality](handbook/15-testing-and-data-quality.md)
+> (unit tests, the six DQ dimensions, the quarantine pattern, frameworks).
 
 ---
 

@@ -1,0 +1,57 @@
+id: py-17-context-managers
+track: python
+order: 17
+title: "Context Managers (with / __enter__ / __exit__)"
+difficulty: 3
+concepts: ["context manager", "with", "__enter__", "__exit__", "cleanup"]
+brief: |
+  A **context manager** guarantees setup and teardown around a block — the `with`
+  statement runs `__enter__` on the way in and `__exit__` on the way out, **even if
+  the block raises**. It's how you safely open files, DB connections, and Spark
+  sessions without leaking resources.
+
+  **Mission:** Implement a `Managed` context manager that appends `"open"` to `log`
+  on enter and `"close"` on exit. Use it in a `with` block that appends `"work"`,
+  so `log` ends as `["open", "work", "close"]`.
+starter_code: |
+  log = []
+
+  class Managed:
+      def __init__(self, log):
+          self.log = log
+      # TODO: implement __enter__ (append "open", return self) and __exit__ (append "close")
+
+  with Managed(log):
+      log.append("work")
+
+  result = log
+  print(result)
+solution_code: |
+  log = []
+
+  class Managed:
+      def __init__(self, log):
+          self.log = log
+
+      def __enter__(self):
+          self.log.append("open")
+          return self
+
+      def __exit__(self, exc_type, exc, tb):
+          self.log.append("close")
+          return False
+
+  with Managed(log):
+      log.append("work")
+
+  result = log
+  print(result)
+checks:
+  - type: var_equals
+    name: result
+    expected: ["open", "work", "close"]
+    message: "log should record open, then work, then close — in that order"
+hints:
+  - "__enter__(self) runs first; append \"open\" and return self."
+  - "__exit__(self, exc_type, exc, tb) runs on the way out; append \"close\"."
+  - "Returning False from __exit__ lets any exception propagate (here there is none)."

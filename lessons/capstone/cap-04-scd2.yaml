@@ -1,0 +1,49 @@
+id: cap-04-scd2
+track: capstone
+order: 4
+title: "Slowly Changing Dimension (Type 2)"
+difficulty: 5
+concepts: ["SCD2", "dimensional modeling", "history", "is_current"]
+needs_spark: true
+brief: |
+  **SCD Type 2** preserves history: when a dimension attribute changes, you don't
+  overwrite — you **expire** the old row (`is_current = False`) and **insert** a new
+  current row. It's the most-asked modeling question, and the heart of every
+  customer/product dimension.
+
+  **Mission:** Apply the change in `changes` to the current `dim`:
+  - rows whose `customer_id` changed → set `is_current = False` (expired),
+  - unchanged rows → keep as-is,
+  - each change → a new row with `is_current = True`.
+
+  Combine all three into `out`. (Customer 1 moves NYC → SF; customer 2 unchanged.)
+starter_code: |
+  dim = spark.createDataFrame(
+      [(1, "NYC", True), (2, "LA", True)], ["customer_id", "city", "is_current"])
+  changes = spark.createDataFrame([(1, "SF")], ["customer_id", "city"])
+  # TODO: expire changed current rows, keep unchanged, add new current rows -> `out`
+  out = ...
+  out.show()
+solution_code: |
+  dim = spark.createDataFrame(
+      [(1, "NYC", True), (2, "LA", True)], ["customer_id", "city", "is_current"])
+  changes = spark.createDataFrame([(1, "SF")], ["customer_id", "city"])
+  changed_ids = changes.select("customer_id").distinct()
+  expired = (dim.join(changed_ids, "customer_id", "left_semi")
+                .withColumn("is_current", F.lit(False)))
+  unchanged = dim.join(changed_ids, "customer_id", "left_anti")
+  new_rows = changes.withColumn("is_current", F.lit(True))
+  out = unchanged.unionByName(expired).unionByName(new_rows)
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"customer_id": 2, "city": "LA", "is_current": true}
+      - {"customer_id": 1, "city": "NYC", "is_current": false}
+      - {"customer_id": 1, "city": "SF", "is_current": true}
+    message: "Customer 1: NYC expired + SF current; customer 2 unchanged"
+hints:
+  - "left_semi keeps dim rows whose id IS in changes; left_anti keeps those that are NOT."
+  - "Expire the semi-join result by setting is_current = F.lit(False)."
+  - "unionByName the unchanged, expired, and new (is_current=True) frames."

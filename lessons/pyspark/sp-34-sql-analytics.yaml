@@ -1,0 +1,45 @@
+id: sp-34-sql-analytics
+track: pyspark
+order: 34
+title: "Spark SQL: top-N per group (window)"
+difficulty: 4
+concepts: ["spark.sql", "window function", "ROW_NUMBER", "subquery"]
+needs_spark: true
+brief: |
+  Window functions in **SQL** are the #1 analytics interview topic. The classic
+  pattern — **top-N per group** — is `ROW_NUMBER() OVER (PARTITION BY ... ORDER BY
+  ...)` filtered in an outer query (you can't filter on a window alias directly).
+
+  **Mission:** Register `trades` as a temp view, then with `spark.sql` find the
+  **largest trade per ticker** (one row each) into `out` with columns
+  `ticker`, `qty`.
+starter_code: |
+  data = [("AAPL", 100), ("AAPL", 150), ("GOOG", 50), ("GOOG", 80)]
+  df = spark.createDataFrame(data, ["ticker", "qty"])
+  df.createOrReplaceTempView("trades")
+  # TODO: use ROW_NUMBER() partitioned by ticker, ordered by qty desc; keep rn = 1
+  out = spark.sql("...")
+  out.show()
+solution_code: |
+  data = [("AAPL", 100), ("AAPL", 150), ("GOOG", 50), ("GOOG", 80)]
+  df = spark.createDataFrame(data, ["ticker", "qty"])
+  df.createOrReplaceTempView("trades")
+  out = spark.sql("""
+      SELECT ticker, qty FROM (
+          SELECT ticker, qty,
+                 ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY qty DESC) AS rn
+          FROM trades
+      ) WHERE rn = 1
+  """)
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "qty": 150}
+      - {"ticker": "GOOG", "qty": 80}
+    message: "out should be the largest trade per ticker (AAPL 150, GOOG 80)"
+hints:
+  - "PARTITION BY ticker ORDER BY qty DESC ranks each ticker's trades."
+  - "ROW_NUMBER() gives 1 to the biggest; wrap in a subquery and filter rn = 1."
+  - "You must filter the window result in an OUTER query, not the same SELECT."
