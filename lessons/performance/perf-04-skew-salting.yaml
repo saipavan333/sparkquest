@@ -6,9 +6,24 @@ difficulty: 5
 concepts: ["data skew", "salting", "key distribution"]
 needs_spark: true
 brief: |
-  When one key holds most of the rows ("hot key"), a single task does all the work
-  and your job crawls. **Salting** spreads one hot key across several synthetic
-  sub-keys so the work parallelises.
+  **What & why.** **Skew** is the #1 cause of a Spark job that's 95% done and then
+  hangs forever. When one key (a "celebrity" user, a `NULL` foreign key, one mega
+  merchant) holds most of the rows, the shuffle sends them all to **one** task —
+  that straggler runs for an hour while every other core sits idle. You'll see it
+  in the Spark UI as one task with `max` duration / shuffle-read 100× the median.
+
+  **Salting** breaks the hot key into `N` synthetic sub-keys (`key_0 … key_{N-1}`)
+  so its rows spread across `N` partitions and `N` tasks. When you join, you
+  replicate the *other* side across all `N` salts so matches still happen; then you
+  aggregate away the salt.
+
+  **The fuller toolkit (name all three in interviews):**
+  - **Let AQE handle it** — `spark.sql.adaptive.skewJoin.enabled` splits skewed
+    partitions automatically (often enough; free).
+  - **Salting** — this lesson's technique, for when you need manual control.
+  - **Broadcast** the other side — if it's small, skew on the join key stops
+    mattering. Also handle `NULL` keys separately. (Deep dive:
+  [Handbook ch.9 §6](../../docs/handbook/09-joins-shuffle-aqe.md).)
 
   **Mission:** Every row has the same hot `key` ("HOT"). Add a `salted_key` that
   appends `_` plus `id % 3`, turning one key into **3** buckets. Then store the

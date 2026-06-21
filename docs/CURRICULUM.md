@@ -5,10 +5,11 @@ topic below maps to a **graded, runnable challenge** (✅ = live now, 🔜 = on 
 roadmap). The structure mirrors the official documentation so you can always go
 deeper at the source.
 
-**Status:** 75 graded lessons across all 7 tracks. The 68 Python / PySpark /
+**Status:** 78 graded lessons across all 7 tracks. The 70 Python / PySpark /
 Performance / Streaming / Capstone lessons are verified in the offline sandbox; the
-7 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
-need an internet JAR fetch). Every reference solution passes its own auto-grader.
+8 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
+need an internet JAR fetch). Every lesson ships **read-along teaching notes** in its
+brief — concept, why it matters, gotchas, and the interview angle. Every reference solution passes its own auto-grader.
 Pair the lessons with the **[Handbook](handbook/)** — now **15 deep-dive chapters**
 (incl. joins & AQE, RDDs, config & cluster sizing, debugging & the Spark UI, Kafka,
 Iceberg, and testing & data quality) — and the in-app **🎤 Mock Interview** drill
@@ -34,7 +35,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 1 — Python for Data Engineering (17 live)
+## Track 1 — Python for Data Engineering (18 live)
 
 > *Goal: write clean, idiomatic Python that's the backbone of every pipeline.*
 > Docs: <https://docs.python.org/3/tutorial/>
@@ -61,7 +62,7 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Dates & times — `datetime`, `strptime`, extracting parts
 - ✅ JSON — `json.loads`/`dumps`, parsing records
 - ✅ Context managers — `with`, `__enter__`/`__exit__`, guaranteed cleanup
-- 🔜 Type hints — `typing`, `Optional`, why DE teams enforce them
+- ✅ Type hints — `typing`, `Optional`, annotations, why DE teams enforce them
 - 🔜 Files & `pathlib` — reading/writing paths
 - 🔜 CSV — the `csv` module, delimited records
 - 🔜 Logging — structured logs over `print`
@@ -185,7 +186,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 6 — Apache Iceberg (3 live)
+## Track 6 — Apache Iceberg (4 live)
 
 > *Goal: the other open table format senior interviews ask about — know how it
 > compares to Delta.*
@@ -197,7 +198,7 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Your first Iceberg table — `CREATE TABLE … USING iceberg`, insert, read back
 - ✅ Row-level `UPDATE` — copy-on-write mutation of a single row via SQL
 - ✅ `MERGE` / upsert (CDC) — update matches, insert non-matches atomically
-- 🔜 Time travel & snapshots — `VERSION AS OF`, snapshot expiry
+- ✅ Time travel & snapshots — read an earlier `snapshot-id` / `VERSION AS OF`
 - 🔜 Hidden partitioning — partition transforms without query-side `WHERE` gymnastics
 
 > Deep dive: [Handbook ch.14 — Apache Iceberg](handbook/14-apache-iceberg.md)
@@ -205,7 +206,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 7 — Capstone ETL Projects (4 live)
+## Track 7 — Capstone ETL Projects (5 live)
 
 > *Goal: combine everything into production-shaped pipelines.*
 
@@ -213,7 +214,7 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Data-quality checks — valid vs quarantined rows, null/range assertions
 - ✅ Streaming pipeline capstone — filter → enrich (join) → aggregate on a live stream
 - ✅ Slowly Changing Dimension (Type 2) — expire old rows, insert new current rows
-- 🔜 Incremental / CDC pattern — process only new data idempotently
+- ✅ Incremental processing — high-water mark, idempotent reruns, backfills
 - 🔜 Orchestration — scheduling and dependencies (concept)
 
 > Deep dives: [ch.6 Data Modeling](handbook/06-data-modeling.md) (SCD 1/2/3) ·

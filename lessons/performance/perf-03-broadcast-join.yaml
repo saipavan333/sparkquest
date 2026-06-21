@@ -6,9 +6,24 @@ difficulty: 4
 concepts: ["broadcast", "join", "shuffle avoidance"]
 needs_spark: true
 brief: |
-  Joining a huge table to a tiny one? Don't shuffle both. **Broadcasting** sends
-  the small table to every executor so the join happens locally — often a massive
-  speed-up. Wrap the small side in `F.broadcast(...)`.
+  **What & why.** A normal (sort-merge) join **shuffles both** tables across the
+  network by the join key — expensive. When one side is **small** (a dimension, a
+  lookup), you don't need to: **broadcast** it to every executor, build a hash table
+  there, and probe the big side **locally**. No shuffle of the big table — often a
+  10×+ speed-up. This is the single most useful join optimization.
+
+  **How Spark decides:**
+  - Automatically broadcasts a side estimated ≤
+    `spark.sql.autoBroadcastJoinThreshold` (**default 10 MB**).
+  - You can **force** it with `F.broadcast(small)` when you *know* it's small but
+    the optimizer's estimate is off (common after filters/joins).
+  - With AQE on, Spark can even convert a planned sort-merge join into a broadcast
+    join at runtime once it sees the real size.
+
+  **Gotcha.** Broadcasting something **too big** collects it to the driver and ships
+  it everywhere → driver OOM or a slow broadcast. Only broadcast genuinely small
+  sides, and remember it needs an **equi-join**. (Deep dive:
+  [Handbook ch.9](../../docs/handbook/09-joins-shuffle-aqe.md).)
 
   **Mission:** Join `big` with the small `sectors` lookup on `ticker`, broadcasting
   `sectors`. Store the result in `joined`.

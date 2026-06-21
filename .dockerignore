@@ -12,13 +12,13 @@ __pycache__
 .coverage
 htmlcov
 
-# Docs / research artifacts not needed at runtime
+# Research artifacts not needed at runtime (context only — the image copies just
+# what the Dockerfile COPYs, so docs/handbook + data/README.md must stay reachable)
 paper
-docs
 benchmarks
 tests
-*.md
-!data/README.md
+# NOTE: do NOT exclude `docs` or `*.md` — the Dockerfile copies docs/handbook
+# (the in-app handbook) and the build fails with "/docs/handbook: not found" otherwise.
 
 # Local Spark / data scratch
 spark-warehouse

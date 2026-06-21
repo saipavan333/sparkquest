@@ -1,0 +1,49 @@
+id: cap-05-incremental
+track: capstone
+order: 5
+title: "Incremental Processing (high-water mark)"
+difficulty: 4
+concepts: ["incremental", "idempotency", "high-water mark", "CDC", "backfill"]
+needs_spark: true
+brief: |
+  **What & why.** Reprocessing the whole table every run is slow and expensive.
+  **Incremental processing** handles only data that's *new since last time*. The
+  standard mechanism is a **high-water mark** — you remember the largest
+  id/timestamp you've already processed, and next run you take only rows beyond it.
+
+  **Why it matters (the interview points):**
+  - **Idempotency** — rerunning after a failure reprocesses the same new slice and
+    produces the same result; no duplicates, no gaps.
+  - **Backfills** — to reprocess history, you simply reset the watermark and replay.
+  - It's the batch cousin of streaming checkpoints (which track Kafka offsets — see
+    [Handbook ch.13](../../docs/handbook/13-kafka-and-streaming-io.md)).
+
+  **The pattern:** `new = source.filter(col(key) > last_processed_value)`. In
+  production you'd persist the new max back to a control table for the next run.
+
+  **Mission:** Given the source and `last_processed_id = 100`, select only the rows
+  **newer than the high-water mark** (id > 100) into `new_rows`.
+starter_code: |
+  data = [(99, "old"), (100, "boundary"), (101, "new"), (102, "new")]
+  source = spark.createDataFrame(data, ["id", "note"])
+  last_processed_id = 100
+  # TODO: keep only rows newer than the high-water mark -> `new_rows`
+  new_rows = ...
+  new_rows.show()
+solution_code: |
+  data = [(99, "old"), (100, "boundary"), (101, "new"), (102, "new")]
+  source = spark.createDataFrame(data, ["id", "note"])
+  last_processed_id = 100
+  new_rows = source.filter(F.col("id") > last_processed_id)
+  new_rows.show()
+checks:
+  - type: df_equals
+    name: new_rows
+    expected:
+      - {"id": 101, "note": "new"}
+      - {"id": 102, "note": "new"}
+    message: "new_rows should contain only ids 101 and 102 (strictly above the watermark)"
+hints:
+  - "The high-water mark is exclusive: use > (not >=), so id 100 isn't reprocessed."
+  - "F.col(\"id\") > last_processed_id filters to the new slice."
+  - "Persisting max(id) back for next run is what makes the job idempotent."

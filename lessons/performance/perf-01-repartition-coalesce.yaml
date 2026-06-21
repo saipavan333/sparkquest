@@ -6,10 +6,24 @@ difficulty: 3
 concepts: ["partitions", "repartition", "coalesce", "shuffle"]
 needs_spark: true
 brief: |
-  Spark splits data into **partitions** processed in parallel. Too few starves
-  your cores; too many adds overhead. `repartition(n)` reshuffles into exactly `n`
-  (a full shuffle); `coalesce(n)` only *merges* down (no shuffle) — cheaper for
-  reducing partitions.
+  **What & why.** A **partition** is Spark's unit of parallelism — one task runs
+  per partition on one core. Get the count wrong and everything suffers: too **few**
+  and most of your cluster sits idle (each task may also spill/OOM on too much
+  data); too **many** and scheduler overhead dominates while tasks do trivial work.
+  Aim for partitions of roughly **128–200 MB**, and a count that's a small multiple
+  of total cores.
+
+  **The two levers (know the difference cold — it's a classic interview question):**
+  - `repartition(n)` — a **full shuffle** into exactly `n` *balanced* partitions.
+    Can grow or shrink the count; use it to fix skew or increase parallelism.
+  - `coalesce(n)` — **merges** existing partitions with **no shuffle**. Only
+    *shrinks*, and can leave partitions uneven — but it's far cheaper, so prefer it
+    to reduce partitions (e.g. before writing fewer output files).
+
+  **Gotcha.** Because `coalesce` avoids the shuffle by combining neighbours,
+  coalescing to very few partitions can also throttle the *upstream* stage's
+  parallelism. Rule of thumb: shrinking → `coalesce`; rebalancing or growing →
+  `repartition`. (Deep dive: [Handbook ch.1 §3](../../docs/handbook/01-spark-architecture-and-execution.md).)
 
   **Mission:** Take `df`, `repartition` it into **4** partitions, then `coalesce`
   to **2**. Store the final partition count in `n` (use `.rdd.getNumPartitions()`).

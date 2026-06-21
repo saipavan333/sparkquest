@@ -6,9 +6,23 @@ difficulty: 4
 concepts: ["partitionBy", "partition pruning", "parquet"]
 needs_spark: true
 brief: |
-  Writing data partitioned by a column lays it out in per-value folders. When you
-  later filter on that column, Spark reads **only** the matching folders —
-  *partition pruning* — skipping the rest. It's one of the biggest real-world wins.
+  **What & why.** `partitionBy(col)` lays data out in **one folder per value**
+  (`sector=Tech/`, `sector=Fin/`…). When a later query filters on that column,
+  Spark skips every non-matching folder entirely — **partition pruning** — so it
+  reads a fraction of the data. On a multi-TB table, filtering one day's partition
+  instead of scanning the year is the difference between seconds and hours.
+
+  **Choosing a partition column (the senior judgement):**
+  - Partition by a **low-cardinality** column you frequently **filter** on (date,
+    region, sector). Date is the classic.
+  - **Avoid high-cardinality** columns (user_id) — millions of tiny folders is the
+    **small-files problem**, which cripples the metastore and scan planning.
+  - Partitioning is physical layout; it pairs with Parquet's **column pruning** and
+    **predicate pushdown** ([Handbook ch.4](../../docs/handbook/04-file-formats-and-layout.md)).
+
+  **Gotcha.** Pruning only kicks in when you filter on the **partition column**
+  directly. Filtering on a derived expression can defeat it. (Iceberg's *hidden
+  partitioning* fixes this — [Handbook ch.14](../../docs/handbook/14-apache-iceberg.md).)
 
   **Mission:** Write `df` to Parquet **partitioned by `sector`**, then read it back
   and filter to `sector == "Tech"`. Store the result in `tech`.

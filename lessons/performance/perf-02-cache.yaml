@@ -6,9 +6,23 @@ difficulty: 3
 concepts: ["cache", "persist", "reuse"]
 needs_spark: true
 brief: |
-  Spark recomputes a DataFrame every time you use it — wasteful when you reuse the
-  same result. `cache()` (or `persist()`) keeps it in memory after the first
-  action, so repeated queries are fast.
+  **What & why.** Spark is **lazy**: every action re-executes the whole lineage
+  from the last shuffle/source. If you reuse a DataFrame (loop over it, branch it,
+  run several reports off it), you pay that cost *every time*. `cache()` /
+  `persist()` keep the computed result around so subsequent actions are cheap.
+
+  **The mechanics that trip people up:**
+  - `cache()` is **lazy** — it only *marks* the DataFrame; the data isn't stored
+    until the **first action** materialises it. That's why this lesson runs a
+    `count()` after caching.
+  - `cache()` = `persist(MEMORY_AND_DISK)` for DataFrames (spills to disk if it
+    doesn't fit); `persist(level)` lets you pick `MEMORY_ONLY`, `DISK_ONLY`,
+    `MEMORY_AND_DISK`, `_2` (replicated), etc.
+  - Release it with `unpersist()` when done — cached blocks compete with execution
+    memory ([Handbook ch.1 §8](../../docs/handbook/01-spark-architecture-and-execution.md)).
+
+  **Gotcha.** Don't cache everything — caching something used **once** just wastes
+  memory and can evict useful blocks. Cache only what you genuinely **reuse**.
 
   **Mission:** Build the aggregate `agg`, **cache** it, then trigger one action so
   the cache materialises.

@@ -1,0 +1,52 @@
+id: iceberg-04-time-travel
+track: iceberg
+order: 4
+title: "Time Travel (snapshots)"
+difficulty: 4
+concepts: ["iceberg", "time travel", "snapshots", "VERSION AS OF"]
+needs_spark: true
+needs_iceberg: true
+brief: |
+  **What & why.** Every write to an Iceberg table creates a new **snapshot** — a
+  complete, immutable view of the table at that commit. Old snapshots stick around,
+  which gives you **time travel** (read the table *as it was*) and **rollback** for
+  free. It's how you audit "what did this table look like before the bad job ran?"
+  and how you reproduce a report from last Tuesday.
+
+  **How you read an old version:** by **snapshot id** (`VERSION AS OF <id>` or the
+  `snapshot-id` read option) or by wall-clock time (`TIMESTAMP AS OF '...'`). The
+  available snapshots live in the `<table>.snapshots` metadata table.
+
+  **Mission:** Create `local.db.px` and insert `('AAPL', 100)` — that's snapshot 1.
+  Capture its `snapshot_id`. Insert `('AAPL', 200)` — now the table has both rows.
+  Then **time-travel** back to the first snapshot, reading just the original row
+  into `out`.
+starter_code: |
+  spark.sql("CREATE TABLE local.db.px (ticker STRING, px BIGINT) USING iceberg")
+  spark.sql("INSERT INTO local.db.px VALUES ('AAPL', 100)")
+  first_snap = spark.sql(
+      "SELECT snapshot_id FROM local.db.px.snapshots ORDER BY committed_at LIMIT 1"
+  ).collect()[0][0]
+  spark.sql("INSERT INTO local.db.px VALUES ('AAPL', 200)")
+  # TODO: read the table AS OF the first snapshot into `out`
+  out = ...
+  out.show()
+solution_code: |
+  spark.sql("CREATE TABLE local.db.px (ticker STRING, px BIGINT) USING iceberg")
+  spark.sql("INSERT INTO local.db.px VALUES ('AAPL', 100)")
+  first_snap = spark.sql(
+      "SELECT snapshot_id FROM local.db.px.snapshots ORDER BY committed_at LIMIT 1"
+  ).collect()[0][0]
+  spark.sql("INSERT INTO local.db.px VALUES ('AAPL', 200)")
+  out = spark.read.option("snapshot-id", first_snap).table("local.db.px")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "px": 100}
+    message: "out should show only the original row (px=100) from the first snapshot"
+hints:
+  - "The first snapshot's id comes from the local.db.px.snapshots metadata table."
+  - "spark.read.option(\"snapshot-id\", first_snap).table(...) reads that version."
+  - "Equivalent SQL: SELECT * FROM local.db.px VERSION AS OF <snapshot_id>."
