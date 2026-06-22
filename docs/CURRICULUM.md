@@ -5,7 +5,7 @@ topic below maps to a **graded, runnable challenge** (✅ = live now, 🔜 = on 
 roadmap). The structure mirrors the official documentation so you can always go
 deeper at the source.
 
-**Status:** 84 graded lessons across all 7 tracks. The 75 Python / PySpark /
+**Status:** 85 graded lessons across all 7 tracks. The 76 Python / PySpark /
 Performance / Streaming / Capstone lessons are verified in the offline sandbox; the
 9 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
 need an internet JAR fetch). **Every lesson ships read-along teaching notes** in its
@@ -36,7 +36,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 1 — Python for Data Engineering (21 live)
+## Track 1 — Python for Data Engineering (22 live)
 
 > *Goal: write clean, idiomatic Python that's the backbone of every pipeline.*
 > Docs: <https://docs.python.org/3/tutorial/>
@@ -53,7 +53,8 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Comprehensions — list/dict comprehensions, filtering
 - ✅ Error handling — `try`/`except`, robustness
 - ✅ Sets, tuples & unpacking — uniqueness, immutability, star-unpacking
-- ✅ `*args` / `**kwargs` & lambda — flexible signatures, anonymous functions
+- ✅ `*args` / `**kwargs` — flexible function signatures
+- ✅ Lambdas & functional style — anonymous functions as `sorted`/`max`/`filter`/`map`/`reduce` keys, lambda vs `def`
 
 **Module 1.3 — Data-engineering Python**
 - ✅ Generators & iterators — `yield`, lazy streams, memory efficiency

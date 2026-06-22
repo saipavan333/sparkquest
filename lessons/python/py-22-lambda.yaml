@@ -1,0 +1,67 @@
+id: py-22-lambda
+track: python
+order: 22
+title: "Lambdas & Functional Style"
+difficulty: 2
+concepts: ["lambda", "higher-order functions", "sorted key", "map", "filter", "reduce"]
+brief: |
+  **What & why.** A **lambda** is a small **anonymous function** written inline:
+  `lambda args: expression`. It's a single *expression* (no statements, no `return`)
+  whose value is returned automatically. You met one briefly in
+  [py-14](py-14-args-kwargs.yaml); here's the full picture, because lambdas are
+  everywhere in data work — they're the **key/predicate functions** you hand to
+  higher-order functions.
+
+  **The idiomatic uses (this is what interviews and real code want):**
+  - **Sort/min/max key:** `sorted(rows, key=lambda r: r[1], reverse=True)`,
+    `max(rows, key=lambda r: r.score)` — *the* most common use.
+  - **Filter:** `filter(lambda x: x > 0, xs)` keeps matching items (returns an
+    iterator — wrap in `list(...)`).
+  - **Map / transform:** `map(lambda x: x * 2, xs)`.
+  - **Reduce:** `functools.reduce(lambda a, b: a + b, xs)` folds a sequence to one
+    value (the pattern behind `reduceByKey`).
+
+  **lambda vs def (a real judgement call):**
+  - Use a **lambda** for a throwaway one-liner passed as an argument.
+  - Use **`def`** when it needs a name, a docstring, multiple statements, or reuse.
+    (PEP 8 actually says *don't* assign a lambda to a variable — use `def` then.)
+
+  **Gotchas:**
+  - **Single expression only** — no `if/else` statements (a ternary expression is
+    fine: `lambda x: "big" if x > 9 else "small"`).
+  - **Late binding in loops:** `[lambda: i for i in range(3)]` all capture the final
+    `i`; bind it with a default arg (`lambda i=i: i`).
+  - **PySpark:** a `lambda` in an RDD `map`/`filter` runs in a slow Python worker and
+    is opaque to Catalyst — prefer built-in column functions; use lambdas freely for
+    plain-Python `sorted`/`key` work ([sp-19](../pyspark/sp-19-udf.yaml)).
+
+  **Mission:** Using **lambdas** (no helper `def`):
+  1. Build `ranked` — the tickers sorted by `qty` **descending**.
+  2. Build `big` — the tickers with `qty >= 100`, in original order.
+
+  Expected: `ranked == ["GOOG", "AAPL", "MSFT"]`, `big == ["AAPL", "GOOG"]`.
+starter_code: |
+  trades = [("AAPL", 100), ("GOOG", 250), ("MSFT", 80)]
+  # TODO: ranked = tickers sorted by qty desc (sorted + lambda key)
+  # TODO: big = tickers with qty >= 100 (filter + lambda)
+  ranked = ...
+  big = ...
+  print(ranked, big)
+solution_code: |
+  trades = [("AAPL", 100), ("GOOG", 250), ("MSFT", 80)]
+  ranked = [t[0] for t in sorted(trades, key=lambda t: t[1], reverse=True)]
+  big = [t[0] for t in filter(lambda t: t[1] >= 100, trades)]
+  print(ranked, big)
+checks:
+  - type: var_equals
+    name: ranked
+    expected: ["GOOG", "AAPL", "MSFT"]
+    message: "ranked should be tickers ordered by qty, largest first"
+  - type: var_equals
+    name: big
+    expected: ["AAPL", "GOOG"]
+    message: "big should be the tickers with qty >= 100, in original order"
+hints:
+  - "sorted(trades, key=lambda t: t[1], reverse=True) sorts by the qty field."
+  - "filter(lambda t: t[1] >= 100, trades) keeps the big trades (wrap/iterate for the names)."
+  - "A list comprehension pulls t[0] (the ticker) out of each kept tuple."
