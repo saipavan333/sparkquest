@@ -6,8 +6,20 @@ difficulty: 3
 concepts: ["when", "otherwise", "conditional columns"]
 needs_spark: true
 brief: |
-  `F.when(condition, value).otherwise(value)` is Spark's `CASE WHEN` — the way you
-  bucket, flag, and classify rows.
+  **What & why.** `F.when(condition, value).otherwise(value)` is Spark's `CASE WHEN`
+  — the column-expression way to bucket, flag, derive, and classify rows. It's how
+  you build feature flags, risk bands, and the `dq_error` reason column in the
+  quarantine pattern.
+
+  **The essentials:**
+  - Chain multiple branches: `F.when(c1, v1).when(c2, v2).otherwise(v3)` — first
+    match wins, like SQL `CASE`.
+  - Omit `.otherwise(...)` and unmatched rows get **`null`**.
+  - Conditions are column expressions: `(F.col("amount") >= 1000) & (...)`.
+
+  **Gotcha.** Keep branch result types consistent (all strings, all ints) — mixing
+  types confuses the inferred column type. This is a built-in expression, so it's
+  far faster than a Python UDF doing `if/else`.
 
   **Mission:** Add a column `band` to `trades`: `"large"` when `amount` is at least
   `1000`, otherwise `"small"`. Store the result in `tagged`.

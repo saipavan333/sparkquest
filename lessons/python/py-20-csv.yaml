@@ -1,0 +1,51 @@
+id: py-20-csv
+track: python
+order: 20
+title: "CSV parsing"
+difficulty: 2
+concepts: ["csv", "DictReader", "parsing"]
+brief: |
+  **What & why.** CSV is the most common (and most error-prone) interchange format
+  you'll meet before data reaches Spark. Python's `csv` module parses it correctly —
+  handling quoted fields, embedded commas, and newlines that naive `line.split(",")`
+  gets wrong. Knowing the stdlib tool (and CSV's pitfalls) is bread-and-butter DE.
+
+  **The essentials:**
+  - `csv.reader(fileobj)` yields rows as **lists**; `csv.DictReader(fileobj)` uses
+    the header row to yield **dicts** keyed by column name (usually what you want).
+  - Read from a file handle or wrap a string in `io.StringIO(...)`.
+  - **Everything comes back as strings** — `"100"`, not `100`. You must **cast**
+    afterwards (the same lesson as Spark's [sp-13](../pyspark/sp-13-cast.yaml)).
+
+  **Gotcha.** Don't parse CSV with `split(",")` — a single quoted field like
+  `"Apple, Inc."` breaks it. Use the `csv` module (or Spark's CSV reader with
+  `header=True`), and watch for delimiter/encoding surprises in real feeds.
+
+  **Mission:** Parse the CSV in `raw` with `csv.DictReader` into a list of dicts
+  named `rows`.
+
+  Expected: `[{"ticker": "AAPL", "qty": "100"}, {"ticker": "GOOG", "qty": "50"}]`
+  (note the values are strings).
+starter_code: |
+  import csv, io
+
+  raw = "ticker,qty\nAAPL,100\nGOOG,50"
+  # TODO: parse with csv.DictReader into a list of dicts named `rows`
+  rows = ...
+  print(rows)
+solution_code: |
+  import csv, io
+
+  raw = "ticker,qty\nAAPL,100\nGOOG,50"
+  rows = list(csv.DictReader(io.StringIO(raw)))
+  print(rows)
+checks:
+  - type: var_equals
+    name: rows
+    expected:
+      - {"ticker": "AAPL", "qty": "100"}
+      - {"ticker": "GOOG", "qty": "50"}
+    message: "rows should be a list of dicts keyed by the header (values are strings)"
+hints:
+  - "Wrap the string: io.StringIO(raw) gives DictReader something to read."
+  - "list(csv.DictReader(...)) materialises the rows; values stay strings until you cast."

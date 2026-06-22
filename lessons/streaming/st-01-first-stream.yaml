@@ -6,9 +6,20 @@ difficulty: 3
 concepts: ["readStream", "writeStream", "memory sink", "availableNow"]
 needs_spark: true
 brief: |
-  Structured Streaming lets you write a streaming job using the *same* DataFrame
-  API you already know — Spark handles the "keep it running" part. A stream is
-  just an unbounded table that grows over time.
+  **What & why.** Structured Streaming lets you write a streaming job with the
+  **same DataFrame API** you already know — Spark turns it into an incremental query
+  and handles the "keep it running" part. The core mental model: **a stream is an
+  unbounded table** that grows as data arrives, and your query runs continuously
+  over the new rows ([Handbook ch.3](../../docs/handbook/03-streaming-internals.md)).
+
+  **The essentials:**
+  - `spark.readStream` (vs `read`) opens a source; `writeStream` (vs `write`) starts
+    a continuous query. Most sources need an explicit **schema** (no inference).
+  - `.trigger(availableNow=True)` processes all currently-available data then
+    **stops** — which makes streaming **deterministic and testable** (exactly how
+    SparkQuest grades streams; see [Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+  - The **memory** sink lands results in a queryable table — great for demos/tests.
+  - `.start()` returns a query handle; `.awaitTermination()` waits for it to finish.
 
   We have a folder of JSON event files at `data/sample/stream_events`. You'll read
   it as a stream and land every event into an in-memory table you can query.

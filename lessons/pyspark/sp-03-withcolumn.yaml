@@ -6,13 +6,24 @@ difficulty: 3
 concepts: ["withColumn", "expressions", "columns"]
 needs_spark: true
 brief: |
-  Real pipelines enrich data by computing new columns. `withColumn(name, expr)`
-  returns a new DataFrame with an extra (or replaced) column.
+  **What & why.** Real pipelines enrich data by computing new columns.
+  `withColumn(name, expr)` returns a new DataFrame with an added (or, if the name
+  exists, **replaced**) column. The expression is a **column expression** built from
+  `F.col(...)` and functions — evaluated by Catalyst across the cluster, not row by
+  row in Python.
+
+  **The essentials:**
+  - `F` is `pyspark.sql.functions` (already imported). Build expressions like
+    `F.col("price") * F.col("qty")`, `F.upper(...)`, `F.when(...).otherwise(...)`.
+  - Prefer these **built-in column functions** over Python UDFs — they stay in the
+    JVM and Catalyst can optimize them ([sp-19](sp-19-udf.yaml) shows the UDF cost).
+
+  **Gotcha (interview-relevant).** Chaining **many** `withColumn` calls builds a
+  deep plan and can be slow to analyze; for lots of new columns, do them in one
+  `select`/`withColumns(...)` instead.
 
   **Mission:** Add a column named `total` equal to `price * qty` to the `orders`
   DataFrame. Store the result in `priced`.
-
-  The helper `F` (``pyspark.sql.functions``) is already imported for you.
 starter_code: |
   orders = spark.createDataFrame(
       [("AAPL", 190, 100), ("GOOG", 142, 50)],

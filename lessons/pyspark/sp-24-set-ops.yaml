@@ -6,9 +6,20 @@ difficulty: 3
 concepts: ["exceptAll", "union", "intersect", "set difference"]
 needs_spark: true
 brief: |
-  Spark supports SQL set operations: `unionByName` (stack rows), `intersect`
-  (common rows), and `exceptAll`/`subtract` (rows in A not in B). They're the
-  reconciliation toolkit — "which records did we lose/gain?".
+  **What & why.** Set operations combine two DataFrames *vertically* (by rows, not
+  columns like joins) — the **reconciliation toolkit** for "which records did we
+  lose or gain between two snapshots?".
+
+  **The operations:**
+  - `unionByName(b)` — stack rows, matching by **column name** (use this, not
+    `union`, which matches by **position** and silently misaligns columns — a nasty
+    bug). `allowMissingColumns=True` tolerates differing schemas.
+  - `intersect(b)` — rows in **both** (distinct); `intersectAll` keeps duplicates.
+  - `exceptAll(b)` / `subtract(b)` — rows in A **not** in B (the diff).
+
+  **Gotcha (interview-relevant).** `union`/`intersect`/`except` (no `All`)
+  **deduplicate**, which is an extra shuffle; the `*All` variants preserve
+  multiplicity and are cheaper when you don't need dedup. Schemas must line up.
 
   **Mission:** Find the tickers present in `a` but **not** in `b`, using
   `exceptAll`. Store the result in `only_in_a`.

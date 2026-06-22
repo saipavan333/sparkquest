@@ -1,0 +1,62 @@
+id: perf-07-bucketing
+track: performance
+order: 7
+title: "Bucketing (shuffle-free joins)"
+difficulty: 4
+concepts: ["bucketBy", "saveAsTable", "shuffle avoidance", "physical layout"]
+needs_spark: true
+brief: |
+  **What & why.** **Bucketing** hash-partitions a table into a **fixed number of
+  buckets** on a key *at write time*, and records that layout in the table metadata.
+  The payoff: when you later **join or aggregate on the bucket key**, the data is
+  already co-located by `hash(key) % N`, so Spark can **skip the shuffle** entirely —
+  a huge win for tables you join repeatedly (a fact table bucketed by `customer_id`).
+
+  **Bucketing vs partitioning (the interview contrast):**
+  - **Partitioning** (`partitionBy`) → one **directory per value**; great for
+    **filtering** on low-cardinality columns (date, region) via partition pruning.
+  - **Bucketing** (`bucketBy`) → fixed **N files by hash**; great for **joins/aggs**
+    on **high-cardinality** keys (ids) where partitioning would explode into millions
+    of folders.
+
+  **The essentials:**
+  - `df.write.bucketBy(n, "key").saveAsTable(name)` — bucketing requires
+    `saveAsTable` (it's metastore-managed, not a plain path write).
+  - Both sides of a join must share the **same bucket count and key** to skip the
+    shuffle; otherwise Spark re-shuffles anyway.
+  - Often combined: `partitionBy(date).bucketBy(n, id)`.
+
+  **Mission:** Write `df` **bucketed into 4 buckets by `ticker`** as a table (a unique
+  `tbl` name is provided), then read it back into `out`.
+starter_code: |
+  import tempfile
+
+  tbl = "bkt_" + tempfile.mkdtemp().split("_")[-1]
+  df = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", 50), ("AAPL", 70)], ["ticker", "qty"]
+  )
+  # TODO: write df bucketBy(4, "ticker").saveAsTable(tbl), then read it into `out`
+  out = ...
+  out.show()
+solution_code: |
+  import tempfile
+
+  tbl = "bkt_" + tempfile.mkdtemp().split("_")[-1]
+  df = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", 50), ("AAPL", 70)], ["ticker", "qty"]
+  )
+  df.write.mode("overwrite").bucketBy(4, "ticker").saveAsTable(tbl)
+  out = spark.table(tbl)
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "qty": 100}
+      - {"ticker": "AAPL", "qty": 70}
+      - {"ticker": "GOOG", "qty": 50}
+    message: "out should round-trip all rows from the bucketed table"
+hints:
+  - "df.write.bucketBy(4, \"ticker\").saveAsTable(tbl) — bucketing needs saveAsTable."
+  - "Read the managed table back with spark.table(tbl)."
+  - "Two tables bucketed the same way join without a shuffle."

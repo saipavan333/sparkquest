@@ -6,8 +6,18 @@ difficulty: 3
 concepts: ["dataclass", "classes", "methods"]
 needs_spark: false
 brief: |
-  `@dataclass` gives you a tidy record type with almost no boilerplate — perfect
-  for modelling rows, configs, and events in a pipeline.
+  **What & why.** `@dataclass` generates the boilerplate of a record type for you —
+  `__init__`, `__repr__`, `__eq__` — from a few typed field declarations. It's the
+  Pythonic way to model **rows, configs, and events** in a pipeline: readable,
+  comparable, and self-documenting, without a wall of `self.x = x` assignments.
+
+  **The essentials:**
+  - Declare fields as **type-annotated class attributes**: `ticker: str`. The
+    decorator turns them into constructor parameters (in order).
+  - Add defaults (`qty: int = 0`), regular **methods** (`def notional(self): ...`),
+    and `frozen=True` for an immutable value object.
+  - `__eq__` compares by field values — two `Trade`s with the same fields are equal,
+    which is exactly what you want for tests.
 
   **Mission:** Define a dataclass `Trade` with fields `ticker` (str), `qty` (int),
   and `price` (float), plus a method `notional(self)` returning `qty * price`.

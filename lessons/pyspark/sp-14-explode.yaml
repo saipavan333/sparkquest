@@ -6,9 +6,22 @@ difficulty: 4
 concepts: ["arrays", "explode", "complex types"]
 needs_spark: true
 brief: |
-  Real data is often nested — a record holding a list of items. `F.explode` turns
-  each element of an array column into its own row, flattening the structure for
-  analysis.
+  **What & why.** Real data is often **nested** — a JSON record holds an array of
+  line items, tags, or events. `F.explode` turns each element of an array column
+  into its **own row** (one-to-many), flattening the structure so you can group,
+  join, and aggregate normally. It's the standard first step after parsing nested
+  JSON/Kafka payloads.
+
+  **The essentials:**
+  - `F.explode(arr)` drops rows whose array is empty/null; `F.explode_outer(arr)`
+    keeps them with a `null` (use it when you must not lose those records).
+  - `F.posexplode` also gives the element's index.
+  - The inverse is `groupBy(...).agg(F.collect_list(...))` — re-nest after
+    processing.
+
+  **Gotcha (interview-relevant).** Exploding **multiplies** row count — a 1 KB row
+  with a 10k-element array becomes 10k rows. It can balloon data and memory, so
+  filter/aggregate soon after.
 
   **Mission:** Each ticker has an array of `actions`. Explode it so every action
   becomes its own row with column `action`, keeping `ticker`. Store it in `flat`.

@@ -6,9 +6,20 @@ difficulty: 3
 concepts: ["upper", "concat_ws", "string functions"]
 needs_spark: true
 brief: |
-  Cleaning text is half of data engineering. Spark ships dozens of string
-  functions in `F` — `upper`, `lower`, `trim`, `substring`, `split`,
-  `regexp_replace`, `concat_ws`, and more.
+  **What & why.** Cleaning and reshaping text is half of data engineering — raw
+  feeds arrive with inconsistent case, stray whitespace, and packed fields. Spark
+  ships dozens of **built-in** string functions in `F`, and using them (instead of
+  a Python UDF) keeps the work in the JVM where Catalyst can optimize it.
+
+  **The toolkit worth memorising:**
+  - Case/clean: `upper`, `lower`, `trim`/`ltrim`/`rtrim`, `lpad`/`rpad`.
+  - Combine/cut: `concat_ws(sep, ...)` (null-safe join), `substring`, `split`
+    (→ array), `length`.
+  - Pattern: `regexp_replace`, `regexp_extract`, `like`/`rlike`.
+
+  **Gotcha.** Most string functions return `null` on a `null` input (it propagates);
+  `concat_ws` is the friendly exception — it skips nulls rather than nulling the
+  whole result.
 
   **Mission:** From `df`, add `symbol` = the **uppercased** ticker, and `label` =
   `symbol` and `name` joined by a single space. Store it in `labeled`.

@@ -6,8 +6,22 @@ difficulty: 4
 concepts: ["dropDuplicates", "watermark", "exactly-once"]
 needs_spark: true
 brief: |
-  Streams often redeliver records. `dropDuplicates` with a watermark keeps only the
-  first occurrence of each key while bounding how much state Spark must remember.
+  **What & why.** Message systems (Kafka) deliver **at-least-once**, so a stream
+  often **redelivers** the same record after a retry. Deduplication makes processing
+  effectively **exactly-once** for your sink. `dropDuplicates(["key"])` keeps the
+  first occurrence of each key; pairing it with a **watermark** is what makes it
+  practical at scale.
+
+  **Why the watermark is essential here:**
+  - Without it, Spark must remember **every key ever seen** to detect a future
+    duplicate — unbounded state that eventually OOMs.
+  - `withWatermark("ts", "10 minutes")` lets Spark **forget** keys older than the
+    watermark, bounding state to a sliding time window (duplicates are realistically
+    near in time anyway).
+
+  **Interview tie-in.** This is one half of exactly-once; the other is a replayable
+  source + checkpointed offsets + an idempotent sink
+  ([Handbook ch.13 §6](../../docs/handbook/13-kafka-and-streaming-io.md)).
 
   **Mission:** Stream `data/sample/stream_events` and keep only the **first event
   per `ticker`** using `dropDuplicates(["ticker"])` with a watermark on `ts`. Use

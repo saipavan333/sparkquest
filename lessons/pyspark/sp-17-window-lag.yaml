@@ -6,8 +6,21 @@ difficulty: 4
 concepts: ["Window", "lag", "time series"]
 needs_spark: true
 brief: |
-  `lag` looks at the **previous** row within an ordered window — the building block
-  of day-over-day change, running diffs, and time-series features.
+  **What & why.** `lag` looks at the **previous** row within an ordered window
+  (`lead` looks ahead) — the building block of day-over-day change, running diffs,
+  gap detection, and time-series features. It expresses "compare this row to the
+  one before it" without a self-join.
+
+  **The essentials:**
+  - `F.lag("price").over(w)` returns the prior row's value; `F.lag("price", 2)` goes
+    back two; an optional default replaces the boundary `null`.
+  - The window **must** be ordered (`orderBy`) for lag/lead to be meaningful, and
+    usually `partitionBy` the entity (per ticker) so you don't bleed across groups.
+  - The first row of each partition has no predecessor → `null` (seen in the
+    expected output).
+
+  **Performance note.** Like all `partitionBy` windows this shuffles by the key;
+  unbounded ordered windows can be memory-heavy on huge partitions.
 
   You'll need `from pyspark.sql.window import Window`. `F` is already imported.
 

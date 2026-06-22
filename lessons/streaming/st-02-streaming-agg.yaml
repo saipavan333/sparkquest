@@ -6,8 +6,22 @@ difficulty: 4
 concepts: ["stateful aggregation", "groupBy", "complete output mode"]
 needs_spark: true
 brief: |
-  Streaming really shines when it maintains a *running* aggregate as new data
-  arrives. Spark keeps the aggregation **state** for you between micro-batches.
+  **What & why.** Streaming shines when it maintains a *running* aggregate as data
+  arrives. Spark keeps the aggregation **state** for you between micro-batches
+  (in a **state store** — HDFS- or RocksDB-backed), so each batch updates the
+  totals rather than recomputing from scratch.
+
+  **The essentials — output modes (a top interview question):**
+  - **`complete`** — re-emit the *entire* result table each trigger. **Required for
+    aggregations without a watermark** (this lesson). State grows unbounded, so it's
+    only safe for small key spaces.
+  - **`append`** — emit only new rows; for aggregations it needs a **watermark** so
+    Spark knows when a group is final ([st-03](st-03-windowed-watermark.yaml)).
+  - **`update`** — emit only changed rows.
+
+  **Gotcha.** Unbounded stateful aggregation in `complete` mode keeps state for
+  *every* key forever — in production you bound it with event-time windows +
+  watermarks so old state can be evicted.
 
   **Mission:** Stream the same `data/sample/stream_events` folder and compute a
   live **count of events per ticker**. Because it's an aggregation, use

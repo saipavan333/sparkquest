@@ -6,8 +6,17 @@ difficulty: 4
 concepts: ["pivot", "groupBy", "reshaping"]
 needs_spark: true
 brief: |
-  Pivoting turns row values into columns — a staple for reports and feature
-  tables. `groupBy(...).pivot(col).agg(...)` does it in one expression.
+  **What & why.** Pivoting turns **row values into columns** — the shape reports and
+  ML feature tables want (one row per entity, one column per category).
+  `groupBy(keys).pivot(col).agg(...)` does it in one expression: group by the row
+  key, spread the distinct values of `col` across columns, aggregate the cell.
+
+  **The essentials:**
+  - Missing key/category combinations come out as **`null`** (no data for that cell).
+  - **Performance:** Spark must learn the distinct pivot values, which costs an
+    extra pass. Pass them explicitly — `.pivot("side", ["BUY", "SELL"])` — to skip
+    that pass and guard against unexpected categories.
+  - The inverse (columns → rows) is an **unpivot** via `stack(...)`/`selectExpr`.
 
   **Mission:** Pivot `trades` so each `side` (BUY/SELL) becomes a column holding
   the **summed** `qty` per `ticker`. Store the result in `pvt`.

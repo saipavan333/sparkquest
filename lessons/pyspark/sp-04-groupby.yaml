@@ -6,8 +6,21 @@ difficulty: 3
 concepts: ["groupBy", "aggregation", "sum", "alias"]
 needs_spark: true
 brief: |
-  Aggregation collapses many rows into summaries — the heartbeat of analytics.
-  `groupBy(col).agg(...)` is Spark's distributed `GROUP BY`.
+  **What & why.** Aggregation collapses many rows into summaries — the heartbeat of
+  analytics. `groupBy(col).agg(...)` is Spark's distributed `GROUP BY`, and it's a
+  **wide transformation**: rows for each key must meet on one machine, so it
+  triggers a **shuffle** ([Handbook ch.1 §3](../../docs/handbook/01-spark-architecture-and-execution.md)).
+
+  **The essentials:**
+  - `.agg(F.sum("qty").alias("total"))` — always **alias** aggregates or you get
+    ugly auto-names like `sum(qty)`. Combine several: `.agg(F.sum(...), F.avg(...),
+    F.countDistinct(...))`.
+  - **Map-side combine:** `sum`/`count`/`avg`/`max` pre-aggregate on each partition
+    *before* the shuffle, so only partial results cross the network — cheap. By
+    contrast `collect_list` ships every value and can blow up memory.
+
+  **Interview angle.** Skew bites here: one hot key → one giant reduce task. Fixes
+  are AQE skew handling, salting, or pre-aggregation ([Handbook ch.9 §6](../../docs/handbook/09-joins-shuffle-aqe.md)).
 
   **Mission:** From `trades`, compute the **total quantity per ticker**. Name the
   aggregated column `total` and store the result in `totals`.

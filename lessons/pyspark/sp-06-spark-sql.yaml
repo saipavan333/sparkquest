@@ -6,9 +6,18 @@ difficulty: 3
 concepts: ["createOrReplaceTempView", "spark.sql", "SQL"]
 needs_spark: true
 brief: |
-  Prefer SQL? Spark speaks it fluently. Register a DataFrame as a temporary view,
-  then query it with `spark.sql(...)`. The DataFrame API and SQL compile to the
-  exact same optimised plan.
+  **What & why.** Prefer SQL? Spark speaks it fluently. Register a DataFrame as a
+  **temporary view**, then query it with `spark.sql(...)`. Crucially, **SQL and the
+  DataFrame API compile to the *exact same* Catalyst plan** — there's no performance
+  difference, so choose whichever reads clearer for the task (often SQL for complex
+  multi-join analytics, the DataFrame API for programmatic pipelines).
+
+  **The essentials:**
+  - `df.createOrReplaceTempView("name")` makes it queryable; it lives for the
+    session and isn't persisted.
+  - `createOrReplaceGlobalTempView` shares across sessions (under `global_temp`).
+  - You can freely mix: query with `spark.sql(...)`, then keep chaining DataFrame
+    ops on the result.
 
   **Mission:** Register `trades` as a view named `trades`, then use SQL to compute
   the **average price per ticker**, aliased as `avg_price`. Store the resulting

@@ -6,9 +6,19 @@ difficulty: 4
 concepts: ["generators", "yield", "lazy evaluation"]
 needs_spark: false
 brief: |
-  Generators produce values lazily with `yield`, so you can stream through huge
-  datasets without loading them all into memory — exactly Spark's philosophy, in
-  miniature.
+  **What & why.** A **generator** produces values **lazily** with `yield` — one at a
+  time, on demand — so you can stream through a 100 GB file (or an infinite
+  sequence) using almost **no memory**. That's exactly Spark's philosophy in
+  miniature: don't materialise everything, pull records through a pipeline as
+  needed. Generators are also how you **batch** work (this lesson) to amortise
+  per-chunk overhead — the same idea as `mapPartitions` and pandas UDFs in Spark.
+
+  **The essentials:**
+  - `yield` turns a function into a generator; calling it returns an iterator that
+    runs the body up to each `yield`, then **pauses**.
+  - It's **single-pass** — once consumed, it's exhausted (a classic bug: iterating
+    a generator twice gives nothing the second time).
+  - `next(gen)` pulls one value; a `for` loop or `list(gen)` drains it.
 
   **Mission:** Write a generator function `batches(items, size)` that yields
   successive chunks of `items`, each a list of length `size` (the last may be

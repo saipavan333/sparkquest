@@ -6,9 +6,17 @@ difficulty: 3
 concepts: ["dictionaries", "counting", "mapreduce-intuition"]
 needs_spark: false
 brief: |
-  Counting how often each item appears is *the* canonical big-data problem — the
-  famous "word count". Today you'll do it in plain Python; tomorrow Spark will do
-  the exact same thing across a thousand machines.
+  **What & why.** Counting how often each item appears is *the* canonical big-data
+  problem — the famous **"word count"**, the "hello world" of MapReduce. Today you
+  do it in one machine's memory with a dict; in the RDD track you'll do the exact
+  same thing with `map(lambda w: (w, 1)).reduceByKey(...)` across a thousand
+  machines (see [Handbook ch.10](../../docs/handbook/10-rdd-and-low-level-api.md)).
+  The mental model — *map each item to a key, then aggregate per key* — is the heart
+  of distributed data processing.
+
+  **The pattern:** `counts[t] = counts.get(t, 0) + 1`. `dict.get(key, 0)` returns a
+  default `0` for a key not yet seen, so the first occurrence starts the tally
+  cleanly. (Python's `collections.Counter` does this for you — you'll meet it later.)
 
   **Mission:** Given a list of `tickers`, build a dictionary named `counts`
   mapping each ticker to how many times it appears.

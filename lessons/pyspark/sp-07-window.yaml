@@ -6,9 +6,21 @@ difficulty: 4
 concepts: ["Window", "row_number", "partitionBy", "ranking"]
 needs_spark: true
 brief: |
-  Window functions compute across a set of rows *related to the current row*
-  without collapsing them — ranking, running totals, lead/lag. They're a favourite
-  in data-engineering interviews.
+  **What & why.** Window functions compute across a set of rows *related to the
+  current row* **without collapsing them** — that's the key difference from
+  `groupBy` (which reduces many rows to one). Ranking, running totals, lead/lag,
+  top-N-per-group, sessionization — all windows, and all interview favourites.
+
+  **The anatomy of a window:**
+  - `Window.partitionBy(col)` — the groups (like `GROUP BY`, but rows are kept).
+  - `.orderBy(col)` — ordering within each partition (required for ranking/offset
+    functions).
+  - `F.row_number()/rank()/dense_rank()`, `F.lag()/lead()`, or an aggregate
+    `.over(w)`.
+
+  **Top-N-per-group pattern:** add `row_number().over(w)` then filter `== 1` — the
+  most-asked window query (you'll also see it in SQL at [sp-34](sp-34-sql-analytics.yaml)).
+  **Cost:** a window with `partitionBy` shuffles by the partition key, like a join.
 
   **Mission:** For each `ticker`, find its **largest** trade by `amount`. Use a
   window partitioned by ticker, ordered by amount descending, add a `row_number()`

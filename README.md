@@ -42,11 +42,12 @@ streaming with watermarks.
 - **Real execution, real feedback** — submissions run in a process-isolated sandbox
   with timeouts and output caps; grading inspects program state and DataFrame
   contents.
-- **Zero → pro curriculum** — 78 finance-themed challenges across 7 tracks (and
+- **Zero → pro curriculum** — 84 finance-themed challenges across 7 tracks (and
   growing): Python for DE → PySpark & DataFrames (incl. **RDD low-level API**) →
   Performance → Structured Streaming → Lakehouse/Delta → Apache Iceberg (incl.
-  **time travel**) → Capstone ETL (incl. **SCD2**, **data-quality** & **incremental**
-  patterns). Each lesson ships **read-along teaching notes**. Full [syllabus](docs/CURRICULUM.md).
+  **time travel**, **hidden partitioning**) → Capstone ETL (incl. **SCD2**,
+  **data-quality** & **incremental** patterns). Each lesson ships **read-along
+  teaching notes**. Full [syllabus](docs/CURRICULUM.md).
 - **AI tutor** — Socratic hints powered by your choice of Anthropic/OpenAI/HF, with
   a fully offline rule-based fallback so the demo is free.
 - **Gamification** — XP, levels, badges (First Blood, Pythonista, Spark Wrangler,
@@ -120,12 +121,12 @@ The full syllabus — every topic with official-doc links — lives in
 
 | Track | Live | You'll learn |
 |-------|:----:|--------------|
-| **Python for Data Engineering** | 18 | collections, comprehensions, errors, generators, decorators, dataclasses, sets/tuples, args/kwargs, datetime, json, stdlib, **context managers**, **type hints** |
+| **Python for Data Engineering** | 21 | collections, comprehensions, errors, generators, decorators, dataclasses, sets/tuples, args/kwargs, datetime, json, stdlib, **context managers**, **type hints**, **pathlib**, **CSV**, **logging** |
 | **PySpark Foundations & DataFrames** | 34 | schemas, Parquet, select/filter, when/otherwise, string/date/null/cast, all join types, **windows (rank/dense_rank/lag/lead/running totals)**, set ops, maps/structs, pivot, `explode`, UDFs, selectExpr, **sessionization**, **pandas UDFs**, **RDDs (map/filter, reduceByKey, broadcast vars, mapPartitions)**, **Spark SQL analytics**, **data-quality validation** |
-| **Performance & Internals** | 6 | repartition/coalesce, caching, broadcast joins, data skew & salting, partitioned writes & **partition pruning** |
-| **Structured Streaming** | 7 | sources/sinks, aggregations, event-time windows, watermarks, dedup, `foreachBatch`, stream-static joins, **Kafka value parsing (`from_json`)** |
+| **Performance & Internals** | 7 | repartition/coalesce, caching, broadcast joins, data skew & salting, partitioned writes & **partition pruning**, **bucketing** |
+| **Structured Streaming** | 8 | sources/sinks, aggregations, event-time windows, watermarks, dedup, `foreachBatch`, stream-static **and stream-stream joins**, **Kafka value parsing (`from_json`)** |
 | **Lakehouse & Delta Lake** | 4 | create Delta tables, `MERGE`/upsert (CDC), time travel, schema evolution |
-| **Apache Iceberg** | 4 | create Iceberg tables, row-level `UPDATE`/`DELETE` (copy-on-write), **`MERGE`/upsert**, **time travel** |
+| **Apache Iceberg** | 5 | create Iceberg tables, row-level `UPDATE`/`DELETE` (copy-on-write), **`MERGE`/upsert**, **time travel**, **hidden partitioning** |
 | **Capstone ETL** | 5 | end-to-end batch ETL, data-quality checks, a live streaming pipeline, **SCD Type 2**, **incremental/high-water-mark** |
 
 Lessons are plain YAML in [`lessons/`](lessons/) — add your own without touching code.
@@ -157,7 +158,7 @@ the official Spark docs and the canonical books.
 | Structured Streaming ingestion | **~11,989 events/s** |
 | Auto-grade, Python challenge | **~1 ms** |
 | Auto-grade, Spark challenge (end-to-end) | **~8.6 s** (3.5 s Spark cold start) |
-| Reference solutions passing their grader | **70/70 sandbox + 8 Delta & Iceberg (CI)** |
+| Reference solutions passing their grader | **75/75 sandbox + 9 Delta & Iceberg (CI)** |
 
 Reproduce: `python benchmarks/run_benchmarks.py --all`. Details and discussion in
 [the paper](paper/sparkquest.pdf).

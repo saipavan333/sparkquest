@@ -7,11 +7,22 @@ concepts: ["delta", "ACID", "write", "read"]
 needs_spark: true
 needs_delta: true
 brief: |
-  **Delta Lake** turns a folder of Parquet files into an ACID table — atomic
-  writes, consistent reads, and a transaction log — all on cheap object storage.
-  Writing one is just `format("delta")`.
+  **What & why.** **Delta Lake** turns a folder of Parquet files into an **ACID
+  table**. The secret is the **transaction log** (`_delta_log/`): a JSON record of
+  every commit (which files were added/removed), periodically checkpointed to
+  Parquet. That log gives you atomic writes, consistent reads (no half-written
+  data), concurrent writers, and the version history behind time travel — all on
+  cheap object storage, no database server ([Handbook ch.5](../../docs/handbook/05-lakehouse-and-delta.md)).
+
+  **The essentials:**
+  - Write/read with `format("delta")`; otherwise it's the DataFrame API you know.
+  - A Delta table *is* Parquet **plus** the `_delta_log` — readers consult the log
+    to know exactly which files form the current snapshot.
+  - This is what enables `MERGE`, time travel, and schema evolution (the next three
+    lessons) that plain Parquet can't do.
 
   A Delta-enabled `spark` session and the `DeltaTable` helper are ready for you.
+  *(This lesson runs in CI/Docker, which can fetch the Delta JAR.)*
 
   **Mission:** Write `df` as a Delta table at `path`, then read it back into
   `loaded`.

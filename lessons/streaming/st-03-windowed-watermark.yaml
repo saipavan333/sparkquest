@@ -6,9 +6,21 @@ difficulty: 4
 concepts: ["event time", "window", "withWatermark", "late data"]
 needs_spark: true
 brief: |
-  The capstone of streaming: aggregating by **event time** (when something
-  happened, not when it arrived) using tumbling **windows**, with a **watermark**
-  that tells Spark how long to wait for late data before finalising a window.
+  **What & why.** The capstone of streaming, and the concept interviews probe
+  hardest. Aggregate by **event time** (when something *happened*) rather than
+  **processing time** (when it *arrived*) — because events arrive late and out of
+  order, and correct analytics must bucket them by when they occurred.
+
+  **The two pieces:**
+  - **Windows** — `F.window("ts", "10 minutes")` groups events into time buckets
+    (tumbling = non-overlapping; add a slide for sliding windows).
+  - **Watermark** — `withWatermark("ts", "1 minute")` tells Spark "don't expect data
+    older than (max event time − 1 min)". This is the **trade-off knob**: it bounds
+    how long window **state** is kept (so memory doesn't grow forever) and decides
+    how late is *too* late — events past the watermark are **dropped**.
+
+  **Interview soundbite:** "Event time + watermark gives correct, bounded-state
+  aggregation over late, out-of-order data" ([Handbook ch.3 §2–3](../../docs/handbook/03-streaming-internals.md)).
 
   **Mission:** Stream `data/sample/stream_events` and count events per `ticker`
   within **10-minute** tumbling windows over the event-time column `ts`. Declare a

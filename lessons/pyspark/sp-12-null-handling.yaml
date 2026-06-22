@@ -6,9 +6,21 @@ difficulty: 3
 concepts: ["na.fill", "na.drop", "nulls"]
 needs_spark: true
 brief: |
-  Missing data is everywhere. Spark gives you `df.na.fill(...)`, `df.na.drop(...)`,
-  and `F.coalesce(...)` to handle it deliberately instead of letting nulls poison
-  your aggregates.
+  **What & why.** Missing data is everywhere, and nulls **propagate** silently:
+  `null + 5` is `null`, `null == null` is **not** true, and unhandled nulls quietly
+  skew aggregates and break joins. Handle them *deliberately*.
+
+  **The toolkit:**
+  - `df.na.fill({"qty": 0})` — replace nulls per column (or a single value for all).
+  - `df.na.drop()` — drop rows with any null; `df.na.drop(subset=["qty"])` targets
+    columns; `how="all"` only drops all-null rows.
+  - `F.coalesce(a, b, c)` — first non-null wins (great for fallback/default columns).
+  - Test with `F.col("x").isNull()` / `isNotNull()` — never `== None`.
+
+  **Interview angle.** `null` join keys never match yet all hash to one partition →
+  skew; and counting nulls is a core **data-quality** check
+  ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)). Decide
+  fill-vs-drop-vs-quarantine on purpose, not by accident.
 
   **Mission:** The `qty` for GOOG is missing (`None`). Replace every null `qty`
   with `0`, storing the result in `filled`.

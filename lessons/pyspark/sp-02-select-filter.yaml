@@ -6,9 +6,21 @@ difficulty: 2
 concepts: ["select", "filter", "where"]
 needs_spark: true
 brief: |
-  The two most common DataFrame operations: **select** picks columns, **filter**
-  (a.k.a. `where`) keeps the rows you want. Both return a *new* DataFrame —
-  Spark DataFrames are immutable.
+  **What & why.** The two workhorses: **`select`** picks/derives columns (projection),
+  **`filter`** (alias **`where`**) keeps matching rows (selection). Together they're
+  most of what a pipeline does. Both return a *new* immutable DataFrame and run
+  nothing until an action.
+
+  **The essentials:**
+  - Reference columns three ways: `"qty"`, `df.qty`, or `F.col("qty")`. Use `F.col`
+    for expressions (`F.col("qty") > 50`).
+  - Combine predicates with `&` / `|` and **parenthesise each** —
+    `df.filter((F.col("qty") > 50) & (F.col("sector") == "Tech"))`.
+
+  **Why it's fast:** Catalyst pushes filters down to the scan (**predicate
+  pushdown**) and reads only the selected columns (**column pruning**) — so on
+  Parquet you touch a fraction of the data ([Handbook ch.1 §6](../../docs/handbook/01-spark-architecture-and-execution.md)).
+  Filtering early shrinks every downstream shuffle.
 
   **Mission:** From `trades`, keep only rows where `qty` is greater than `50`,
   and select the `ticker` and `qty` columns, into a DataFrame named `big`.

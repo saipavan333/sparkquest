@@ -6,9 +6,19 @@ difficulty: 4
 concepts: ["UDF", "custom logic", "types"]
 needs_spark: true
 brief: |
-  When a built-in won't do, a **UDF** wraps your own Python function as a column
-  operation. (Prefer built-ins when you can — UDFs are slower because they cross
-  the JVM↔Python boundary — but they're essential for custom logic.)
+  **What & why.** When no built-in expresses your logic, a **UDF** wraps a Python
+  function as a column operation. Powerful, but understand the cost — it's a
+  guaranteed interview question:
+
+  **The performance story (say this):**
+  - A plain Python UDF serializes each row from the JVM to a **Python worker**, runs
+    your code, and serializes back. That **JVM↔Python boundary** is slow, and the
+    UDF is a **black box to Catalyst** — no pushdown, no codegen.
+  - So **prefer built-in `F` functions / `when` / `expr`** whenever possible.
+  - When you must run Python, use a **pandas UDF** ([sp-28](sp-28-pandas-udf.yaml)) —
+    it processes Arrow batches vectorised, far faster than a row-at-a-time UDF.
+  - Always declare the **return type** (`T.StringType()`); a UDF that returns
+    `null`/errors silently is a debugging trap.
 
   `F` and the types module `T` are available.
 

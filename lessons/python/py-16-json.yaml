@@ -6,8 +6,22 @@ difficulty: 3
 concepts: ["json", "parsing", "serialisation"]
 needs_spark: false
 brief: |
-  JSON is the lingua franca of data pipelines — APIs, Kafka messages, log lines.
-  `json.loads` turns a JSON string into a Python dict.
+  **What & why.** JSON is the lingua franca of data pipelines — REST APIs, **Kafka
+  message values**, config files, log lines. Knowing how to parse and emit it
+  reliably is bread-and-butter DE work. This same step — string → structured record
+  — is what `from_json` does over a Kafka `value` column in Spark
+  ([Handbook ch.13](../../docs/handbook/13-kafka-and-streaming-io.md)).
+
+  **The four functions:**
+  - `json.loads(s)` — JSON **string → Python** object (dict/list). `json.load(f)`
+    reads from a file.
+  - `json.dumps(obj)` — Python → JSON **string** (`indent=2` to pretty-print).
+  - JSON objects become **dicts**, arrays become **lists**, `null` becomes `None`,
+    `true`/`false` become `True`/`False`.
+
+  **Gotcha.** Real feeds have malformed records — wrap `json.loads` in `try/except
+  json.JSONDecodeError` and quarantine the bad lines rather than letting one crash
+  the batch ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
 
   **Mission:** Parse the JSON string `raw` into a dict `rec`, then pull out
   `ticker` and `qty`.

@@ -6,8 +6,23 @@ difficulty: 3
 concepts: ["parquet", "read", "write", "columnar"]
 needs_spark: true
 brief: |
-  **Parquet** is the default file format of data engineering — columnar, compressed,
-  splittable, and schema-aware. Writing and reading it is a one-liner.
+  **What & why.** **Parquet** is the default file format of data engineering, and
+  understanding *why* is a standard interview question. It's **columnar** (stores
+  values column-by-column), which means: read only the columns you select (**column
+  pruning**), skip row groups whose min/max stats can't match your filter
+  (**predicate pushdown**), and compress far better than row formats because a
+  column's values are similar. It's also **splittable** (parallel reads) and carries
+  its own **schema**.
+
+  **The essentials:**
+  - Write: `df.write.mode("overwrite").parquet(path)` — modes: `overwrite`,
+    `append`, `error`, `ignore`.
+  - Read: `spark.read.parquet(path)` — schema comes from the files.
+  - Pair with `partitionBy` for directory pruning ([perf-05](../performance/perf-05-partitioned-write.yaml)).
+
+  **Interview angle.** Parquet vs CSV: columnar + stats + compression = 10–100× less
+  I/O on analytic scans. Delta/Iceberg are *Parquet + a transaction log*
+  ([Handbook ch.4](../../docs/handbook/04-file-formats-and-layout.md)).
 
   **Mission:** Write `df` to Parquet at `path`, then read it back into `loaded`.
   (`path` is a fresh temp directory, already set up for you.)

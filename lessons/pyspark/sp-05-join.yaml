@@ -6,9 +6,20 @@ difficulty: 3
 concepts: ["join", "keys"]
 needs_spark: true
 brief: |
-  Joins combine two DataFrames on a shared key — enriching trades with reference
-  data, stitching fact and dimension tables, the bread and butter of a data
-  engineer.
+  **What & why.** Joins combine two DataFrames on a shared key — enriching trades
+  with reference data, stitching fact and dimension tables. It's the bread and
+  butter of DE, and the **#1 performance topic** in Spark interviews.
+
+  **The essentials:**
+  - `a.join(b, on="ticker", how="inner")`. Joining on a shared column **name**
+    (string or list) auto-dedupes the key column; joining on an expression
+    (`a.k == b.k`) leaves both.
+  - `how`: `inner` (default), `left`/`right`/`full` outer, `left_semi` (filter to
+    matches), `left_anti` (find non-matches) — see [sp-16](sp-16-join-types.yaml).
+
+  **Performance (the part interviews probe):** a big⋈big join **shuffles both
+  sides** (sort-merge join). If one side is small, **broadcast** it to skip the
+  shuffle ([perf-03](../performance/perf-03-broadcast-join.yaml), [Handbook ch.9](../../docs/handbook/09-joins-shuffle-aqe.md)).
 
   **Mission:** Join `trades` with the `sectors` lookup on `ticker` so each trade
   gains its `sector`. Store the result in `joined`.

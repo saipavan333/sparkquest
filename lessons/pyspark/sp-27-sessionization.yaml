@@ -6,9 +6,13 @@ difficulty: 5
 concepts: ["Window", "lag", "cumulative sum", "sessionization"]
 needs_spark: true
 brief: |
-  A senior favourite: group a user's events into **sessions**, starting a new
-  session whenever the gap since the previous event exceeds a threshold. The
-  classic **gaps-and-islands** technique:
+  **What & why.** A senior favourite that combines three window skills. **Sessionize**
+  a user's event stream — group consecutive events into sessions, starting a new one
+  whenever the idle gap exceeds a threshold (e.g. a new web session after 30 min
+  idle). This is the canonical **gaps-and-islands** problem, and being able to
+  derive it live is a strong signal.
+
+  **The three-step pattern (memorise it):**
 
   1. `lag` the timestamp to get the previous event's time.
   2. Flag a **new session** when the gap > threshold (or there's no previous row).

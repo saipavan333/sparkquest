@@ -6,13 +6,20 @@ difficulty: 1
 concepts: ["print", "strings"]
 needs_spark: false
 brief: |
-  Welcome to **SparkQuest**! Every data pipeline ever written started with a
-  single line of code. Let's write yours.
+  **What & why.** Welcome to **SparkQuest**! Every pipeline starts with code that
+  *does* something and tells you what happened — and `print(...)` is how you make a
+  program speak. It writes text to **stdout**, the standard output stream; in data
+  engineering that same stream carries logs, debug output, and the results your
+  graders (and dashboards) read.
+
+  **The essentials:**
+  - A **string** is text wrapped in quotes — `"..."` or `'...'` (both work).
+  - **f-strings** interpolate values: `f"price is {x}"` — the workhorse for log
+    messages and you'll use them constantly.
+  - `print()` adds a newline each call; it converts non-strings for you
+    (`print(42)` works).
 
   **Mission:** Print a greeting that contains the word `Hello`.
-
-  In Python, `print(...)` writes text to the screen. Text (a *string*) goes
-  inside quotes.
 starter_code: |
   # Print a greeting that includes the word "Hello"
 solution_code: |

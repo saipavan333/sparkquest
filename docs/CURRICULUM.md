@@ -5,11 +5,12 @@ topic below maps to a **graded, runnable challenge** (✅ = live now, 🔜 = on 
 roadmap). The structure mirrors the official documentation so you can always go
 deeper at the source.
 
-**Status:** 78 graded lessons across all 7 tracks. The 70 Python / PySpark /
+**Status:** 84 graded lessons across all 7 tracks. The 75 Python / PySpark /
 Performance / Streaming / Capstone lessons are verified in the offline sandbox; the
-8 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
-need an internet JAR fetch). Every lesson ships **read-along teaching notes** in its
-brief — concept, why it matters, gotchas, and the interview angle. Every reference solution passes its own auto-grader.
+9 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
+need an internet JAR fetch). **Every lesson ships read-along teaching notes** in its
+brief — concept, why it matters, gotchas, and the interview angle, with cross-links
+into the Handbook — across all 7 tracks, so each lesson teaches as you practice. Every reference solution passes its own auto-grader.
 Pair the lessons with the **[Handbook](handbook/)** — now **15 deep-dive chapters**
 (incl. joins & AQE, RDDs, config & cluster sizing, debugging & the Spark UI, Kafka,
 Iceberg, and testing & data quality) — and the in-app **🎤 Mock Interview** drill
@@ -35,7 +36,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 1 — Python for Data Engineering (18 live)
+## Track 1 — Python for Data Engineering (21 live)
 
 > *Goal: write clean, idiomatic Python that's the backbone of every pipeline.*
 > Docs: <https://docs.python.org/3/tutorial/>
@@ -63,10 +64,10 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ JSON — `json.loads`/`dumps`, parsing records
 - ✅ Context managers — `with`, `__enter__`/`__exit__`, guaranteed cleanup
 - ✅ Type hints — `typing`, `Optional`, annotations, why DE teams enforce them
-- 🔜 Files & `pathlib` — reading/writing paths
-- 🔜 CSV — the `csv` module, delimited records
-- 🔜 Logging — structured logs over `print`
-- 🔜 Testing — `assert`, designing for testability
+- ✅ Files & `pathlib` — `Path`, stem/suffix/parent, cross-platform paths
+- ✅ CSV — the `csv` module / `DictReader`, why values are strings
+- ✅ Logging — levels, handlers, structured logs over `print`
+- 🔜 Testing — `assert`, designing for testability (see Handbook ch.15)
 
 ---
 
@@ -125,7 +126,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 3 — Performance & Internals (6 live)
+## Track 3 — Performance & Internals (7 live)
 
 > *Goal: understand what Spark does under the hood and make it fast.*
 > Docs: <https://spark.apache.org/docs/latest/sql-performance-tuning.html>
@@ -136,7 +137,7 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Data skew & salting — spreading hot keys
 - ✅ Partitioned writes — `partitionBy` on write
 - ✅ Partition pruning — filter a partition column, read only matching dirs
-- 🔜 Bucketing — write-time hash layout
+- ✅ Bucketing — write-time hash layout for shuffle-free joins (`bucketBy`)
 - ✅ Catalyst & Adaptive Query Execution — *deep dive:* [Handbook ch.9](handbook/09-joins-shuffle-aqe.md)
 - ✅ Reading the Spark UI — stages, tasks, shuffle, spill, skew — [Handbook ch.12](handbook/12-debugging-and-spark-ui.md)
 - ✅ Cluster sizing & config — executors/cores/memory math — [Handbook ch.11](handbook/11-configuration-and-cluster-sizing.md)
@@ -147,7 +148,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 4 — Structured Streaming (7 live)
+## Track 4 — Structured Streaming (8 live)
 
 > *Goal: build real-time pipelines with the same DataFrame API.*
 > Docs: <https://spark.apache.org/docs/latest/streaming/index.html>
@@ -159,9 +160,9 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Custom sinks with `foreachBatch` — per-batch DataFrames, upserts
 - ✅ Stream-static joins — enriching a stream with reference data
 - ✅ Parsing a Kafka value — `from_json` over the `value` column (the universal step)
+- ✅ Stream-stream joins — joining two live streams with watermarks + time bounds
 - 🔜 Output modes & triggers — append/update/complete, `processingTime`
 - 🔜 Sliding & session windows — overlapping and gap-based windows
-- 🔜 Stream-stream joins — joining two live streams with watermarks
 
 > Deep dives: [ch.3 Streaming Internals](handbook/03-streaming-internals.md) ·
 > [ch.13 Kafka & Streaming I/O](handbook/13-kafka-and-streaming-io.md) (offsets,
@@ -186,7 +187,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 6 — Apache Iceberg (4 live)
+## Track 6 — Apache Iceberg (5 live)
 
 > *Goal: the other open table format senior interviews ask about — know how it
 > compares to Delta.*
@@ -199,7 +200,7 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Row-level `UPDATE` — copy-on-write mutation of a single row via SQL
 - ✅ `MERGE` / upsert (CDC) — update matches, insert non-matches atomically
 - ✅ Time travel & snapshots — read an earlier `snapshot-id` / `VERSION AS OF`
-- 🔜 Hidden partitioning — partition transforms without query-side `WHERE` gymnastics
+- ✅ Hidden partitioning — `bucket(4, ticker)` transform, query the raw column
 
 > Deep dive: [Handbook ch.14 — Apache Iceberg](handbook/14-apache-iceberg.md)
 > (metadata tree, hidden partitioning, CoW vs MoR, Delta vs Iceberg vs Hudi).

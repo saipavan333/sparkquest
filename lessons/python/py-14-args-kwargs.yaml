@@ -6,8 +6,18 @@ difficulty: 3
 concepts: ["args", "varargs", "lambda"]
 needs_spark: false
 brief: |
-  `*args` lets a function take any number of positional arguments; `lambda` makes
-  a tiny anonymous function. Both show up constantly in framework APIs.
+  **What & why.** Two features you'll see all over framework APIs:
+  - **`*args`** collects extra positional arguments into a **tuple**; **`**kwargs`**
+    collects extra keyword arguments into a **dict**. Together they let a function
+    accept *any* signature — which is exactly how decorator wrappers
+    ([py-10](py-10-decorators.yaml)) forward calls, and how config-driven APIs stay
+    flexible.
+  - **`lambda`** makes a tiny **anonymous** function inline: `lambda x: x * x`. Great
+    for one-off keys/callbacks (`sorted(rows, key=lambda r: r.qty)`).
+
+  **Gotcha.** Keep lambdas tiny — if it needs a name or more than one expression,
+  use `def`. And in **PySpark**, a Python `lambda` in an RDD/UDF runs in a slow
+  Python worker and is opaque to Catalyst; prefer built-in column functions.
 
   **Mission:**
   1. Write `total(*nums)` that returns the sum of all arguments passed.

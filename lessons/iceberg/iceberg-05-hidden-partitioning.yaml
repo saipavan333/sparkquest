@@ -1,0 +1,53 @@
+id: iceberg-05-hidden-partitioning
+track: iceberg
+order: 5
+title: "Hidden Partitioning"
+difficulty: 4
+concepts: ["iceberg", "hidden partitioning", "partition transform", "bucket"]
+needs_spark: true
+needs_iceberg: true
+brief: |
+  **What & why.** Iceberg's headline feature. In Hive/Delta you partition by a
+  *column you must also filter on* — and analysts forget, scanning everything.
+  Iceberg partitions by a **transform of a column** (`bucket`, `days`, `truncate`,
+  `years`…) recorded in metadata, so queries filter on the **raw** column and
+  Iceberg **derives the partition automatically** — pruning files without the user
+  writing any partition-specific `WHERE`.
+
+  **The essentials:**
+  - Declare with a transform: `PARTITIONED BY (bucket(4, ticker))` or `(days(ts))`.
+  - Query naturally: `WHERE ticker = 'AAPL'` — Iceberg maps it to the right bucket
+    and skips the rest. No `WHERE bucket = ...` gymnastics.
+  - Bonus: **partition evolution** — change the transform later without rewriting old
+    data ([Handbook ch.14 §3–4](../../docs/handbook/14-apache-iceberg.md)).
+
+  **Mission:** Create `local.db.ev (ticker STRING, amount BIGINT)` **partitioned by
+  `bucket(4, ticker)`**, insert three rows, then select just the AAPL rows into
+  `out` by filtering on the **raw** `ticker` column.
+starter_code: |
+  spark.sql(
+      "CREATE TABLE local.db.ev (ticker STRING, amount BIGINT) "
+      "USING iceberg PARTITIONED BY (bucket(4, ticker))"
+  )
+  spark.sql("INSERT INTO local.db.ev VALUES ('AAPL', 100), ('GOOG', 50), ('AAPL', 70)")
+  # TODO: select only AAPL rows by filtering on the raw ticker column -> `out`
+  out = ...
+  out.show()
+solution_code: |
+  spark.sql(
+      "CREATE TABLE local.db.ev (ticker STRING, amount BIGINT) "
+      "USING iceberg PARTITIONED BY (bucket(4, ticker))"
+  )
+  spark.sql("INSERT INTO local.db.ev VALUES ('AAPL', 100), ('GOOG', 50), ('AAPL', 70)")
+  out = spark.sql("SELECT * FROM local.db.ev WHERE ticker = 'AAPL'")
+  out.show()
+checks:
+  - type: df_equals
+    name: out
+    expected:
+      - {"ticker": "AAPL", "amount": 100}
+      - {"ticker": "AAPL", "amount": 70}
+    message: "out should be the AAPL rows, pruned via the hidden bucket partition"
+hints:
+  - "PARTITIONED BY (bucket(4, ticker)) partitions by a transform, not a raw column."
+  - "Query with WHERE ticker = 'AAPL' — Iceberg derives the partition for you."

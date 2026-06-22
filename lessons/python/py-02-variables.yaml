@@ -6,8 +6,18 @@ difficulty: 1
 concepts: ["variables", "arithmetic"]
 needs_spark: false
 brief: |
-  A *variable* is a named box that stores a value. Data engineering is mostly
-  moving values between boxes and transforming them along the way.
+  **What & why.** A *variable* is a named reference to a value. Data engineering is
+  mostly moving values between names and transforming them along the way, so getting
+  comfortable here pays off everywhere.
+
+  **The essentials:**
+  - Python is **dynamically typed** — you don't declare a type; `price = 189.50`
+    just works, and the name can later point at anything.
+  - Numeric types matter: `100` is an **int**, `189.50` is a **float**. Mixing them
+    (`int * float`) gives a float — which is why `cost` below comes out as `18950.0`,
+    not `18950`.
+  - Operators: `+ - * /` (true division, always float), `//` (floor), `%` (modulo),
+    `**` (power). `/` returning a float trips up newcomers.
 
   **Mission:** A stock trades at `189.50` and you buy `100` shares. Compute the
   total cost and store it in a variable named `cost`.

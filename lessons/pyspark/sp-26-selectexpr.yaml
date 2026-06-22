@@ -6,9 +6,21 @@ difficulty: 3
 concepts: ["selectExpr", "expr", "SQL expressions"]
 needs_spark: true
 brief: |
-  `selectExpr` lets you write **SQL expression strings** instead of column objects —
-  often more concise for arithmetic, casts, and function calls. (`F.expr(...)` does
-  the same inside `withColumn`.)
+  **What & why.** `selectExpr` lets you write **SQL expression strings** instead of
+  building column objects — often far more concise for arithmetic, casts, `CASE`,
+  and function calls, especially if you think in SQL. It's the same Catalyst engine
+  underneath, so there's **no performance difference** — purely a readability choice.
+
+  **The essentials:**
+  - `df.selectExpr("price * qty AS total", "upper(ticker) AS sym")` — each string is
+    a SQL expression with an optional `AS` alias.
+  - `F.expr("price * qty")` does the same for a single column inside `withColumn`/
+    `filter` — handy for mixing string expressions into the DataFrame API.
+  - Full SQL function vocabulary is available: `CASE WHEN`, `CAST(... AS ...)`,
+    `coalesce`, date functions, etc.
+
+  **Tip.** Great for parameterising transforms from config (build the expression
+  string), but validate the strings — a typo becomes a runtime `AnalysisException`.
 
   **Mission:** From `df`, produce `out` with: `ticker`, `total` = `price * qty`,
   and `sym` = the uppercased ticker — all via `selectExpr`.

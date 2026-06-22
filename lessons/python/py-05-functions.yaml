@@ -6,8 +6,18 @@ difficulty: 2
 concepts: ["functions", "return values"]
 needs_spark: false
 brief: |
-  A *function* packages logic so you can reuse it. Spark UDFs, transformations,
-  and pipelines are all functions under the hood.
+  **What & why.** A *function* packages logic behind a name so you can reuse it and
+  test it in isolation. This matters enormously in data engineering: Spark UDFs,
+  transformations, and whole pipeline stages are all just functions — and writing
+  them as **pure functions** (output depends only on inputs, no hidden state) is
+  what makes them unit-testable (see [Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+
+  **The essentials:**
+  - `def name(params):` defines it; **`return`** sends a value back. A function with
+    no `return` yields `None`.
+  - Arguments bind by position or by name (`pnl(buy=100, ...)`); you can give
+    defaults (`def f(x, rate=0.1):`).
+  - Keep functions small and single-purpose — easy to reason about, easy to test.
 
   **Mission:** Write a function named `pnl(buy, sell, qty)` that returns the
   profit-and-loss of a trade: `(sell - buy) * qty`.

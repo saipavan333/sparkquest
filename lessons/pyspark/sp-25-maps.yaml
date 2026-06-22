@@ -6,8 +6,21 @@ difficulty: 4
 concepts: ["MapType", "map access", "semi-structured"]
 needs_spark: true
 brief: |
-  A **map** column holds key→value pairs per row (think a JSON object). You read a
-  value by key with bracket access: `F.col("meta")["sector"]`.
+  **What & why.** A **map** column holds **key→value pairs per row** with arbitrary,
+  per-row keys — think a flexible JSON object or a bag of tags/attributes. Use it
+  when the set of keys varies row to row (a **struct** is the right choice when the
+  fields are fixed and known).
+
+  **The essentials:**
+  - Read by key: `F.col("meta")["sector"]` or `F.col("meta.sector")`; a missing key
+    yields `null`.
+  - Build/inspect: `F.create_map(...)`, `F.map_keys`, `F.map_values`,
+    `F.explode` (a map explodes to `key`,`value` rows).
+
+  **Interview angle: map vs struct.** Map = dynamic keys, all values share **one
+  type**, no schema enforcement on keys. Struct = fixed, named, individually-typed
+  fields with schema validation. Reach for struct when you can — you get type
+  safety and column pruning.
 
   **Mission:** Each row has a `meta` map. Pull the `sector` value into a top-level
   column `sector` (keeping `ticker`). Store the result in `out`.

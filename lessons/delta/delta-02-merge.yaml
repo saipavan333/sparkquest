@@ -7,9 +7,21 @@ concepts: ["MERGE", "upsert", "change-data-capture"]
 needs_spark: true
 needs_delta: true
 brief: |
-  The killer feature: `MERGE` updates existing rows and inserts new ones in a
-  single atomic operation — the foundation of change-data-capture (CDC) into a
-  lakehouse. Parquet alone can't do this.
+  **What & why.** `MERGE` (upsert) updates matching rows and inserts new ones in a
+  **single atomic operation** — the foundation of **change-data-capture (CDC)** into
+  a lakehouse and the most-used Delta feature in production. Plain Parquet can't do
+  this (no in-place update); you'd rewrite files by hand and risk partial writes.
+
+  **The essentials:**
+  - `DeltaTable.forPath(spark, path)` gives the target; `.merge(source, condition)`
+    then chain `.whenMatchedUpdate(...)`, `.whenNotMatchedInsert(...)`,
+    optionally `.whenMatchedDelete()`, `.execute()`.
+  - It's the engine behind the **streaming CDC sink**: `foreachBatch` + `MERGE`
+    gives idempotent, exactly-once upserts ([Handbook ch.13 §6](../../docs/handbook/13-kafka-and-streaming-io.md)).
+  - Iceberg has the same operation in SQL ([iceberg-03](../iceberg/iceberg-03-merge.yaml)).
+
+  **Gotcha.** If the source has **duplicate keys** for one target row, MERGE errors
+  (ambiguous update) — dedupe the source first.
 
   **Mission:** A positions table exists with AAPL 100, GOOG 50. Apply `updates`
   (AAPL → 120, MSFT 30) with a `MERGE`: update matched tickers, insert new ones.

@@ -6,9 +6,21 @@ difficulty: 4
 concepts: ["foreachBatch", "custom sink", "micro-batch"]
 needs_spark: true
 brief: |
-  `foreachBatch` hands you each micro-batch as a normal DataFrame, so you can do
-  *anything* — upsert to a database, write to several targets, or call an API. It's
-  the escape hatch that makes Structured Streaming production-ready.
+  **What & why.** `foreachBatch(fn)` hands you each micro-batch as an ordinary
+  **batch DataFrame** (plus a `batch_id`), so inside it you can do *anything* the
+  batch API allows — **upsert to Delta/JDBC**, write to **multiple sinks**, or call
+  an external service. It's the escape hatch that makes Structured Streaming
+  production-ready, because the built-in sinks can't express upserts.
+
+  **The essentials:**
+  - Signature: `def fn(batch_df, batch_id): ...` — `batch_df` is a normal DataFrame.
+  - The headline pattern is **`foreachBatch` + Delta `MERGE`** for idempotent CDC
+    upserts ([Handbook ch.13 §6](../../docs/handbook/13-kafka-and-streaming-io.md)).
+  - It's **at-least-once** at the batch level (a batch can re-run on recovery) — use
+    the `batch_id` or an idempotent write (MERGE) to stay exactly-once.
+
+  **Testing tip.** Because the body is a plain DataFrame transform, you can unit-test
+  it directly — no streaming harness needed.
 
   **Mission:** Stream `data/sample/stream_events` and use `foreachBatch` to record
   each batch's row count into the `processed` list. After the query finishes, store

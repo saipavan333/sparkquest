@@ -6,8 +6,21 @@ difficulty: 3
 concepts: ["try/except", "exceptions", "robustness"]
 needs_spark: false
 brief: |
-  Real pipelines hit bad data. Catching exceptions lets your code keep running
-  instead of crashing on one bad row.
+  **What & why.** Real pipelines hit bad data — a malformed row, a divide-by-zero, a
+  missing field. **`try`/`except`** lets your code handle the failure instead of
+  crashing the whole job on one bad record. This is the foundation of the
+  **quarantine pattern** (route bad rows aside, keep going — see
+  [Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+
+  **The essentials:**
+  - `try:` the risky code, `except SomeError:` the recovery. Catch the **specific**
+    exception (`ZeroDivisionError`, `KeyError`, `ValueError`), not a bare `except:`,
+    so you don't swallow bugs you didn't intend to.
+  - Optional `else:` (ran if no error) and `finally:` (always runs — cleanup).
+  - You can inspect the error: `except ValueError as e:`.
+
+  **Gotcha.** Catching too broadly (`except Exception`) hides real bugs and makes
+  failures silent — the cardinal sin in data pipelines. Be specific.
 
   **Mission:** Write a function `safe_divide(a, b)` that returns `a / b`, but
   returns `None` when `b` is `0` (catch the `ZeroDivisionError`).

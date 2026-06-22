@@ -6,9 +6,21 @@ difficulty: 4
 concepts: ["Window", "frame", "cumulative sum"]
 needs_spark: true
 brief: |
-  A **running (cumulative) total** is a windowed `sum` with an explicit **frame**:
-  all rows from the start up to the current one. The frame
-  `rowsBetween(Window.unboundedPreceding, Window.currentRow)` is the key.
+  **What & why.** A **running (cumulative) total** — account balances, cumulative
+  volume, YTD revenue — is a windowed `sum` with an explicit **frame**: every row
+  from the start of the partition up to the current one. Understanding window
+  **frames** separates people who memorised `row_number` from people who actually
+  understand windows.
+
+  **Frames in one breath:**
+  - `rowsBetween(unboundedPreceding, currentRow)` → running total (this lesson).
+  - The default frame for an **ordered** window is `rangeBetween(unboundedPreceding,
+    currentRow)` — subtly different (RANGE groups equal-ordering rows together;
+    ROWS counts physical rows). For cumulative sums, be explicit with **`rowsBetween`**.
+  - `rowsBetween(-2, 0)` → trailing 3-row moving average.
+
+  **Gotcha.** A cumulative window must be **ordered**; without `orderBy` the frame
+  is the whole partition (you'd get the grand total on every row).
 
   **Mission:** For `AAPL`, compute the cumulative `amt` ordered by date `d`, as
   column `cum`. Select `ticker`, `d`, `cum` into `running`.

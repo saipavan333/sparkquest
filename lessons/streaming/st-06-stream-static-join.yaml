@@ -6,9 +6,21 @@ difficulty: 4
 concepts: ["stream-static join", "enrichment", "aggregation"]
 needs_spark: true
 brief: |
-  A classic pattern: enrich a live stream with a static reference table (a
-  dimension). Joining a streaming DataFrame to a batch DataFrame is fully
-  supported and needs no watermark.
+  **What & why.** The most common streaming join: enrich a live stream with a
+  **static** reference/dimension table (sector lookup, product catalog, user
+  profile). Joining a streaming DataFrame to a batch DataFrame is fully supported,
+  needs **no watermark**, and keeps no join state — each event is enriched as it
+  flows through.
+
+  **The essentials:**
+  - `stream.join(static_df, "key")` — the static side is re-read per micro-batch, so
+    refreshing the reference table picks up changes (broadcast it if small).
+  - Allowed join types are limited (e.g. a stream can be the left side of a left
+    join); the static side can't "wait" for stream rows.
+
+  **Contrast — stream-stream joins** (the harder, frequently-asked case) join two
+  *live* streams and **require watermarks on both** to bound the buffered state
+  while waiting for matches ([Handbook ch.3 §9](../../docs/handbook/03-streaming-internals.md)).
 
   **Mission:** Join the event stream to the static `sectors` table on `ticker`,
   then count events **per sector** (complete mode). Land it in a memory table and

@@ -6,9 +6,19 @@ difficulty: 4
 concepts: ["decorators", "closures", "higher-order functions"]
 needs_spark: false
 brief: |
-  A decorator wraps a function to add behaviour — timing, retries, logging,
-  caching — without touching the function's body. They're everywhere in data
-  frameworks.
+  **What & why.** A **decorator** wraps a function to add behaviour — timing,
+  retries, logging, caching, auth — **without touching the function's body**. You've
+  already used them: `@dataclass`, `@pandas_udf`, and pytest's `@pytest.fixture` are
+  all decorators. Understanding them demystifies half the "magic" in data frameworks.
+
+  **How it works (the mechanics interviewers probe):**
+  - A decorator is a **function that takes a function and returns a function**.
+  - The inner `wrapper(*args, **kwargs)` accepts *any* signature, calls the original
+    `fn`, and adds behaviour around it — a **closure** over `fn`.
+  - `@double` above `def add` is just sugar for `add = double(add)`.
+
+  **Tip.** In real code wrap the inner function with `functools.wraps(fn)` so the
+  decorated function keeps its original name/docstring (matters for debugging).
 
   **Mission:** Write a decorator `double` that **doubles** whatever a function
   returns, then apply it to `add(a, b)`.

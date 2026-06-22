@@ -6,8 +6,21 @@ difficulty: 4
 concepts: ["ETL", "filter", "withColumn", "groupBy", "pipeline"]
 needs_spark: true
 brief: |
-  Time to put it together. A batch ETL job typically: **extracts** raw data,
-  **transforms** it (clean → enrich → aggregate), and **loads** the result.
+  **What & why.** Time to put it together. Almost every batch pipeline is an
+  **ETL/ELT** job: **Extract** raw data, **Transform** it (clean → enrich →
+  aggregate), and **Load** the result to a serving table. Structuring it as clear,
+  ordered stages — each a pure DataFrame transform — is what makes a pipeline
+  readable, testable, and debuggable.
+
+  **The standard transform order (and why):**
+  1. **Clean first** — drop/quarantine invalid rows (`price <= 0`) so bad data never
+     reaches the math ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+  2. **Enrich** — derive columns (`notional = price * qty`), join dimensions.
+  3. **Aggregate** — collapse to the report grain (`groupBy().agg()`).
+
+  Filtering **early** also shrinks every downstream shuffle — clean-then-aggregate
+  is both correct and fast. In production you'd write the result to Delta/Iceberg
+  with a data-quality gate before publishing.
 
   **Mission:** From `raw` trades:
   1. Drop invalid rows where `price <= 0`.

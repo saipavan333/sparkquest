@@ -6,8 +6,22 @@ difficulty: 5
 concepts: ["streaming ETL", "filter", "join", "aggregation"]
 needs_spark: true
 brief: |
-  The real-time finale: an end-to-end streaming pipeline that **filters**,
-  **enriches** with reference data, and **aggregates** — all on a live stream.
+  **What & why.** The real-time finale: a complete streaming pipeline that
+  **filters → enriches (stream-static join) → aggregates**, all on a live stream
+  with the *same* DataFrame API as batch. It ties together everything from the
+  Streaming track into the shape of a production job.
+
+  **The pipeline, stage by stage:**
+  1. **Filter** early (`amount >= 500`) — drop noise before the expensive steps.
+  2. **Enrich** via a **stream-static join** to the `sectors` dimension
+     ([st-06](../streaming/st-06-stream-static-join.yaml)) — no watermark needed.
+  3. **Aggregate** per sector; an aggregation without a watermark uses
+     `outputMode("complete")` ([st-02](../streaming/st-02-streaming-agg.yaml)).
+
+  **From here to production:** swap the file source for **Kafka**, the memory sink
+  for **`foreachBatch` + Delta `MERGE`**, add a **checkpoint** for exactly-once, and
+  a data-quality gate — the architecture in [Handbook ch.13](../../docs/handbook/13-kafka-and-streaming-io.md).
+  `trigger(availableNow=True)` keeps this lesson deterministic for grading.
 
   **Mission:** Stream `data/sample/stream_events`, keep only events with
   `amount >= 500`, join the static `sectors` table, then count events per sector

@@ -1,0 +1,61 @@
+id: py-21-logging
+track: python
+order: 21
+title: "Logging (over print)"
+difficulty: 3
+concepts: ["logging", "observability", "handlers"]
+brief: |
+  **What & why.** In a real pipeline you never debug with `print` — you use the
+  **`logging`** module. It gives you severity **levels** (so prod shows `INFO`+ while
+  dev shows `DEBUG`), structured **handlers** (route to stdout, files, or a log
+  aggregator), and timestamps/context — the foundation of **observability**. A job
+  you can't see into is a job you can't operate.
+
+  **The essentials:**
+  - Get a named logger: `logging.getLogger("pipeline")`; set a level
+    (`logger.setLevel(logging.INFO)`).
+  - A **handler** decides where records go (`StreamHandler` → a stream/console,
+    `FileHandler` → a file); a **formatter** decides how they look.
+  - Levels, low→high: `DEBUG < INFO < WARNING < ERROR < CRITICAL`. The logger emits
+    records at or above its level.
+
+  **Why over print:** levels let you dial verbosity without code changes, handlers
+  let ops route logs anywhere, and structured logs are queryable — none of which
+  `print` offers.
+
+  **Mission:** Send an `INFO` log `"processed 100 rows"` from a logger into the
+  provided `buf` (via a `StreamHandler`), then read the captured text into
+  `captured`.
+starter_code: |
+  import logging, io
+
+  buf = io.StringIO()
+  logger = logging.getLogger("pipeline_demo")
+  logger.setLevel(logging.INFO)
+  logger.handlers.clear()
+  # TODO: add a StreamHandler writing to buf, log an INFO message, read buf into `captured`
+  ...
+  captured = ...
+  print(captured)
+solution_code: |
+  import logging, io
+
+  buf = io.StringIO()
+  logger = logging.getLogger("pipeline_demo")
+  logger.setLevel(logging.INFO)
+  logger.handlers.clear()
+  handler = logging.StreamHandler(buf)
+  logger.addHandler(handler)
+  logger.info("processed 100 rows")
+  handler.flush()
+  captured = buf.getvalue()
+  print(captured)
+checks:
+  - type: custom
+    message: "captured should contain the INFO message 'processed 100 rows'"
+    code: |
+      ok = "processed 100 rows" in (ns.get("captured") or "")
+hints:
+  - "handler = logging.StreamHandler(buf); logger.addHandler(handler)."
+  - "logger.info(\"processed 100 rows\") emits the record; read it with buf.getvalue()."
+  - "An INFO message shows because the logger's level is INFO (INFO >= INFO)."

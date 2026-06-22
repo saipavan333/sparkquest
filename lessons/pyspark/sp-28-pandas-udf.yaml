@@ -6,10 +6,20 @@ difficulty: 4
 concepts: ["pandas_udf", "Arrow", "vectorized UDF"]
 needs_spark: true
 brief: |
-  A plain Python UDF processes one row at a time across the slow JVM↔Python
-  boundary. A **pandas UDF** receives a whole **batch** as a pandas `Series` via
-  Apache **Arrow** and returns one — far faster, and the right tool when you must
-  drop into Python.
+  **What & why.** A plain Python UDF ([sp-19](sp-19-udf.yaml)) processes **one row at
+  a time** across the slow JVM↔Python boundary. A **pandas UDF** (a.k.a. vectorized
+  UDF) instead receives a whole **batch** as a pandas `Series` via Apache **Arrow**
+  — so serialization is columnar and bulk, and your code runs vectorised in NumPy/
+  pandas. Typically **10–100× faster** than a row-at-a-time UDF, and the right tool
+  when you genuinely must run Python (custom math, an ML model's `predict`).
+
+  **The essentials:**
+  - `@pandas_udf(returnType)` (or `F.pandas_udf(fn, type)`); the function maps a
+    `pd.Series` → `pd.Series` of the **same length**.
+  - Still slower than a pure built-in expression — the ladder is **built-in `F` >
+    pandas UDF > Python UDF**.
+  - Needs `pyarrow`; great for applying a model batch-wise inside `mapInPandas`/
+    `applyInPandas` for grouped work.
 
   `F` and the types module `T` are available.
 

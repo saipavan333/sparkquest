@@ -6,8 +6,19 @@ difficulty: 3
 concepts: ["cast", "type conversion"]
 needs_spark: true
 brief: |
-  Raw data often arrives as strings — prices, quantities, dates all as text. Use
-  `.cast(...)` to convert columns to the right type before you compute on them.
+  **What & why.** Raw feeds (CSV, JSON, Kafka) often arrive as **strings** — prices,
+  quantities, dates all as text. `.cast(type)` converts a column to the right type
+  so arithmetic, comparisons, and sorting behave correctly (`"100" < "9"` is true as
+  *strings*!). Casting is the bridge between messy ingest and clean computation.
+
+  **The essentials:**
+  - `F.col("x").cast("double")` (or `.cast(T.DoubleType())`) — string⇄number,
+    number⇄string, string⇄date.
+  - **Invalid casts become `null`**, not errors — `"abc".cast("double")` → `null`.
+    That's a silent data-quality risk: count the nulls after casting to catch bad
+    input ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+  - Better still, declare types up front with an explicit **schema**
+    ([sp-08](sp-08-schema.yaml)) so you never guess.
 
   **Mission:** `price_str` is text. Cast it to a **double** column named `price`,
   keeping `ticker`. Store the result in `casted`.

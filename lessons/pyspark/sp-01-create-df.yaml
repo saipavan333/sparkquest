@@ -6,10 +6,18 @@ difficulty: 2
 concepts: ["SparkSession", "createDataFrame", "DataFrame"]
 needs_spark: true
 brief: |
-  A Spark **DataFrame** is a distributed table — rows and named columns spread
-  across a cluster, but you program it as if it were one tidy table.
+  **What & why.** A Spark **DataFrame** is a distributed table — rows and named
+  columns spread across many machines, but you program it as if it were one tidy
+  table. Behind that simple API, **Catalyst** optimizes your query and **Tungsten**
+  runs it on compact binary memory ([Handbook ch.1](../../docs/handbook/01-spark-architecture-and-execution.md)),
+  which is why DataFrames beat hand-written RDD code.
 
-  A ready-to-use `spark` session is already available to you (no setup needed).
+  **The essentials:**
+  - The `SparkSession` (`spark`) is your entry point — already created for you here.
+  - `spark.createDataFrame(data, schema)` builds one from a Python collection;
+    in production you'd read Parquet/Kafka/JDBC instead.
+  - DataFrames are **immutable** and **lazy** — operations return a *new* DataFrame
+    and nothing runs until an **action** like `.show()`/`.count()`.
 
   **Mission:** Create a DataFrame named `df` from the list below, with columns
   `ticker` and `qty`.

@@ -6,10 +6,19 @@ difficulty: 3
 concepts: ["StructType", "StructField", "types"]
 needs_spark: true
 brief: |
-  In production you almost never let Spark *guess* types — you declare a schema.
-  It's faster (no inference scan) and safer (bad data fails loudly).
+  **What & why.** In production you almost never let Spark **guess** types — you
+  declare a schema. It's **faster** (inference reads the data an extra time) and
+  **safer** (a column that should be a number won't silently become a string when
+  the source drifts). Schema-on-read is a core data-quality control
+  ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
 
-  The types module is available to you as `T` (`pyspark.sql.types`).
+  **The essentials:**
+  - A schema is a `T.StructType([...])` of `T.StructField(name, type, nullable)`.
+  - Common types: `StringType`, `LongType`/`IntegerType`, `DoubleType`,
+    `BooleanType`, `TimestampType`, `ArrayType`, `StructType` (nested), `MapType`.
+  - `LongType` vs `IntegerType` matters at scale (overflow); financial amounts often
+    use `DecimalType` for exactness.
+  - The types module is available to you as `T` (`pyspark.sql.types`).
 
   **Mission:** Build `df` from `data` using an explicit schema: `ticker` as
   `StringType`, `qty` as `LongType`, `price` as `DoubleType`.

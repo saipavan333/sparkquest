@@ -1,0 +1,61 @@
+id: py-19-pathlib
+track: python
+order: 19
+title: "Files & pathlib"
+difficulty: 2
+concepts: ["pathlib", "Path", "filesystem"]
+brief: |
+  **What & why.** `pathlib.Path` is the modern, cross-platform way to work with
+  filesystem paths — building, splitting, and inspecting them as objects instead of
+  hand-gluing strings with `os.path.join` and brittle `"/"` concatenation. Data
+  engineering is full of path wrangling (partition folders, landing zones, file
+  globs), so this is a daily tool.
+
+  **The essentials:**
+  - Build with the `/` operator: `Path("/data") / "raw" / "trades.csv"` — no manual
+    separators, and it's correct on every OS.
+  - Inspect the parts: `.name` (`trades.csv`), `.stem` (`trades`), `.suffix`
+    (`.csv`), `.parent` (`/data/raw`).
+  - Useful methods: `.exists()`, `.glob("*.csv")`, `.read_text()`, `.mkdir(parents=True)`.
+
+  **Why prefer it:** `os.path.join` returns strings you then re-parse; `Path`
+  objects carry structure and read far cleaner — `p.with_suffix(".parquet")` beats
+  string surgery.
+
+  **Mission:** From the path `/data/raw/trades.csv`, extract its `stem`, `suffix`,
+  and `parent` (the parent as a string).
+
+  Expected: `stem == "trades"`, `suffix == ".csv"`, `parent == "/data/raw"`.
+starter_code: |
+  from pathlib import Path
+
+  p = Path("/data/raw/trades.csv")
+  # TODO: extract stem, suffix, and parent (as a string)
+  stem = ...
+  suffix = ...
+  parent = ...
+  print(stem, suffix, parent)
+solution_code: |
+  from pathlib import Path
+
+  p = Path("/data/raw/trades.csv")
+  stem = p.stem
+  suffix = p.suffix
+  parent = str(p.parent)
+  print(stem, suffix, parent)
+checks:
+  - type: var_equals
+    name: stem
+    expected: "trades"
+    message: "stem should be the filename without its extension"
+  - type: var_equals
+    name: suffix
+    expected: ".csv"
+    message: "suffix should be the file extension, including the dot"
+  - type: var_equals
+    name: parent
+    expected: "/data/raw"
+    message: "parent should be the containing directory as a string"
+hints:
+  - "p.stem is the name without extension; p.suffix includes the dot."
+  - "p.parent is a Path — wrap it in str(...) for the expected string."

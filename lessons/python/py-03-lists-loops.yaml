@@ -6,8 +6,20 @@ difficulty: 2
 concepts: ["lists", "loops", "accumulation"]
 needs_spark: false
 brief: |
-  A *list* holds many values in order. Looping over a list and accumulating a
-  result is the seed of every aggregation you'll later do in Spark.
+  **What & why.** A *list* holds many values **in order**, and looping over a list
+  to accumulate a result is the seed of every aggregation you'll later do in Spark
+  (`groupBy().sum()` is this idea, distributed across a cluster).
+
+  **The essentials:**
+  - Lists are **ordered** and **mutable**: `xs.append(x)`, index with `xs[0]`,
+    slice with `xs[1:3]`.
+  - The accumulator pattern: start at a zero value, loop, and `total += r`.
+  - **Prefer built-ins** when they exist — `sum(returns)` is faster and clearer than
+    a manual loop. In Spark the same lesson applies: built-in functions beat
+    hand-rolled UDFs.
+
+  **Gotcha.** Adding floats accumulates tiny rounding error (`0.1 + 0.2 != 0.3`
+  exactly) — that's why the check below uses a tolerance, not strict equality.
 
   **Mission:** Given a list of daily `returns`, add them all up and store the
   result in a variable named `total`.

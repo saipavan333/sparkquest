@@ -6,8 +6,18 @@ difficulty: 3
 concepts: ["Counter", "standard library", "counting"]
 needs_spark: false
 brief: |
-  Python's standard library has batteries for data work. `collections.Counter`
-  counts things in one line — the same job as a Spark `groupBy().count()`, locally.
+  **What & why.** Python's standard library is "batteries included" — and
+  `collections` has the data-wrangling batteries. `Counter` counts things in one
+  line (the local twin of Spark's `groupBy().count()`); reach for the right tool
+  instead of re-implementing it.
+
+  **The `collections` toolkit worth knowing:**
+  - **`Counter`** — frequency map; `.most_common(n)` returns the top-n `(item,
+    count)` pairs already sorted.
+  - **`defaultdict(list)`** — a dict that auto-creates a default for missing keys
+    (no more `if k not in d`), perfect for grouping rows by key.
+  - **`namedtuple`** / **`deque`** (O(1) ends, great for sliding windows).
+  - `itertools` complements it: `groupby`, `chain`, `islice` for lazy pipelines.
 
   **Mission:** Use `Counter` to count the `tickers`, store it in `counts`, and put
   the single most-common ticker in `top`.
