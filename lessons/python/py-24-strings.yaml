@@ -1,0 +1,65 @@
+id: py-24-strings
+track: python
+order: 2
+title: "Strings & Slicing"
+difficulty: 1
+concepts: ["strings", "indexing", "slicing", "string methods", "f-strings"]
+brief: |
+  **What & why.** Text is everywhere in data work — tickers, log lines, file paths,
+  CSV/JSON fields — so fluent string handling is a daily skill. Python strings are
+  **immutable** sequences of characters, which means every "edit" returns a **new**
+  string.
+
+  **Indexing & slicing (the part beginners miss):**
+  - Index from `0`: `s[0]` is the first char; negative indexes from the end:
+    `s[-1]` is the last.
+  - **Slice** `s[start:stop:step]` — `stop` is **exclusive**. `s[:3]` first three,
+    `s[-3:]` last three, `s[::-1]` reversed. (Same slicing works on lists.)
+
+  **Essential methods:** `.upper()`/`.lower()`, `.strip()` (trim whitespace),
+  `.replace(a, b)`, `.split(sep)` → list, `sep.join(list)` → string,
+  `.startswith()`/`.endswith()`, `.find()`/`in`.
+
+  **f-strings** — the modern way to build text: `f"{ticker}: {price:.2f}"` embeds
+  values with formatting (`:.2f` = 2 decimals). Prefer them to `+` concatenation.
+
+  **Gotcha.** Because strings are immutable, `s.upper()` returns a new string — you
+  must assign it (`s = s.upper()`); calling it without assigning does nothing.
+
+  **Mission:** From `raw = "  aapl,google,msft  "`:
+  1. `clean` — trimmed and uppercased.
+  2. `first` — the first ticker only (split on `,`, take index 0).
+  3. `label` — an f-string `"Tickers: 3"` using the count of tickers.
+
+  Expected: `clean == "AAPL,GOOGLE,MSFT"`, `first == "AAPL"`, `label == "Tickers: 3"`.
+starter_code: |
+  raw = "  aapl,google,msft  "
+  # TODO: clean (strip + upper), first ticker (split, index 0), label (f-string)
+  clean = ...
+  first = ...
+  label = ...
+  print(clean, first, label)
+solution_code: |
+  raw = "  aapl,google,msft  "
+  clean = raw.strip().upper()
+  parts = clean.split(",")
+  first = parts[0]
+  label = f"Tickers: {len(parts)}"
+  print(clean, first, label)
+checks:
+  - type: var_equals
+    name: clean
+    expected: "AAPL,GOOGLE,MSFT"
+    message: "clean should be trimmed of spaces and uppercased"
+  - type: var_equals
+    name: first
+    expected: "AAPL"
+    message: "first should be the first ticker after splitting on ','"
+  - type: var_equals
+    name: label
+    expected: "Tickers: 3"
+    message: "label should be an f-string with the ticker count"
+hints:
+  - "Chain raw.strip().upper() — strip first to drop the surrounding spaces."
+  - "split(\",\") returns a list; index [0] is the first element."
+  - "f\"Tickers: {len(parts)}\" embeds the count into the string."

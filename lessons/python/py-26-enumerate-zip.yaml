@@ -1,0 +1,58 @@
+id: py-26-enumerate-zip
+track: python
+order: 3
+title: "enumerate & zip"
+difficulty: 2
+concepts: ["enumerate", "zip", "iteration", "parallel sequences"]
+brief: |
+  **What & why.** Two iteration helpers that separate idiomatic Python from clumsy
+  C-style loops — you'll use them constantly to walk records cleanly.
+
+  **`enumerate(seq)`** — loop with an **index and the value** together, instead of
+  `range(len(seq))` + indexing:
+
+  ```python
+  for i, ticker in enumerate(tickers):
+      print(i, ticker)          # 0 AAPL, 1 GOOG, ...
+  # enumerate(seq, start=1) starts the count at 1
+  ```
+
+  **`zip(a, b, ...)`** — walk **multiple sequences in parallel**, pairing elements
+  by position (perfect for combining columns into rows, or names with values):
+
+  ```python
+  for ticker, price in zip(tickers, prices):
+      ...
+  dict(zip(keys, values))       # build a dict from two lists
+  ```
+
+  **The essentials:**
+  - `zip` stops at the **shortest** input (extra items are dropped) — a subtle bug
+    source; use `itertools.zip_longest` if you need padding.
+  - `zip` returns a lazy iterator; wrap in `list(...)`/`dict(...)` to materialise.
+  - `zip(*rows)` **transposes** rows into columns — a neat trick.
+
+  **Mission:** Given parallel `tickers` and `prices`, build `book` — a dict mapping
+  each ticker to its price — using `zip`.
+
+  Expected: `{"AAPL": 189.5, "GOOG": 142.1, "MSFT": 415.6}`.
+starter_code: |
+  tickers = ["AAPL", "GOOG", "MSFT"]
+  prices = [189.5, 142.1, 415.6]
+  # TODO: pair them into a dict `book` using zip
+  book = ...
+  print(book)
+solution_code: |
+  tickers = ["AAPL", "GOOG", "MSFT"]
+  prices = [189.5, 142.1, 415.6]
+  book = dict(zip(tickers, prices))
+  print(book)
+checks:
+  - type: var_equals
+    name: book
+    expected: {"AAPL": 189.5, "GOOG": 142.1, "MSFT": 415.6}
+    message: "book should map each ticker to its price, paired by position"
+hints:
+  - "zip(tickers, prices) yields (ticker, price) pairs."
+  - "dict(zip(...)) turns those pairs into a mapping."
+  - "The two lists must line up by position — zip pairs index 0 with 0, etc."

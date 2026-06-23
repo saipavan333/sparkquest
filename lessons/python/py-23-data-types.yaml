@@ -1,0 +1,70 @@
+id: py-23-data-types
+track: python
+order: 2
+title: "Python Data Types"
+difficulty: 1
+concepts: ["int", "float", "str", "bool", "None", "type conversion", "truthiness"]
+brief: |
+  **What & why.** Before anything else, you need the **building blocks** every value
+  in Python is made of. Pick the wrong type and your math, comparisons, and joins
+  silently go wrong — so this is the true starting point of the language.
+
+  **The core built-in types:**
+  - **`int`** — whole numbers (`100`), unbounded precision.
+  - **`float`** — decimals (`189.5`); subject to tiny rounding error.
+  - **`str`** — text (`"AAPL"`), in quotes.
+  - **`bool`** — `True` / `False` (a subtype of `int`: `True == 1`).
+  - **`NoneType`** — the single value `None`, meaning "no value" (Spark's `null`).
+
+  **The essentials:**
+  - Python is **dynamically typed** — a name can hold any type; check with
+    `type(x)` or `isinstance(x, int)`.
+  - **Convert explicitly:** `int("100")`, `float("189.5")`, `str(42)`, `bool(x)`.
+    Raw feeds (CSV, JSON, Kafka) arrive as **strings** — converting to real types is
+    job #1 (the same idea as Spark's `cast`, [sp-13](../pyspark/sp-13-cast.yaml)).
+  - **Truthiness:** `0`, `0.0`, `""`, `[]`, `{}`, and `None` are **falsy**; almost
+    everything else is **truthy** — which is why `if value:` is so common.
+
+  **Gotcha.** `int("abc")` raises `ValueError`, and `int("3.9")` also errors (use
+  `int(float("3.9"))`). Real pipelines wrap conversions in `try/except` and
+  quarantine bad rows ([py-08](py-08-errors.yaml)).
+
+  **Mission:** Convert `"100"` to an int `qty`, convert `"189.50"` to a float
+  `price`, set `flag = bool(0)`, and capture the type **name** of `qty` in `kind`.
+
+  Expected: `qty == 100`, `price == 189.5`, `flag == False`, `kind == "int"`.
+starter_code: |
+  # TODO: convert the strings to real numeric types and explore type/truthiness
+  qty = ...          # int from "100"
+  price = ...        # float from "189.50"
+  flag = ...         # bool of 0
+  kind = ...         # the type name of qty, e.g. type(qty).__name__
+  print(qty, price, flag, kind)
+solution_code: |
+  qty = int("100")
+  price = float("189.50")
+  flag = bool(0)
+  kind = type(qty).__name__
+  print(qty, price, flag, kind)
+checks:
+  - type: var_equals
+    name: qty
+    expected: 100
+    message: "qty should be the integer 100 (converted from a string)"
+  - type: var_close
+    name: price
+    expected: 189.5
+    tol: 0.001
+    message: "price should be the float 189.5"
+  - type: var_equals
+    name: flag
+    expected: false
+    message: "bool(0) is False — zero is 'falsy'"
+  - type: var_equals
+    name: kind
+    expected: "int"
+    message: "kind should be 'int' — the type name of qty"
+hints:
+  - "int(\"100\") and float(\"189.50\") parse the strings into numbers."
+  - "bool(0) is False; every non-zero number is truthy."
+  - "type(qty).__name__ gives the type's name as a string."

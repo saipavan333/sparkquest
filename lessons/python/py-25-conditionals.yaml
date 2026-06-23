@@ -1,0 +1,61 @@
+id: py-25-conditionals
+track: python
+order: 2
+title: "Conditionals: if / elif / else"
+difficulty: 1
+concepts: ["if", "elif", "else", "comparison operators", "boolean logic"]
+brief: |
+  **What & why.** Branching — "do different things depending on the data" — is the
+  core of all logic. `if` / `elif` / `else` is how a pipeline routes records: valid
+  vs invalid, large vs small, by category. It's the plain-Python ancestor of Spark's
+  `when().otherwise()` ([sp-09](../pyspark/sp-09-when-otherwise.yaml)).
+
+  **The essentials:**
+  - Structure: `if cond:` … `elif other:` … `else:` — the **first** true branch
+    runs, the rest are skipped. Indentation (4 spaces) defines each block.
+  - **Comparisons:** `==`, `!=`, `<`, `<=`, `>`, `>=`; chainable: `0 < x < 100`.
+  - **Boolean operators:** `and`, `or`, `not`; combine with parentheses for clarity.
+  - **Membership / identity:** `x in collection`, `x is None` (use `is` for `None`,
+    not `==`).
+  - **Ternary expression** for a one-liner value: `band = "big" if x > 9 else "small"`.
+
+  **Gotcha.** `and`/`or` are **short-circuit** and return an *operand*, not always a
+  bool: `x or "default"` yields `x` if truthy else `"default"` — a handy idiom, but
+  know it's not the same as a strict boolean.
+
+  **Mission:** Write `band(amount)` returning `"large"` if `amount >= 1000`,
+  `"medium"` if `amount >= 100`, otherwise `"small"`.
+
+  Examples: `band(1500) == "large"`, `band(250) == "medium"`, `band(50) == "small"`.
+starter_code: |
+  def band(amount):
+      # TODO: return "large" (>=1000), "medium" (>=100), else "small"
+      ...
+solution_code: |
+  def band(amount):
+      if amount >= 1000:
+          return "large"
+      elif amount >= 100:
+          return "medium"
+      else:
+          return "small"
+checks:
+  - type: callable_returns
+    name: band
+    args: [1500]
+    expected: "large"
+    message: "band(1500) should be 'large'"
+  - type: callable_returns
+    name: band
+    args: [250]
+    expected: "medium"
+    message: "band(250) should be 'medium'"
+  - type: callable_returns
+    name: band
+    args: [50]
+    expected: "small"
+    message: "band(50) should be 'small'"
+hints:
+  - "Order matters: test the highest threshold (>= 1000) first."
+  - "Use elif for the middle band, else for everything left over."
+  - "Each branch returns, so the first match wins."

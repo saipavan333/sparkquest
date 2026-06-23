@@ -1,0 +1,53 @@
+id: sp-35-orderby
+track: pyspark
+order: 2
+title: "Sorting: orderBy / sort"
+difficulty: 2
+concepts: ["orderBy", "sort", "asc", "desc", "ordering"]
+needs_spark: true
+brief: |
+  **What & why.** `orderBy` (alias `sort`) returns a DataFrame ordered by one or
+  more columns — for ranked reports, top-N previews, and deterministic output.
+  Because ordering the *whole* dataset means bringing related rows together, it's a
+  **wide transformation** that triggers a **shuffle** (and a sort) — so it's not free.
+
+  **The essentials:**
+  - `df.orderBy("qty")` ascending; descending with `F.col("qty").desc()` or
+    `df.orderBy(F.desc("qty"))`.
+  - Multiple keys: `df.orderBy(F.col("sector"), F.col("qty").desc())`.
+  - Null placement: `.asc_nulls_last()` / `.desc_nulls_first()`.
+
+  **Gotcha (interview-relevant).** A **global** `orderBy` forces all data through a
+  sort and concentrates it — expensive on big data. If you only need the top few
+  rows, prefer a **window `row_number`** filtered to rank ≤ N
+  ([sp-07](sp-07-window.yaml)), or `limit`, rather than fully sorting. Also: a
+  DataFrame has **no inherent order** — only an explicit `orderBy` guarantees it.
+
+  **Mission:** Sort `trades` by `qty` **descending** into `ranked` (largest first).
+
+  Expected order: GOOG 250, AAPL 100, MSFT 80.
+starter_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", 250), ("MSFT", 80)], ["ticker", "qty"]
+  )
+  # TODO: order by qty descending -> `ranked`
+  ranked = ...
+  ranked.show()
+solution_code: |
+  trades = spark.createDataFrame(
+      [("AAPL", 100), ("GOOG", 250), ("MSFT", 80)], ["ticker", "qty"]
+  )
+  ranked = trades.orderBy(F.col("qty").desc())
+  ranked.show()
+checks:
+  - type: df_equals
+    name: ranked
+    ordered: true
+    expected:
+      - {"ticker": "GOOG", "qty": 250}
+      - {"ticker": "AAPL", "qty": 100}
+      - {"ticker": "MSFT", "qty": 80}
+    message: "ranked should be ordered by qty, largest first"
+hints:
+  - "trades.orderBy(F.col(\"qty\").desc()) sorts descending."
+  - "F.col(\"qty\").desc() or F.desc(\"qty\") both work."

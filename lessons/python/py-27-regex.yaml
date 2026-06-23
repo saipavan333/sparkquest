@@ -1,0 +1,59 @@
+id: py-27-regex
+track: python
+order: 16
+title: "Regular Expressions (re)"
+difficulty: 3
+concepts: ["regex", "re", "pattern matching", "extraction"]
+brief: |
+  **What & why.** **Regular expressions** are a mini-language for matching and
+  extracting text patterns — indispensable for parsing **log lines**, validating
+  formats (emails, IDs, dates), and pulling fields out of messy semi-structured
+  data before it's clean enough for Spark.
+
+  **The essentials (Python's `re` module):**
+  - Always use a **raw string** for the pattern: `r"\d+"` (so backslashes aren't
+    eaten by Python).
+  - Key functions: `re.search(p, s)` (first match anywhere), `re.match` (anchored at
+    start), **`re.findall(p, s)`** (all matches → list), `re.sub(p, repl, s)`
+    (replace), `re.split`.
+  - **Character classes:** `\d` digit, `\w` word char, `\s` whitespace, `.` any;
+    `[A-Z]` a set. **Quantifiers:** `+` (1+), `*` (0+), `?` (0/1), `{2,}` (2+).
+  - **Groups** `(...)` capture sub-parts; `findall` returns the groups when present.
+
+  **When NOT to use regex.** For *structured* formats (JSON, CSV, fixed schemas) use
+  the proper parser ([py-16](py-16-json.yaml)/[py-20](py-20-csv.yaml)) — regex on
+  nested/quoted data is fragile. Regex shines on **free-form text**.
+
+  **Mission:** From the log line `text`, extract:
+  1. `tickers` — all runs of 2+ uppercase letters (`[A-Z]{2,}`).
+  2. `prices` — all decimal numbers (`\d+\.\d+`), as strings.
+
+  Expected: `tickers == ["AAPL", "GOOG"]`, `prices == ["189.5", "142.1"]`.
+starter_code: |
+  import re
+
+  text = "Trade AAPL at 189.5, then GOOG at 142.1"
+  # TODO: findall uppercase tickers and decimal prices
+  tickers = ...
+  prices = ...
+  print(tickers, prices)
+solution_code: |
+  import re
+
+  text = "Trade AAPL at 189.5, then GOOG at 142.1"
+  tickers = re.findall(r"[A-Z]{2,}", text)
+  prices = re.findall(r"\d+\.\d+", text)
+  print(tickers, prices)
+checks:
+  - type: var_equals
+    name: tickers
+    expected: ["AAPL", "GOOG"]
+    message: "tickers should be the uppercase symbols matched by [A-Z]{2,}"
+  - type: var_equals
+    name: prices
+    expected: ["189.5", "142.1"]
+    message: "prices should be the decimal numbers matched by \\d+\\.\\d+ (as strings)"
+hints:
+  - "re.findall(r\"[A-Z]{2,}\", text) returns every run of 2+ capitals."
+  - "re.findall(r\"\\d+\\.\\d+\", text) matches decimals; results are strings."
+  - "Use raw strings (r\"...\") so backslashes reach the regex engine intact."

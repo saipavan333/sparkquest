@@ -42,7 +42,7 @@ streaming with watermarks.
 - **Real execution, real feedback** — submissions run in a process-isolated sandbox
   with timeouts and output caps; grading inspects program state and DataFrame
   contents.
-- **Zero → pro curriculum** — 85 finance-themed challenges across 7 tracks (and
+- **Zero → pro curriculum** — 92 finance-themed challenges across 7 tracks (and
   growing): Python for DE → PySpark & DataFrames (incl. **RDD low-level API**) →
   Performance → Structured Streaming → Lakehouse/Delta → Apache Iceberg (incl.
   **time travel**, **hidden partitioning**) → Capstone ETL (incl. **SCD2**,
@@ -121,8 +121,8 @@ The full syllabus — every topic with official-doc links — lives in
 
 | Track | Live | You'll learn |
 |-------|:----:|--------------|
-| **Python for Data Engineering** | 22 | collections, comprehensions, errors, generators, decorators, dataclasses, sets/tuples, args/kwargs, **lambdas & functional style**, datetime, json, stdlib, **context managers**, **type hints**, **pathlib**, **CSV**, **logging** |
-| **PySpark Foundations & DataFrames** | 34 | schemas, Parquet, select/filter, when/otherwise, string/date/null/cast, all join types, **windows (rank/dense_rank/lag/lead/running totals)**, set ops, maps/structs, pivot, `explode`, UDFs, selectExpr, **sessionization**, **pandas UDFs**, **RDDs (map/filter, reduceByKey, broadcast vars, mapPartitions)**, **Spark SQL analytics**, **data-quality validation** |
+| **Python for Data Engineering** | 27 | **data types & conversion**, **strings & slicing**, **conditionals**, variables, lists, dicts, **enumerate/zip**, comprehensions, functions, **lambdas & functional style**, errors, generators, decorators, dataclasses, sets/tuples, collections, datetime, json, **regex**, **context managers**, **type hints**, **pathlib**, **CSV**, **logging** |
+| **PySpark Foundations & DataFrames** | 36 | schemas, Parquet, select/filter, **sorting**, **distinct/dedup**, when/otherwise, string/date/null/cast, all join types, **windows (rank/dense_rank/lag/lead/running totals)**, set ops, maps/structs, pivot, `explode`, UDFs, selectExpr, **sessionization**, **pandas UDFs**, **RDDs (map/filter, reduceByKey, broadcast vars, mapPartitions)**, **Spark SQL analytics**, **data-quality validation** |
 | **Performance & Internals** | 7 | repartition/coalesce, caching, broadcast joins, data skew & salting, partitioned writes & **partition pruning**, **bucketing** |
 | **Structured Streaming** | 8 | sources/sinks, aggregations, event-time windows, watermarks, dedup, `foreachBatch`, stream-static **and stream-stream joins**, **Kafka value parsing (`from_json`)** |
 | **Lakehouse & Delta Lake** | 4 | create Delta tables, `MERGE`/upsert (CDC), time travel, schema evolution |
@@ -158,7 +158,7 @@ the official Spark docs and the canonical books.
 | Structured Streaming ingestion | **~11,989 events/s** |
 | Auto-grade, Python challenge | **~1 ms** |
 | Auto-grade, Spark challenge (end-to-end) | **~8.6 s** (3.5 s Spark cold start) |
-| Reference solutions passing their grader | **76/76 sandbox + 9 Delta & Iceberg (CI)** |
+| Reference solutions passing their grader | **83/83 sandbox + 9 Delta & Iceberg (CI)** |
 
 Reproduce: `python benchmarks/run_benchmarks.py --all`. Details and discussion in
 [the paper](paper/sparkquest.pdf).

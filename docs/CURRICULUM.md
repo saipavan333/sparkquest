@@ -5,7 +5,7 @@ topic below maps to a **graded, runnable challenge** (✅ = live now, 🔜 = on 
 roadmap). The structure mirrors the official documentation so you can always go
 deeper at the source.
 
-**Status:** 85 graded lessons across all 7 tracks. The 76 Python / PySpark /
+**Status:** 92 graded lessons across all 7 tracks. The 83 Python / PySpark /
 Performance / Streaming / Capstone lessons are verified in the offline sandbox; the
 9 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
 need an internet JAR fetch). **Every lesson ships read-along teaching notes** in its
@@ -36,15 +36,19 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 1 — Python for Data Engineering (22 live)
+## Track 1 — Python for Data Engineering (27 live)
 
 > *Goal: write clean, idiomatic Python that's the backbone of every pipeline.*
 > Docs: <https://docs.python.org/3/tutorial/>
 
-**Module 1.1 — Core syntax**
+**Module 1.1 — Core syntax & data types**
 - ✅ Print & strings — output, f-strings, quoting
 - ✅ Variables & arithmetic — numeric types, operators
+- ✅ Data types — int/float/str/bool/None, conversion, truthiness
+- ✅ Strings & slicing — indexing, slices, methods, f-strings
+- ✅ Conditionals — `if`/`elif`/`else`, comparison & boolean logic
 - ✅ Lists & loops — sequences, iteration, accumulation
+- ✅ `enumerate` & `zip` — index-with-value, parallel iteration
 - ✅ Dictionaries — key/value lookups, the basis of joins & caches
 - ✅ Functions — parameters, return values, reuse
 - ✅ Word count — counting with dicts (the MapReduce intuition)
@@ -63,6 +67,7 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ `collections` & `itertools` — `Counter`, `defaultdict`, `groupby`
 - ✅ Dates & times — `datetime`, `strptime`, extracting parts
 - ✅ JSON — `json.loads`/`dumps`, parsing records
+- ✅ Regular expressions — `re`, `findall`/`sub`, extracting from free-form text
 - ✅ Context managers — `with`, `__enter__`/`__exit__`, guaranteed cleanup
 - ✅ Type hints — `typing`, `Optional`, annotations, why DE teams enforce them
 - ✅ Files & `pathlib` — `Path`, stem/suffix/parent, cross-platform paths
@@ -72,7 +77,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 2 — PySpark Foundations & DataFrames (34 live)
+## Track 2 — PySpark Foundations & DataFrames (36 live)
 
 > *Goal: think in distributed DataFrames; read, transform, and write any data.*
 > Docs: <https://spark.apache.org/docs/latest/sql-getting-started.html>
@@ -92,9 +97,9 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Date/time functions — `to_date`, `datediff`, `year`
 - ✅ Null handling — `na.fill`/`na.drop`
 - ✅ Casting types — `cast`, schema enforcement
+- ✅ Sorting — `orderBy`/`sort`, asc/desc, null placement
+- ✅ Distinct & dedup — `distinct`, `dropDuplicates([...])`
 - 🔜 Math & rounding — `round`, `abs`
-- 🔜 Sort, distinct & dedup — `orderBy`, `dropDuplicates`
-- 🔜 Union & set ops — `unionByName`, `subtract`
 
 **Module 2.3 — Aggregations & joins**
 - ✅ Group & aggregate — `groupBy().agg()`
