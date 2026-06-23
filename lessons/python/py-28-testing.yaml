@@ -1,0 +1,68 @@
+id: py-28-testing
+track: python
+order: 18
+title: "Testing with assert"
+difficulty: 2
+concepts: ["testing", "assert", "pytest", "data quality"]
+brief: |
+  **What & why.** Untested pipeline code is a liability — a silent logic bug can
+  corrupt data for weeks. The foundation of testing is the **`assert`** statement:
+  `assert condition, "message"` raises `AssertionError` (failing the test) when the
+  condition is false, and does nothing when true. Structure business logic as
+  **pure functions** ([py-05](py-05-functions.yaml)) and you can assert their output
+  on tiny hand-built inputs in milliseconds.
+
+  **The essentials:**
+  - A test is just a function full of asserts: `assert f(2, 3) == 5`.
+  - **`pytest`** is the standard runner — it auto-discovers `test_*` functions and
+    gives rich failure diffs; fixtures provide shared setup (like a local
+    `SparkSession`).
+  - For **Spark**, `chispa.assert_df_equality(actual, expected)` compares DataFrames;
+    use `Trigger.AvailableNow` to make streaming deterministic
+    ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+
+  **The testing pyramid:** many fast **unit** tests on transforms, some
+  **integration** tests on wired stages, and **data-quality** checks on the live
+  data in production.
+
+  **Mission:** Implement `pnl(buy, sell, qty)` returning `(sell - buy) * qty`, then
+  write `test_pnl()` that **asserts** two cases and `return`s `True` when both pass.
+  Call it into `result`.
+
+  Expected: `result == True` (both assertions hold).
+starter_code: |
+  def pnl(buy, sell, qty):
+      # TODO: return the profit-and-loss
+      ...
+
+  def test_pnl():
+      # TODO: assert pnl(100, 110, 10) == 100 and pnl(50, 40, 5) == -50, then return True
+      ...
+
+  result = test_pnl()
+  print(result)
+solution_code: |
+  def pnl(buy, sell, qty):
+      return (sell - buy) * qty
+
+  def test_pnl():
+      assert pnl(100, 110, 10) == 100, "expected a 100 profit"
+      assert pnl(50, 40, 5) == -50, "expected a 50 loss"
+      return True
+
+  result = test_pnl()
+  print(result)
+checks:
+  - type: var_equals
+    name: result
+    expected: true
+    message: "result should be True — both assertions in test_pnl passed"
+  - type: callable_returns
+    name: pnl
+    args: [100, 110, 10]
+    expected: 100
+    message: "pnl(100, 110, 10) should be 100"
+hints:
+  - "assert pnl(100, 110, 10) == 100 raises AssertionError if the value is wrong."
+  - "If no assert fails, fall through to `return True`."
+  - "A failing assert would stop the function before it returns True."

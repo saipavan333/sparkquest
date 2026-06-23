@@ -1,0 +1,54 @@
+id: sp-38-accumulators
+track: pyspark
+order: 31
+title: "RDDs: accumulators (metrics)"
+difficulty: 3
+concepts: ["accumulator", "shared variables", "RDD", "metrics"]
+needs_spark: true
+brief: |
+  **What & why.** An **accumulator** is a write-only-from-executors, read-from-driver
+  shared variable — a distributed **counter/sum**. It's how you gather **side
+  metrics** (bad-row counts, bytes processed) across the cluster without a second
+  pass over the data. It's the RDD cousin of the broadcast variable
+  ([sp-31](sp-31-rdd-broadcast.yaml)): broadcast ships data *out*, accumulators
+  collect numbers *back*.
+
+  **The essentials:**
+  - Create on the driver: `acc = sc.accumulator(0)`; executors **add** with
+    `acc += 1`; only the **driver** reads `acc.value`.
+  - Add-only and commutative/associative — you can't read it inside a task.
+
+  **The caveat interviewers reward.** Accumulators are guaranteed **exactly-once
+  only inside actions** (like `foreach`). Inside *transformations* (`map`), a task
+  retry or recomputation can apply the update **more than once** — so use
+  accumulators for **debugging/metrics**, never for values your logic depends on.
+  (For real aggregates, use DataFrame aggregations.)
+
+  **Mission:** Using an **accumulator** and `rdd.foreach`, count how many amounts in
+  `amounts` are **negative**, storing the total in `n_bad`.
+
+  Expected: `n_bad == 2` (the `-5` and `-2`).
+starter_code: |
+  sc = spark.sparkContext
+  amounts = sc.parallelize([100, -5, 30, -2, 80])
+  bad = sc.accumulator(0)
+  # TODO: use rdd.foreach to add 1 to `bad` for each negative amount, then read it
+  ...
+  n_bad = ...
+  print(n_bad)
+solution_code: |
+  sc = spark.sparkContext
+  amounts = sc.parallelize([100, -5, 30, -2, 80])
+  bad = sc.accumulator(0)
+  amounts.foreach(lambda x: bad.add(1) if x < 0 else None)
+  n_bad = bad.value
+  print(n_bad)
+checks:
+  - type: var_equals
+    name: n_bad
+    expected: 2
+    message: "n_bad should be 2 — the count of negative amounts"
+hints:
+  - "amounts.foreach(lambda x: bad.add(1) if x < 0 else None) adds 1 per negative."
+  - "foreach is an action, so the accumulator is counted exactly once."
+  - "Read the total on the driver with bad.value."

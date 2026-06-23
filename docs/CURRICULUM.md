@@ -5,7 +5,7 @@ topic below maps to a **graded, runnable challenge** (✅ = live now, 🔜 = on 
 roadmap). The structure mirrors the official documentation so you can always go
 deeper at the source.
 
-**Status:** 92 graded lessons across all 7 tracks. The 83 Python / PySpark /
+**Status:** 96 graded lessons across all 7 tracks. The 87 Python / PySpark /
 Performance / Streaming / Capstone lessons are verified in the offline sandbox; the
 9 Delta + Iceberg lessons are verified by a dedicated Maven-enabled CI job (both
 need an internet JAR fetch). **Every lesson ships read-along teaching notes** in its
@@ -36,7 +36,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 1 — Python for Data Engineering (27 live)
+## Track 1 — Python for Data Engineering (28 live)
 
 > *Goal: write clean, idiomatic Python that's the backbone of every pipeline.*
 > Docs: <https://docs.python.org/3/tutorial/>
@@ -73,11 +73,11 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Files & `pathlib` — `Path`, stem/suffix/parent, cross-platform paths
 - ✅ CSV — the `csv` module / `DictReader`, why values are strings
 - ✅ Logging — levels, handlers, structured logs over `print`
-- 🔜 Testing — `assert`, designing for testability (see Handbook ch.15)
+- ✅ Testing — `assert`-based tests, pytest, chispa (see Handbook ch.15)
 
 ---
 
-## Track 2 — PySpark Foundations & DataFrames (36 live)
+## Track 2 — PySpark Foundations & DataFrames (38 live)
 
 > *Goal: think in distributed DataFrames; read, transform, and write any data.*
 > Docs: <https://spark.apache.org/docs/latest/sql-getting-started.html>
@@ -99,7 +99,7 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Casting types — `cast`, schema enforcement
 - ✅ Sorting — `orderBy`/`sort`, asc/desc, null placement
 - ✅ Distinct & dedup — `distinct`, `dropDuplicates([...])`
-- 🔜 Math & rounding — `round`, `abs`
+- ✅ Math & rounding — `round`/`abs`/`ceil`/`floor`, float pitfalls
 
 **Module 2.3 — Aggregations & joins**
 - ✅ Group & aggregate — `groupBy().agg()`
@@ -126,7 +126,7 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ `reduceByKey` — pair RDDs, map-side combine, the word-count pattern
 - ✅ Broadcast variables — ship a read-only lookup once per executor
 - ✅ `mapPartitions` — amortise per-partition setup (connections, models)
-- 🔜 Accumulators — add-only metrics (and the exactly-once caveat)
+- ✅ Accumulators — add-only metrics (and the exactly-once caveat)
 
 > Deep dive: [Handbook ch.10 — RDDs & the Low-Level API](handbook/10-rdd-and-low-level-api.md).
 
@@ -154,7 +154,7 @@ your output. Tracks are ordered — finish one before the next.
 
 ---
 
-## Track 4 — Structured Streaming (8 live)
+## Track 4 — Structured Streaming (9 live)
 
 > *Goal: build real-time pipelines with the same DataFrame API.*
 > Docs: <https://spark.apache.org/docs/latest/streaming/index.html>
@@ -167,8 +167,9 @@ your output. Tracks are ordered — finish one before the next.
 - ✅ Stream-static joins — enriching a stream with reference data
 - ✅ Parsing a Kafka value — `from_json` over the `value` column (the universal step)
 - ✅ Stream-stream joins — joining two live streams with watermarks + time bounds
+- ✅ Sliding windows — overlapping windows via a slide interval
 - 🔜 Output modes & triggers — append/update/complete, `processingTime`
-- 🔜 Sliding & session windows — overlapping and gap-based windows
+- 🔜 Session windows — gap-based dynamic windows
 
 > Deep dives: [ch.3 Streaming Internals](handbook/03-streaming-internals.md) ·
 > [ch.13 Kafka & Streaming I/O](handbook/13-kafka-and-streaming-io.md) (offsets,

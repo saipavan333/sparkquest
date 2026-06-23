@@ -1,0 +1,77 @@
+id: st-09-sliding-window
+track: streaming
+order: 3
+title: "Sliding Windows"
+difficulty: 4
+concepts: ["sliding window", "overlapping windows", "window", "watermark"]
+needs_spark: true
+brief: |
+  **What & why.** A **tumbling** window ([st-03](st-03-windowed-watermark.yaml)) is
+  fixed and non-overlapping. A **sliding** window adds a **slide interval** smaller
+  than the window, so windows **overlap** — every event falls into multiple windows.
+  That's how you compute **moving metrics**: "5-minute rolling count updated every
+  minute", "1-hour trailing average refreshed every 10 minutes".
+
+  **The one new argument:**
+  - `F.window("ts", "10 minutes", "5 minutes")` → **size** 10 min, **slide** 5 min.
+    An event at 12:07 lands in both the 12:00–12:10 and 12:05–12:15 windows.
+  - Omit the slide (`F.window("ts", "10 minutes")`) and it's a tumbling window
+    (size == slide).
+  - Still needs a **watermark** to bound and finalise state, exactly like tumbling.
+
+  **Gotcha.** Overlap multiplies work: a 60-min window sliding every 1 min puts each
+  event in **60** windows — more state and compute. Size the slide to the freshness
+  you actually need.
+
+  **Mission:** Stream `data/sample/stream_events`, watermark `ts` by `1 minute`, and
+  count events per `ticker` in **10-minute** windows **sliding every 5 minutes**.
+  Write to a memory table (`complete` mode) and load `out` (it should have a
+  `window` and a `count` column).
+starter_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  # TODO: watermark, group by a 10-min window sliding every 5 min + ticker, count -> out
+  out = ...
+  out.show(truncate=False)
+solution_code: |
+  from pyspark.sql.types import (StructType, StructField, StringType,
+                                 LongType, TimestampType)
+
+  schema = StructType([
+      StructField("ticker", StringType()),
+      StructField("amount", LongType()),
+      StructField("ts", TimestampType()),
+  ])
+
+  stream = spark.readStream.schema(schema).json("data/sample/stream_events")
+  windowed = (
+      stream.withWatermark("ts", "1 minute")
+      .groupBy(F.window("ts", "10 minutes", "5 minutes"), "ticker")
+      .count()
+  )
+  query = (
+      windowed.writeStream.format("memory").queryName("sliding_counts")
+      .outputMode("complete").trigger(availableNow=True).start()
+  )
+  query.awaitTermination()
+  out = spark.table("sliding_counts")
+  out.show(truncate=False)
+checks:
+  - type: custom
+    message: "out should have a window column, a count column, and at least one row"
+    code: |
+      df = ns.get("out")
+      cols = df.columns if df is not None else []
+      ok = ("window" in cols) and ("count" in cols) and df.count() > 0
+    fail_detail: "Use F.window(\"ts\", \"10 minutes\", \"5 minutes\") with a watermark."
+hints:
+  - "The third argument to F.window is the slide interval: F.window(\"ts\", \"10 minutes\", \"5 minutes\")."
+  - "A slide smaller than the window makes the windows overlap."
