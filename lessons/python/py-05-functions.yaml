@@ -6,18 +6,20 @@ difficulty: 2
 concepts: ["functions", "return values"]
 needs_spark: false
 brief: |
-  **What & why.** A *function* packages logic behind a name so you can reuse it and
-  test it in isolation. This matters enormously in data engineering: Spark UDFs,
-  transformations, and whole pipeline stages are all just functions — and writing
-  them as **pure functions** (output depends only on inputs, no hidden state) is
-  what makes them unit-testable (see [Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+  A **function** is a reusable block of code with a name. You write the steps once,
+  give them a name, and then "call" that name whenever you want those steps to run —
+  like a recipe you can follow again and again instead of re-writing it each time.
 
-  **The essentials:**
-  - `def name(params):` defines it; **`return`** sends a value back. A function with
-    no `return` yields `None`.
-  - Arguments bind by position or by name (`pnl(buy=100, ...)`); you can give
-    defaults (`def f(x, rate=0.1):`).
-  - Keep functions small and single-purpose — easy to reason about, easy to test.
+  - You create one with the word `def`, then list its **inputs** (called
+    *parameters*) in brackets, and use **`return`** to hand a result back:
+    `def add(a, b): return a + b`.
+  - You **call** it by writing its name with values: `add(2, 3)` gives back `5`.
+  - The values you pass in (`2` and `3`) are called *arguments*. You can also pass
+    them by name: `add(a=2, b=3)`.
+  - If a function doesn't `return` anything, you get Python's "nothing" value, `None`.
+
+  Keeping each function small and focused on one job makes your code easy to read,
+  reuse, and check.
 
   **Mission:** Write a function named `pnl(buy, sell, qty)` that returns the
   profit-and-loss of a trade: `(sell - buy) * qty`.

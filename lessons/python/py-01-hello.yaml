@@ -6,18 +6,18 @@ difficulty: 1
 concepts: ["print", "strings"]
 needs_spark: false
 brief: |
-  **What & why.** Welcome to **SparkQuest**! Every pipeline starts with code that
-  *does* something and tells you what happened — and `print(...)` is how you make a
-  program speak. It writes text to **stdout**, the standard output stream; in data
-  engineering that same stream carries logs, debug output, and the results your
-  graders (and dashboards) read.
+  Welcome to **SparkQuest**! Every program needs a way to show its results, and in
+  Python that job belongs to `print(...)`. It displays whatever you put in the
+  brackets on the screen, so you'll use it all the time to see what your code is
+  doing. (Programmers call this screen output the *standard output*, often shortened
+  to **stdout** — but you can just think "the screen".)
 
-  **The essentials:**
-  - A **string** is text wrapped in quotes — `"..."` or `'...'` (both work).
-  - **f-strings** interpolate values: `f"price is {x}"` — the workhorse for log
-    messages and you'll use them constantly.
-  - `print()` adds a newline each call; it converts non-strings for you
-    (`print(42)` works).
+  A few simple things to know:
+  - **Text goes inside quotes** — `"hello"` or `'hello'` both work. A piece of text
+    like this is called a **string**.
+  - To **drop a value into your text**, put an `f` in front and use `{ }`:
+    `f"price is {x}"` shows the value of `x` inside the sentence.
+  - `print` works on numbers too — `print(42)` is fine.
 
   **Mission:** Print a greeting that contains the word `Hello`.
 starter_code: |

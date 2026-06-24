@@ -6,21 +6,23 @@ difficulty: 2
 concepts: ["dictionaries", "lookup"]
 needs_spark: false
 brief: |
-  **What & why.** A *dictionary* maps **keys to values** — like a price book
-  mapping a ticker to its price. It's a **hash map**: lookups are average **O(1)**
-  (constant time) no matter how big it gets, which is exactly why dictionaries power
-  in-memory **joins**, **caches**, and broadcast lookups (the broadcast variable in
-  Spark is this idea shipped to every executor).
+  A **dictionary** stores pairs of things: a **key** and its **value** — like a
+  contacts app where a name (the key) gives you a phone number (the value). Here
+  we'll map a stock symbol to its price.
 
-  **The essentials:**
-  - Literal: `{"AAPL": 189.5, ...}`; read with `prices["GOOG"]`; add/update with
-    `prices["TSLA"] = 250.0`.
-  - Keys must be **hashable** (strings, numbers, tuples — not lists).
-  - Iterate with `.keys()`, `.values()`, `.items()`.
+  - You write one with curly braces: `{"AAPL": 189.5, "GOOG": 142.1}`.
+  - To look a value up, put its key in square brackets: `prices["GOOG"]` gives back
+    `142.1`.
+  - To add or change one: `prices["TSLA"] = 250.0`.
 
-  **Gotcha.** `prices["MISSING"]` raises **`KeyError`**. Use `prices.get("MISSING")`
-  (returns `None`) or `prices.get(k, default)` when a key might be absent — the safe
-  habit for messy real-world data.
+  Why they matter: finding a value by its key is **instant**, no matter how big the
+  dictionary gets. That's why dictionaries are everywhere in data work — for fast
+  lookups, counting things, and matching data together.
+
+  Watch out: asking for a key that isn't there — `prices["MISSING"]` — causes an
+  error (called a **KeyError**). If a key might be missing, use
+  `prices.get("MISSING")` instead; it hands back `None` (Python's "nothing here"
+  value) rather than crashing.
 
   **Mission:** Build a dictionary named `prices` with these entries, then look up
   Google's price into a variable named `goog`.

@@ -5,10 +5,15 @@ title: "Context Managers (with / __enter__ / __exit__)"
 difficulty: 3
 concepts: ["context manager", "with", "__enter__", "__exit__", "cleanup"]
 brief: |
-  A **context manager** guarantees setup and teardown around a block — the `with`
-  statement runs `__enter__` on the way in and `__exit__` on the way out, **even if
-  the block raises**. It's how you safely open files, DB connections, and Spark
-  sessions without leaking resources.
+  A **context manager** is the `with` block you've probably seen used for opening
+  files. Its job is to handle **setup and cleanup automatically**: it runs some code
+  as you enter the block, and guaranteed cleanup code as you leave — *even if
+  something goes wrong inside*. That's how files and connections always get closed
+  properly, without you having to remember to do it.
+
+  You can build your own by writing two special methods: `__enter__` (runs on the
+  way in) and `__exit__` (runs on the way out). Python calls them for you whenever
+  the object is used in a `with` statement.
 
   **Mission:** Implement a `Managed` context manager that appends `"open"` to `log`
   on enter and `"close"` on exit. Use it in a `with` block that appends `"work"`,

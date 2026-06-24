@@ -6,18 +6,21 @@ difficulty: 3
 concepts: ["dataclass", "classes", "methods"]
 needs_spark: false
 brief: |
-  **What & why.** `@dataclass` generates the boilerplate of a record type for you —
-  `__init__`, `__repr__`, `__eq__` — from a few typed field declarations. It's the
-  Pythonic way to model **rows, configs, and events** in a pipeline: readable,
-  comparable, and self-documenting, without a wall of `self.x = x` assignments.
+  A **class** lets you bundle related pieces of data into your own kind of object —
+  here, a `Trade` that holds a ticker, a quantity, and a price. Normally setting one
+  up takes a lot of repetitive code; a **`@dataclass`** writes that boring part for
+  you automatically.
 
-  **The essentials:**
-  - Declare fields as **type-annotated class attributes**: `ticker: str`. The
-    decorator turns them into constructor parameters (in order).
-  - Add defaults (`qty: int = 0`), regular **methods** (`def notional(self): ...`),
-    and `frozen=True` for an immutable value object.
-  - `__eq__` compares by field values — two `Trade`s with the same fields are equal,
-    which is exactly what you want for tests.
+  - You list the fields with their types, like `ticker: str` and `qty: int`, and the
+    dataclass lets you create one straight away: `Trade("AAPL", 10, 190.0)`.
+  - You can also add a **method** — a function that belongs to the object and can use
+    the object's own data through `self`: `def notional(self): return self.qty *
+    self.price`.
+  - Bonus: two trades with the same field values count as equal, which is handy when
+    you test your code.
+
+  Dataclasses are a tidy way to model the "rows" and "records" that move through a
+  data pipeline.
 
   **Mission:** Define a dataclass `Trade` with fields `ticker` (str), `qty` (int),
   and `price` (float), plus a method `notional(self)` returning `qty * price`.

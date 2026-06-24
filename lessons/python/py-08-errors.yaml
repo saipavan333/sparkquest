@@ -6,21 +6,24 @@ difficulty: 3
 concepts: ["try/except", "exceptions", "robustness"]
 needs_spark: false
 brief: |
-  **What & why.** Real pipelines hit bad data — a malformed row, a divide-by-zero, a
-  missing field. **`try`/`except`** lets your code handle the failure instead of
-  crashing the whole job on one bad record. This is the foundation of the
-  **quarantine pattern** (route bad rows aside, keep going — see
-  [Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+  Sometimes code hits a problem it can't handle — dividing by zero, a missing value,
+  or text where a number was expected. By default Python **stops the whole program**
+  and shows an error. (These errors have a name: *exceptions*.) `try` / `except`
+  lets you catch the problem and carry on instead of crashing.
 
-  **The essentials:**
-  - `try:` the risky code, `except SomeError:` the recovery. Catch the **specific**
-    exception (`ZeroDivisionError`, `KeyError`, `ValueError`), not a bare `except:`,
-    so you don't swallow bugs you didn't intend to.
-  - Optional `else:` (ran if no error) and `finally:` (always runs — cleanup).
-  - You can inspect the error: `except ValueError as e:`.
+  ```
+  try:
+      result = a / b           # the risky part
+  except ZeroDivisionError:    # if THAT particular error happens...
+      result = None            # ...do this instead
+  ```
 
-  **Gotcha.** Catching too broadly (`except Exception`) hides real bugs and makes
-  failures silent — the cardinal sin in data pipelines. Be specific.
+  - Put the risky code under `try:`, and what to do if it goes wrong under `except:`.
+  - Name the **specific** problem you expect (here, `ZeroDivisionError`) instead of
+    catching everything — otherwise you might hide real bugs without noticing.
+
+  In real data work, this is how you keep a job running when one bad row turns up:
+  catch the problem, set that row aside, and keep going.
 
   **Mission:** Write a function `safe_divide(a, b)` that returns `a / b`, but
   returns `None` when `b` is `0` (catch the `ZeroDivisionError`).

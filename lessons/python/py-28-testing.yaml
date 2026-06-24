@@ -5,25 +5,22 @@ title: "Testing with assert"
 difficulty: 2
 concepts: ["testing", "assert", "pytest", "data quality"]
 brief: |
-  **What & why.** Untested pipeline code is a liability — a silent logic bug can
-  corrupt data for weeks. The foundation of testing is the **`assert`** statement:
-  `assert condition, "message"` raises `AssertionError` (failing the test) when the
-  condition is false, and does nothing when true. Structure business logic as
-  **pure functions** ([py-05](py-05-functions.yaml)) and you can assert their output
-  on tiny hand-built inputs in milliseconds.
+  Code you haven't tested is code you can't fully trust — a quiet mistake can feed
+  wrong numbers into reports for weeks before anyone notices. The simplest way to
+  test is the **`assert`** statement. `assert something == expected` does nothing if
+  it's true, but stops with an error if it's false — so a failed `assert` points
+  straight at what went wrong.
 
-  **The essentials:**
-  - A test is just a function full of asserts: `assert f(2, 3) == 5`.
-  - **`pytest`** is the standard runner — it auto-discovers `test_*` functions and
-    gives rich failure diffs; fixtures provide shared setup (like a local
-    `SparkSession`).
-  - For **Spark**, `chispa.assert_df_equality(actual, expected)` compares DataFrames;
-    use `Trigger.AvailableNow` to make streaming deterministic
-    ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+  - A test is just a small function full of `assert` checks, for example
+    `assert add(2, 3) == 5`.
+  - **`pytest`** is the popular tool that finds and runs all your tests for you (any
+    function whose name starts with `test_`) and shows a clear message when one fails.
+  - For Spark specifically, a helper called `chispa` can compare two tables and tell
+    you whether they match (more on testing in
+    [Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
 
-  **The testing pyramid:** many fast **unit** tests on transforms, some
-  **integration** tests on wired stages, and **data-quality** checks on the live
-  data in production.
+  The habit to build: write your logic as small functions, then check each one with a
+  few asserts on simple, made-up inputs.
 
   **Mission:** Implement `pnl(buy, sell, qty)` returning `(sell - buy) * qty`, then
   write `test_pnl()` that **asserts** two cases and `return`s `True` when both pass.

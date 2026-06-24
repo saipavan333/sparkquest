@@ -5,26 +5,23 @@ title: "Strings & Slicing"
 difficulty: 1
 concepts: ["strings", "indexing", "slicing", "string methods", "f-strings"]
 brief: |
-  **What & why.** Text is everywhere in data work — tickers, log lines, file paths,
-  CSV/JSON fields — so fluent string handling is a daily skill. Python strings are
-  **immutable** sequences of characters, which means every "edit" returns a **new**
-  string.
+  Text shows up everywhere in data work — names, dates, file paths — so being
+  comfortable with it pays off every day. A **string** is simply text in quotes.
 
-  **Indexing & slicing (the part beginners miss):**
-  - Index from `0`: `s[0]` is the first char; negative indexes from the end:
-    `s[-1]` is the last.
-  - **Slice** `s[start:stop:step]` — `stop` is **exclusive**. `s[:3]` first three,
-    `s[-3:]` last three, `s[::-1]` reversed. (Same slicing works on lists.)
+  Two ideas are worth getting:
+  - **Picking out parts.** Positions start at `0`, so `s[0]` is the first character
+    and `s[-1]` is the last. A **slice** grabs a range: `s[0:3]` is the first three
+    characters (the second number stops *just before* it). The same trick works on
+    lists.
+  - **Built-in actions.** `.upper()` / `.lower()` change the case, `.strip()`
+    removes spaces from the ends, and `.split(",")` breaks text into a list. An
+    **f-string** like `f"{name}: {price}"` drops values into a sentence.
 
-  **Essential methods:** `.upper()`/`.lower()`, `.strip()` (trim whitespace),
-  `.replace(a, b)`, `.split(sep)` → list, `sep.join(list)` → string,
-  `.startswith()`/`.endswith()`, `.find()`/`in`.
-
-  **f-strings** — the modern way to build text: `f"{ticker}: {price:.2f}"` embeds
-  values with formatting (`:.2f` = 2 decimals). Prefer them to `+` concatenation.
-
-  **Gotcha.** Because strings are immutable, `s.upper()` returns a new string — you
-  must assign it (`s = s.upper()`); calling it without assigning does nothing.
+  One thing to remember: a string can't be changed once it's made — you always get
+  a **new** string back, never a changed one. (Programmers call this being
+  **immutable**, which just means "can't be changed".) So `.upper()` hands you a new
+  string and you have to save it — `s = s.upper()`. Calling it without saving does
+  nothing.
 
   **Mission:** From `raw = "  aapl,google,msft  "`:
   1. `clean` — trimmed and uppercased.

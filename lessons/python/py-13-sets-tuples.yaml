@@ -6,18 +6,19 @@ difficulty: 2
 concepts: ["set", "tuple", "unpacking"]
 needs_spark: false
 brief: |
-  **What & why.** Three small tools you'll use every day:
-  - **Sets** hold **unique** items with average **O(1)** membership tests
-    (`x in s`) — the right tool for deduplication and "have I seen this id?" checks.
-    Backed by a hash table, like dicts.
-  - **Tuples** are **immutable** ordered records — `(ticker, qty)`. Being immutable
-    makes them **hashable**, so they can be dict keys or set members (lists can't).
-  - **Unpacking** pulls values apart in one line: `a, b = pair`. **Star-unpacking**
-    (`first, *rest = xs`) grabs the head and the remainder — handy for splitting a
-    header row from data rows.
+  Three small tools you'll use all the time:
+  - **Sets** hold only **unique** items — no duplicates allowed. They're perfect for
+    removing repeats, or quickly checking "have I already seen this one?" with
+    `x in s`. You write one with curly braces: `{1, 2, 3}`.
+  - **Tuples** are like lists but **can't be changed** once they're made (that
+    "can't be changed" property is called *immutable*). You write them with round
+    brackets: `(ticker, qty)`. Good for grouping a few values that belong together.
+  - **Unpacking** splits a group of values into separate names in one line:
+    `a, b = pair`. A handy version — `first, *rest = [1, 2, 3, 4]` — puts the first
+    item in `first` and everything else in a list called `rest`.
 
-  **Gotcha.** Sets are **unordered** — don't rely on iteration order. And `{}` is an
-  empty *dict*, not a set; use `set()` for an empty set.
+  Small heads-up: `{}` on its own makes an empty **dictionary**, not a set — for an
+  empty set, write `set()`.
 
   **Mission:**
   1. Deduplicate `tickers` into a set and store its size in `n_unique`.

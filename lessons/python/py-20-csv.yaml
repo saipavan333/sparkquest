@@ -5,21 +5,20 @@ title: "CSV parsing"
 difficulty: 2
 concepts: ["csv", "DictReader", "parsing"]
 brief: |
-  **What & why.** CSV is the most common (and most error-prone) interchange format
-  you'll meet before data reaches Spark. Python's `csv` module parses it correctly —
-  handling quoted fields, embedded commas, and newlines that naive `line.split(",")`
-  gets wrong. Knowing the stdlib tool (and CSV's pitfalls) is bread-and-butter DE.
+  **CSV** ("comma-separated values") is the most common — and most fiddly — way data
+  is shared as a plain text file before it reaches Spark. Python's built-in `csv`
+  tool reads it correctly, even tricky cases like a comma *inside* a quoted value
+  (`"Apple, Inc."`) that a simple split on commas would get wrong.
 
-  **The essentials:**
-  - `csv.reader(fileobj)` yields rows as **lists**; `csv.DictReader(fileobj)` uses
-    the header row to yield **dicts** keyed by column name (usually what you want).
-  - Read from a file handle or wrap a string in `io.StringIO(...)`.
-  - **Everything comes back as strings** — `"100"`, not `100`. You must **cast**
-    afterwards (the same lesson as Spark's [sp-13](../pyspark/sp-13-cast.yaml)).
+  - `csv.reader(...)` gives you each row as a **list**; `csv.DictReader(...)` uses
+    the first row (the header) to give you each row as a **dictionary**, labelled by
+    column name — usually the handier choice.
+  - To read from a piece of text (rather than a file), wrap it with `io.StringIO(...)`.
+  - Important: every value comes back as **text**, even numbers — `"100"`, not `100`.
+    So you convert them to real numbers yourself afterwards.
 
-  **Gotcha.** Don't parse CSV with `split(",")` — a single quoted field like
-  `"Apple, Inc."` breaks it. Use the `csv` module (or Spark's CSV reader with
-  `header=True`), and watch for delimiter/encoding surprises in real feeds.
+  (Tip: don't split CSV yourself with `text.split(",")` — let the `csv` tool handle
+  the awkward cases.)
 
   **Mission:** Parse the CSV in `raw` with `csv.DictReader` into a list of dicts
   named `rows`.

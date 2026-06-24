@@ -5,32 +5,27 @@ title: "enumerate & zip"
 difficulty: 2
 concepts: ["enumerate", "zip", "iteration", "parallel sequences"]
 brief: |
-  **What & why.** Two iteration helpers that separate idiomatic Python from clumsy
-  C-style loops — you'll use them constantly to walk records cleanly.
+  Two small helpers that make loops much nicer to write.
 
-  **`enumerate(seq)`** — loop with an **index and the value** together, instead of
-  `range(len(seq))` + indexing:
+  **`enumerate`** gives you both the position number *and* the item as you loop, so
+  you don't have to keep track of a counter yourself:
 
   ```python
   for i, ticker in enumerate(tickers):
-      print(i, ticker)          # 0 AAPL, 1 GOOG, ...
-  # enumerate(seq, start=1) starts the count at 1
+      print(i, ticker)          # i is 0, then 1, then 2...
   ```
 
-  **`zip(a, b, ...)`** — walk **multiple sequences in parallel**, pairing elements
-  by position (perfect for combining columns into rows, or names with values):
+  **`zip`** lets you go through **two lists side by side**, pairing them up by
+  position — first with first, second with second, and so on:
 
   ```python
   for ticker, price in zip(tickers, prices):
       ...
-  dict(zip(keys, values))       # build a dict from two lists
   ```
 
-  **The essentials:**
-  - `zip` stops at the **shortest** input (extra items are dropped) — a subtle bug
-    source; use `itertools.zip_longest` if you need padding.
-  - `zip` returns a lazy iterator; wrap in `list(...)`/`dict(...)` to materialise.
-  - `zip(*rows)` **transposes** rows into columns — a neat trick.
+  A handy move: `dict(zip(keys, values))` turns two lists into a lookup table (a
+  dictionary). One thing to watch — `zip` stops as soon as the shorter list runs
+  out, so make sure your two lists line up.
 
   **Mission:** Given parallel `tickers` and `prices`, build `book` — a dict mapping
   each ticker to its price — using `zip`.

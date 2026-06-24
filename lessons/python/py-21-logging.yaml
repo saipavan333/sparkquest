@@ -5,23 +5,22 @@ title: "Logging (over print)"
 difficulty: 3
 concepts: ["logging", "observability", "handlers"]
 brief: |
-  **What & why.** In a real pipeline you never debug with `print` — you use the
-  **`logging`** module. It gives you severity **levels** (so prod shows `INFO`+ while
-  dev shows `DEBUG`), structured **handlers** (route to stdout, files, or a log
-  aggregator), and timestamps/context — the foundation of **observability**. A job
-  you can't see into is a job you can't operate.
+  When you want to see what a program is doing, you *could* use `print` — but real
+  programs use the **`logging`** tool instead. Think of it as `print` with extra
+  powers: it labels each message with how important it is, can send messages to
+  different places (the screen, a file, a monitoring system), and can be turned up or
+  down without changing your code.
 
-  **The essentials:**
-  - Get a named logger: `logging.getLogger("pipeline")`; set a level
-    (`logger.setLevel(logging.INFO)`).
-  - A **handler** decides where records go (`StreamHandler` → a stream/console,
-    `FileHandler` → a file); a **formatter** decides how they look.
-  - Levels, low→high: `DEBUG < INFO < WARNING < ERROR < CRITICAL`. The logger emits
-    records at or above its level.
+  - You get a logger by name — `logging.getLogger("pipeline")` — and tell it how
+    chatty to be by setting a **level**.
+  - **Levels** run from least to most serious: `DEBUG`, `INFO`, `WARNING`, `ERROR`,
+    `CRITICAL`. If you set the level to `INFO`, you'll see `INFO` and anything more
+    serious, but the noisy `DEBUG` messages stay hidden.
+  - A **handler** is simply "where the messages go" — for example, to the screen or
+    into a file.
 
-  **Why over print:** levels let you dial verbosity without code changes, handlers
-  let ops route logs anywhere, and structured logs are queryable — none of which
-  `print` offers.
+  Why bother instead of `print`? You can turn the detail up while building and down
+  in production, and send logs wherever you need — things plain `print` can't do.
 
   **Mission:** Send an `INFO` log `"processed 100 rows"` from a logger into the
   provided `buf` (via a `StreamHandler`), then read the captured text into

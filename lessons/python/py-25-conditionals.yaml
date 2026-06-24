@@ -5,23 +5,27 @@ title: "Conditionals: if / elif / else"
 difficulty: 1
 concepts: ["if", "elif", "else", "comparison operators", "boolean logic"]
 brief: |
-  **What & why.** Branching — "do different things depending on the data" — is the
-  core of all logic. `if` / `elif` / `else` is how a pipeline routes records: valid
-  vs invalid, large vs small, by category. It's the plain-Python ancestor of Spark's
-  `when().otherwise()` ([sp-09](../pyspark/sp-09-when-otherwise.yaml)).
+  Programs constantly need to make decisions — "if this is true, do that; otherwise
+  do something else." `if` / `elif` / `else` is how you write that. Python checks
+  each test in order and runs the **first** one that turns out true:
 
-  **The essentials:**
-  - Structure: `if cond:` … `elif other:` … `else:` — the **first** true branch
-    runs, the rest are skipped. Indentation (4 spaces) defines each block.
-  - **Comparisons:** `==`, `!=`, `<`, `<=`, `>`, `>=`; chainable: `0 < x < 100`.
-  - **Boolean operators:** `and`, `or`, `not`; combine with parentheses for clarity.
-  - **Membership / identity:** `x in collection`, `x is None` (use `is` for `None`,
-    not `==`).
-  - **Ternary expression** for a one-liner value: `band = "big" if x > 9 else "small"`.
+  ```
+  if amount >= 1000:
+      band = "large"
+  elif amount >= 100:     # "elif" is short for "else, if"
+      band = "medium"
+  else:
+      band = "small"
+  ```
 
-  **Gotcha.** `and`/`or` are **short-circuit** and return an *operand*, not always a
-  bool: `x or "default"` yields `x` if truthy else `"default"` — a handy idiom, but
-  know it's not the same as a strict boolean.
+  The pieces:
+  - **Compare** values with `==` (equal to), `!=` (not equal), and `<`, `<=`, `>`,
+    `>=`.
+  - **Combine** tests with `and`, `or`, and `not`.
+  - The **indented** lines under each branch are what runs. In Python, indentation
+    (the spaces at the start of a line) is how you show which lines belong together.
+
+  (Later you'll meet Spark's `when().otherwise()` — it's the same idea, for tables.)
 
   **Mission:** Write `band(amount)` returning `"large"` if `amount >= 1000`,
   `"medium"` if `amount >= 100`, otherwise `"small"`.

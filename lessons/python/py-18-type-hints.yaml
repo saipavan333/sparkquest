@@ -5,21 +5,17 @@ title: "Type Hints (typing)"
 difficulty: 2
 concepts: ["type hints", "typing", "annotations", "mypy"]
 brief: |
-  **What & why.** Type hints annotate the *intended* types of parameters, returns,
-  and variables. Python doesn't enforce them at runtime — they're for **humans and
-  tools**: your IDE autocompletes and flags mismatches, and `mypy`/`pyright` catch
-  whole classes of bugs *before* you ship. Data-engineering teams enforce them
-  because a pipeline that passes a `str` where a `float` was expected fails at 3am,
-  not in code review.
+  **Type hints** let you note what kind of value a function expects and what it gives
+  back — for example, "this takes a list of numbers and returns a number". Python
+  doesn't force these to be correct when the program runs; they're mainly there to
+  **help people and tools**. Your editor can autocomplete and warn you, and checking
+  tools can spot mistakes before the code is ever run.
 
-  **Syntax you'll use daily:**
-  - `def f(x: int, name: str) -> bool: ...` — params and return type.
-  - Containers: `list[float]`, `dict[str, int]`, `tuple[int, ...]` (3.9+ builtins).
-  - `Optional[T]` (a.k.a. `T | None`) for "might be None".
-  - Hints live on the function object in `__annotations__` — that's all they are.
-
-  **Gotcha.** Hints are *not* validated at runtime; `f("3")` still runs. They
-  document intent and power static checkers — they don't replace input validation.
+  - You add them with a colon and an arrow: `def f(x: int, name: str) -> bool:`.
+  - For a list of decimals you'd write `list[float]`; for "this might be missing" you
+    write `Optional[float]` (which just means "a float, or `None`").
+  - They're only notes — `f("3")` still runs even if you wrote `int`. Teams still use
+    them, because catching a wrong type early is far cheaper than a failure later.
 
   **Mission:** Write `total_revenue(prices: list[float]) -> float` that returns the
   sum of `prices`, then call it on the sample list into `result`.

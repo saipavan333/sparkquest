@@ -5,29 +5,27 @@ title: "Python Data Types"
 difficulty: 1
 concepts: ["int", "float", "str", "bool", "None", "type conversion", "truthiness"]
 brief: |
-  **What & why.** Before anything else, you need the **building blocks** every value
-  in Python is made of. Pick the wrong type and your math, comparisons, and joins
-  silently go wrong — so this is the true starting point of the language.
+  Every value in Python has a **type**, and learning the basic ones is the real
+  place to start. There are five you'll see again and again:
+  - **int** — a whole number, like `100`.
+  - **float** — a number with a decimal point, like `189.5`.
+  - **str** — text in quotes, like `"AAPL"` (short for "string").
+  - **bool** — either `True` or `False`.
+  - **None** — a special "nothing here" value (Spark calls this `null`).
 
-  **The core built-in types:**
-  - **`int`** — whole numbers (`100`), unbounded precision.
-  - **`float`** — decimals (`189.5`); subject to tiny rounding error.
-  - **`str`** — text (`"AAPL"`), in quotes.
-  - **`bool`** — `True` / `False` (a subtype of `int`: `True == 1`).
-  - **`NoneType`** — the single value `None`, meaning "no value" (Spark's `null`).
+  The most useful everyday skill is **converting** between them. Data usually
+  arrives as text, so you turn it into real numbers before doing maths:
+  `int("100")` gives you the number `100`, and `float("189.5")` gives `189.5`. You
+  can check a value's type any time with `type(x)`.
 
-  **The essentials:**
-  - Python is **dynamically typed** — a name can hold any type; check with
-    `type(x)` or `isinstance(x, int)`.
-  - **Convert explicitly:** `int("100")`, `float("189.5")`, `str(42)`, `bool(x)`.
-    Raw feeds (CSV, JSON, Kafka) arrive as **strings** — converting to real types is
-    job #1 (the same idea as Spark's `cast`, [sp-13](../pyspark/sp-13-cast.yaml)).
-  - **Truthiness:** `0`, `0.0`, `""`, `[]`, `{}`, and `None` are **falsy**; almost
-    everything else is **truthy** — which is why `if value:` is so common.
+  One more handy idea. A few values count as "false" when you test them in a
+  decision (an `if`): `0`, empty text `""`, an empty list `[]`, and `None`.
+  Programmers call these **falsy** values ("falsy" = "treated as false"). Everything
+  else counts as "true" (**truthy**). This is why you often see `if value:` — it
+  means "if there's actually something there".
 
-  **Gotcha.** `int("abc")` raises `ValueError`, and `int("3.9")` also errors (use
-  `int(float("3.9"))`). Real pipelines wrap conversions in `try/except` and
-  quarantine bad rows ([py-08](py-08-errors.yaml)).
+  Heads-up: converting nonsense fails — `int("abc")` gives an error — so real
+  programs check their input first (you'll learn how in the error-handling lesson).
 
   **Mission:** Convert `"100"` to an int `qty`, convert `"189.50"` to a float
   `price`, set `flag = bool(0)`, and capture the type **name** of `qty` in `kind`.

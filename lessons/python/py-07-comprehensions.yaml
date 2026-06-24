@@ -6,19 +6,20 @@ difficulty: 3
 concepts: ["list comprehension", "dict comprehension", "filtering"]
 needs_spark: false
 brief: |
-  **What & why.** Comprehensions build a new list/dict/set in one readable line —
-  the Pythonic replacement for the build-a-loop-and-append pattern. They read like
-  the math they express, and they're a touch faster than the equivalent loop. You'll
-  reach for them constantly to reshape records before/after Spark.
+  A **comprehension** is a short way to build a new list (or dictionary) from an
+  existing one, all in a single line — instead of writing a `for` loop that keeps
+  adding to a list. Once you're used to them, they're easier to read, not harder.
 
-  **The forms:**
-  - List: `[expr for x in xs if cond]` — map + filter in one go.
-  - Dict: `{k: v for k, v in pairs}` — build a lookup from pairs.
-  - Set: `{x for x in xs}` — dedupe while building.
-  - **Tuple unpacking** in the loop target: `for t, r in data` pulls each pair apart.
+  Read this left to right: "give me `x` for every `x` in the list, but only if it
+  passes the test":
+  - List: `[x for x in xs if x > 0]` — keep, and optionally change, items in one go.
+  - Dict: `{k: v for k, v in pairs}` — build a lookup table from pairs of values.
 
-  **Gotcha.** Don't over-nest — a triple-nested comprehension is harder to read than
-  a plain loop. Clarity wins.
+  The `for t, r in data` part is **unpacking**: each item in `data` is a pair, and
+  this splits it into `t` and `r` for you automatically.
+
+  (Tip: keep them simple — if a comprehension gets long or nested, a plain loop is
+  clearer.)
 
   **Mission:** From `data` (ticker, daily return) pairs:
   1. Build a list `winners` of the tickers whose return is **positive**.

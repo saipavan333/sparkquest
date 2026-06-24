@@ -6,22 +6,20 @@ difficulty: 3
 concepts: ["json", "parsing", "serialisation"]
 needs_spark: false
 brief: |
-  **What & why.** JSON is the lingua franca of data pipelines — REST APIs, **Kafka
-  message values**, config files, log lines. Knowing how to parse and emit it
-  reliably is bread-and-butter DE work. This same step — string → structured record
-  — is what `from_json` does over a Kafka `value` column in Spark
-  ([Handbook ch.13](../../docs/handbook/13-kafka-and-streaming-io.md)).
+  **JSON** is the most common way data is passed between systems — web services,
+  message queues, config files, log lines. It's just text written in a particular
+  layout, and Python can turn it into the lists and dictionaries you already know
+  (and back again).
 
-  **The four functions:**
-  - `json.loads(s)` — JSON **string → Python** object (dict/list). `json.load(f)`
-    reads from a file.
-  - `json.dumps(obj)` — Python → JSON **string** (`indent=2` to pretty-print).
-  - JSON objects become **dicts**, arrays become **lists**, `null` becomes `None`,
-    `true`/`false` become `True`/`False`.
+  - `json.loads(text)` reads a JSON **string** and gives you back a Python value,
+    usually a **dictionary**. (Think "load string".)
+  - `json.dumps(value)` goes the other way: a Python value becomes a JSON **string**.
+    (Think "dump to string".)
+  - The pieces match up neatly: a JSON object becomes a dict, a JSON list becomes a
+    Python list, and `null` becomes `None`.
 
-  **Gotcha.** Real feeds have malformed records — wrap `json.loads` in `try/except
-  json.JSONDecodeError` and quarantine the bad lines rather than letting one crash
-  the batch ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+  (In real life, some incoming records are broken, so you'd wrap `json.loads` in a
+  `try/except` and set the bad ones aside instead of letting one crash the whole job.)
 
   **Mission:** Parse the JSON string `raw` into a dict `rec`, then pull out
   `ticker` and `qty`.

@@ -5,14 +5,13 @@ title: "Lambdas & Functional Style"
 difficulty: 2
 concepts: ["lambda", "higher-order functions", "sorted key", "map", "filter", "reduce"]
 brief: |
-  **What & why.** A **lambda** is a small **anonymous function** written inline:
-  `lambda args: expression`. It's a single *expression* (no statements, no `return`)
-  whose value is returned automatically. You met one briefly in
-  [py-14](py-14-args-kwargs.yaml); here's the full picture, because lambdas are
-  everywhere in data work — they're the **key/predicate functions** you hand to
-  higher-order functions.
+  A **lambda** is a tiny function with no name, written on a single line:
+  `lambda x: x * 2` takes `x` and gives back `x` doubled. You don't write `return` —
+  whatever that one line works out to is automatically the answer. (You saw one
+  briefly in [py-14](py-14-args-kwargs.yaml); here's the fuller picture.)
 
-  **The idiomatic uses (this is what interviews and real code want):**
+  Lambdas are mostly used as a quick instruction you *hand to another function* —
+  most often "here's how to sort or pick from these":
   - **Sort/min/max key:** `sorted(rows, key=lambda r: r[1], reverse=True)`,
     `max(rows, key=lambda r: r.score)` — *the* most common use.
   - **Filter:** `filter(lambda x: x > 0, xs)` keeps matching items (returns an

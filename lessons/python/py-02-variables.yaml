@@ -6,18 +6,18 @@ difficulty: 1
 concepts: ["variables", "arithmetic"]
 needs_spark: false
 brief: |
-  **What & why.** A *variable* is a named reference to a value. Data engineering is
-  mostly moving values between names and transforming them along the way, so getting
-  comfortable here pays off everywhere.
+  A **variable** is just a name you give to a value so you can use it again later —
+  like putting a label on a box. You create one with `=`, for example
+  `price = 189.50`.
 
-  **The essentials:**
-  - Python is **dynamically typed** — you don't declare a type; `price = 189.50`
-    just works, and the name can later point at anything.
-  - Numeric types matter: `100` is an **int**, `189.50` is a **float**. Mixing them
-    (`int * float`) gives a float — which is why `cost` below comes out as `18950.0`,
-    not `18950`.
-  - Operators: `+ - * /` (true division, always float), `//` (floor), `%` (modulo),
-    `**` (power). `/` returning a float trips up newcomers.
+  A few simple things to know:
+  - You don't have to say what kind of value it is — Python figures that out for
+    you. (This "Python sorts out the types itself" behaviour has a name:
+    **dynamically typed**.) `100` is a whole number (called an **int**); `189.50`
+    has a decimal point (called a **float**).
+  - You do maths with the usual symbols: `+`, `-`, `*` (multiply), `/` (divide).
+  - Small surprise: `/` always gives a decimal answer, so `190 / 2` is `95.0`, not
+    `95`. That's why the total below comes out as `18950.0`.
 
   **Mission:** A stock trades at `189.50` and you buy `100` shares. Compute the
   total cost and store it in a variable named `cost`.

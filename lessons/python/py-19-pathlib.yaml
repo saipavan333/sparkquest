@@ -5,22 +5,18 @@ title: "Files & pathlib"
 difficulty: 2
 concepts: ["pathlib", "Path", "filesystem"]
 brief: |
-  **What & why.** `pathlib.Path` is the modern, cross-platform way to work with
-  filesystem paths — building, splitting, and inspecting them as objects instead of
-  hand-gluing strings with `os.path.join` and brittle `"/"` concatenation. Data
-  engineering is full of path wrangling (partition folders, landing zones, file
-  globs), so this is a daily tool.
+  **`pathlib`** is the modern way to work with file and folder paths in Python.
+  Instead of gluing bits of text together with slashes (which is easy to get wrong,
+  and differs between Windows and Mac/Linux), you work with a tidy `Path` object that
+  knows it's a path.
 
-  **The essentials:**
-  - Build with the `/` operator: `Path("/data") / "raw" / "trades.csv"` — no manual
-    separators, and it's correct on every OS.
-  - Inspect the parts: `.name` (`trades.csv`), `.stem` (`trades`), `.suffix`
-    (`.csv`), `.parent` (`/data/raw`).
-  - Useful methods: `.exists()`, `.glob("*.csv")`, `.read_text()`, `.mkdir(parents=True)`.
-
-  **Why prefer it:** `os.path.join` returns strings you then re-parse; `Path`
-  objects carry structure and read far cleaner — `p.with_suffix(".parquet")` beats
-  string surgery.
+  - **Build a path** with the `/` symbol: `Path("/data") / "raw" / "trades.csv"`.
+    Python puts in the right separators for you, on any operating system.
+  - **Pull pieces out** of a path: `.name` is the file name (`trades.csv`), `.stem`
+    is the name without its extension (`trades`), `.suffix` is the extension
+    (`.csv`), and `.parent` is the folder it sits in (`/data/raw`).
+  - Handy extras: `.exists()` checks whether it's actually there, and `.glob("*.csv")`
+    finds all the matching files in a folder.
 
   **Mission:** From the path `/data/raw/trades.csv`, extract its `stem`, `suffix`,
   and `parent` (the parent as a string).

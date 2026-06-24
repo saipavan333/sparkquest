@@ -6,18 +6,20 @@ difficulty: 3
 concepts: ["Counter", "standard library", "counting"]
 needs_spark: false
 brief: |
-  **What & why.** Python's standard library is "batteries included" — and
-  `collections` has the data-wrangling batteries. `Counter` counts things in one
-  line (the local twin of Spark's `groupBy().count()`); reach for the right tool
-  instead of re-implementing it.
+  Python comes with a large toolbox built in. The **`collections`** module holds a
+  few ready-made helpers that save you from rebuilding common things by hand —
+  especially **`Counter`**, which tallies how often each item appears in a single
+  line.
 
-  **The `collections` toolkit worth knowing:**
-  - **`Counter`** — frequency map; `.most_common(n)` returns the top-n `(item,
-    count)` pairs already sorted.
-  - **`defaultdict(list)`** — a dict that auto-creates a default for missing keys
-    (no more `if k not in d`), perfect for grouping rows by key.
-  - **`namedtuple`** / **`deque`** (O(1) ends, great for sliding windows).
-  - `itertools` complements it: `groupby`, `chain`, `islice` for lazy pipelines.
+  Two worth knowing:
+  - **`Counter(items)`** counts everything for you, and `.most_common(1)` hands back
+    the single most frequent item (as an `(item, count)` pair — so `[0][0]` gets just
+    the item).
+  - **`defaultdict`** is a dictionary that fills in a sensible starting value for a
+    brand-new key on its own, so you never have to check "have I seen this key yet?".
+
+  The takeaway: when a task feels common, Python probably already has a tool for it —
+  reach for the toolbox instead of writing it from scratch.
 
   **Mission:** Use `Counter` to count the `tickers`, store it in `counts`, and put
   the single most-common ticker in `top`.

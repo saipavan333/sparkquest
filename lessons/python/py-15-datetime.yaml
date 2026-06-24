@@ -6,21 +6,21 @@ difficulty: 3
 concepts: ["datetime", "strptime", "parsing"]
 needs_spark: false
 brief: |
-  **What & why.** Almost every pipeline is time-aware — partition by date, window by
-  hour, compute "days since". `datetime.strptime` parses a string into a real
-  `datetime` you can compare, subtract (`d2 - d1` gives a `timedelta`), and pull
-  parts from. Getting time right is a recurring source of production bugs.
+  Almost every data job involves dates and times — grouping by day, or working out
+  "how many days between these two dates". Python's `datetime` lets you turn a date
+  that's written as text into a real date you can actually do maths with.
 
-  **The essentials:**
-  - **Parse**: `strptime(text, fmt)`; **format**: `dt.strftime(fmt)`. The codes:
-    `%Y` 4-digit year, `%m` month, `%d` day, `%H:%M:%S` time.
-  - Extract parts with `.year`, `.month`, `.day`, `.hour`.
-  - The same `%Y-%m-%d` pattern is what Spark's `to_date`/`to_timestamp` use.
+  - **Reading a date from text:** `datetime.strptime("2026-01-15", "%Y-%m-%d")`. That
+    `%Y-%m-%d` part is a little pattern that says "4-digit year, then month, then day"
+    (`%Y` = year, `%m` = month, `%d` = day).
+  - Once you have a real date, you can pull pieces out of it: `d.year`, `d.month`,
+    `d.day`.
+  - You can also subtract one date from another to get the number of days between
+    them.
 
-  **Gotcha (interview-relevant).** **Timezones.** A naive `datetime` has no tz;
-  mixing naive and aware times, or ignoring UTC, causes off-by-hours bugs. Store and
-  compute in **UTC**, convert only for display. Event-time vs processing-time is the
-  streaming version of this ([Handbook ch.3](../../docs/handbook/03-streaming-internals.md)).
+  (A common real-world trap is **time zones**: if you mix dates from different zones,
+  times can come out wrong by a few hours. A good habit is to keep everything in one
+  zone — usually UTC — and only convert when you show it to people.)
 
   **Mission:** Parse `"2026-01-15"` with `strptime` into `d`, then store its `year`
   and `month`.
