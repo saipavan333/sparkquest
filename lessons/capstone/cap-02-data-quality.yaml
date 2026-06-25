@@ -6,22 +6,17 @@ difficulty: 4
 concepts: ["data quality", "validation", "quarantine"]
 needs_spark: true
 brief: |
-  **What & why.** Never trust raw data. A production pipeline **measures** quality
-  every run — counting the **valid** rows it keeps and **quarantining** the rest with
-  a reason — so silent corruption surfaces as a metric and an alert, not a wrong
-  dashboard a month later. This is the operational half of the six DQ dimensions
-  ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+  Never just trust the data coming in. A good pipeline **checks** it every run —
+  counting how many rows are good and how many are bad — so a problem shows up as a
+  number you can alert on, not as a wrong dashboard someone spots a month later.
 
-  **The essentials:**
-  - Encode each rule as a column predicate: `F.col("qty").isNotNull() & (F.col("qty")
-    > 0)`. Validity = completeness (not null) + a domain rule (> 0).
-  - **Don't `dropna()` silently** — split valid vs quarantine so bad rows are visible
-    (the pattern from [sp-33](../pyspark/sp-33-data-quality.yaml)).
-  - Emit counts (`n_valid`, `n_bad`) as run metrics; alert when `n_bad` spikes
-    versus history (anomaly detection).
-
-  **Interview soundbite:** "Where did the missing revenue go?" — a good answer points
-  at the quarantine table and the DQ metrics, not a shrug.
+  - Write each rule as a simple condition, and count the rows that pass:
+    `df.filter(F.col("qty").isNotNull() & (F.col("qty") > 0)).count()`. A row is
+    "good" here if `qty` is present **and** above zero.
+  - The number of bad rows is just the total minus the good ones.
+  - The key habit: don't quietly throw bad rows away — count them (and ideally set
+    them aside), so nothing disappears silently
+    ([sp-33](../pyspark/sp-33-data-quality.yaml)).
 
   **Mission:** A row is valid only if `qty` is **not null** and **greater than 0**.
   Compute `n_valid` (count of valid rows) and `n_bad` (everything else).

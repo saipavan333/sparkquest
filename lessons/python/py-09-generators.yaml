@@ -11,6 +11,13 @@ brief: |
   work through a huge file (or an endless stream of data) while keeping almost
   nothing in memory at any moment.
 
+  ```
+   a list builds everything at once:   [#][#][#][#][#][#]   (all held in memory)
+
+   a generator hands them over one at a time, only when asked:
+        [#] ─► use ─► [#] ─► use ─► [#] ─► ...
+  ```
+
   The special word is **`yield`**. Using `yield` instead of `return` turns a function
   into a generator: each time you ask for the next value, it runs up to the next
   `yield`, hands that value back, and **pauses** right there until you ask again.

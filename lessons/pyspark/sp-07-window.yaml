@@ -6,21 +6,26 @@ difficulty: 4
 concepts: ["Window", "row_number", "partitionBy", "ranking"]
 needs_spark: true
 brief: |
-  **What & why.** Window functions compute across a set of rows *related to the
-  current row* **without collapsing them** — that's the key difference from
-  `groupBy` (which reduces many rows to one). Ranking, running totals, lead/lag,
-  top-N-per-group, sessionization — all windows, and all interview favourites.
+  A **window function** does a calculation *within groups of rows* — but unlike
+  `groupBy`, it **keeps every row** and just adds the answer as a new column. Think
+  "rank each trade within its own ticker", or "running total so far". This keep-all
+  behaviour is the whole point.
 
-  **The anatomy of a window:**
-  - `Window.partitionBy(col)` — the groups (like `GROUP BY`, but rows are kept).
-  - `.orderBy(col)` — ordering within each partition (required for ranking/offset
-    functions).
-  - `F.row_number()/rank()/dense_rank()`, `F.lag()/lead()`, or an aggregate
-    `.over(w)`.
+  ```
+   ┌────────┬────────┐   rank by amount      ┌────────┬────────┬────┐
+   │ ticker │ amount │   within each ticker  │ ticker │ amount │ rk │
+   │ AAPL   │  100   │  ──────────────────►  │ AAPL   │  300   │ 1  │
+   │ AAPL   │  300   │   (rows are kept,     │ AAPL   │  100   │ 2  │
+   │ GOOG   │   80   │    a rank is added)   │ GOOG   │   80   │ 1  │
+   └────────┴────────┘                       └────────┴────────┴────┘
+  ```
 
-  **Top-N-per-group pattern:** add `row_number().over(w)` then filter `== 1` — the
-  most-asked window query (you'll also see it in SQL at [sp-34](sp-34-sql-analytics.yaml)).
-  **Cost:** a window with `partitionBy` shuffles by the partition key, like a join.
+  A window has two parts:
+  - `Window.partitionBy("ticker")` — which rows count as a group.
+  - `.orderBy("amount")` — the order within each group (needed for ranking).
+
+  Then you apply a function `.over(w)`, like `F.row_number()`. A super-common pattern
+  is "keep the top one per group": add `row_number()` and keep where it equals `1`.
 
   **Mission:** For each `ticker`, find its **largest** trade by `amount`. Use a
   window partitioned by ticker, ordered by amount descending, add a `row_number()`

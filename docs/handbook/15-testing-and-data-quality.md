@@ -10,6 +10,13 @@
 > [Great Expectations](https://docs.greatexpectations.io/docs/), and
 > [Delta constraints](https://docs.delta.io/latest/delta-constraints.html).
 
+> **In plain words.** This chapter is about **trusting your data**. A normal program
+> bug makes things crash loudly; a *data* bug is sneakier — the job runs fine but
+> quietly produces wrong numbers that nobody notices for weeks. So you do two things:
+> **test your code** (check each piece does what you expect on small inputs) and
+> **check your data** every run (count the bad rows and set them aside rather than
+> letting them through). The chapter covers both, with the common tools for each.
+
 ## 1. Why data pipelines need their own testing discipline
 
 Application bugs throw exceptions; **data bugs return wrong answers silently**. A

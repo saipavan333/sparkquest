@@ -6,22 +6,23 @@ difficulty: 4
 concepts: ["arrays", "explode", "complex types"]
 needs_spark: true
 brief: |
-  **What & why.** Real data is often **nested** — a JSON record holds an array of
-  line items, tags, or events. `F.explode` turns each element of an array column
-  into its **own row** (one-to-many), flattening the structure so you can group,
-  join, and aggregate normally. It's the standard first step after parsing nested
-  JSON/Kafka payloads.
+  Sometimes one cell holds a **list** of things — like a trade row whose `actions`
+  column is `["buy", "sell"]`. `F.explode` unpacks that list, turning each item into
+  its **own row**, so you can count and group them normally.
 
-  **The essentials:**
-  - `F.explode(arr)` drops rows whose array is empty/null; `F.explode_outer(arr)`
-    keeps them with a `null` (use it when you must not lose those records).
-  - `F.posexplode` also gives the element's index.
-  - The inverse is `groupBy(...).agg(F.collect_list(...))` — re-nest after
-    processing.
+  ```
+   ┌────────┬─────────────┐             ┌────────┬────────┐
+   │ ticker │ actions     │   explode   │ ticker │ action │
+   │ AAPL   │ [buy, sell] │  ─────────► │ AAPL   │ buy    │
+   │ GOOG   │ [buy]       │   one row   │ AAPL   │ sell   │
+   └────────┴─────────────┘   per item  │ GOOG   │ buy    │
+                                        └────────┴────────┘
+  ```
 
-  **Gotcha (interview-relevant).** Exploding **multiplies** row count — a 1 KB row
-  with a 10k-element array becomes 10k rows. It can balloon data and memory, so
-  filter/aggregate soon after.
+  - `F.explode("actions")` makes one row per item in the list. (A row whose list is
+    empty disappears; `F.explode_outer` keeps it instead.)
+  - Heads-up: exploding **multiplies** rows — a row with a 1,000-item list becomes
+    1,000 rows — so your data can grow quickly.
 
   **Mission:** Each ticker has an array of `actions`. Explode it so every action
   becomes its own row with column `action`, keeping `ticker`. Store it in `flat`.

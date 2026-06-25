@@ -7,21 +7,21 @@ concepts: ["iceberg", "UPDATE", "row-level", "copy-on-write"]
 needs_spark: true
 needs_iceberg: true
 brief: |
-  **What & why.** Plain Parquet is immutable — you can't change one row without
-  rewriting files by hand. Iceberg (like Delta) supports **row-level `UPDATE` /
-  `DELETE` / `MERGE`** in SQL, handling the file rewrite transactionally for you.
+  Plain Parquet files can't be changed in place — to fix one value you'd have to
+  rewrite files yourself. Iceberg lets you simply run **`UPDATE` / `DELETE` in SQL**,
+  just like a database, and it takes care of safely rewriting the files underneath.
 
-  **The mechanism (a real interview distinction):**
-  - **Copy-on-write (CoW)** — rewrite the affected data files at write time. Slower
-    writes, **fast reads**. Default; good for read-heavy tables.
-  - **Merge-on-read (MoR)** — write small **delete files** and merge them away at
-    read time. **Fast writes**, slower reads until compaction. Good for frequent
-    updates / streaming CDC.
-  - Set per table via `write.update.mode` / `write.merge.mode`
-    ([Handbook ch.14 §6](../../docs/handbook/14-apache-iceberg.md)).
+  ```
+   UPDATE local.db.pos SET qty = 999 WHERE ticker = 'AAPL'
 
-  **Gotcha.** Frequent small updates create many files/delete-files — schedule
-  `rewrite_data_files` **compaction** to keep read performance healthy.
+   AAPL = 100  ─►  AAPL = 999     (GOOG is left untouched)
+   GOOG =  50  ─►  GOOG =  50
+  ```
+
+  (Worth knowing for interviews: Iceberg can apply these changes in two styles —
+  rewrite the files now for fast reads later, or jot down the changes quickly and
+  merge them in at read time. You pick based on whether the table is read-heavy or
+  updated often.)
 
   **Mission:** Create `local.db.pos`, insert AAPL@100 and GOOG@50, then **UPDATE**
   AAPL's `qty` to `999`. Read the result into `out`.

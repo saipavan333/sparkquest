@@ -6,18 +6,26 @@ difficulty: 2
 concepts: ["SparkSession", "createDataFrame", "DataFrame"]
 needs_spark: true
 brief: |
-  **What & why.** A Spark **DataFrame** is a distributed table — rows and named
-  columns spread across many machines, but you program it as if it were one tidy
-  table. Behind that simple API, **Catalyst** optimizes your query and **Tungsten**
-  runs it on compact binary memory ([Handbook ch.1](../../docs/handbook/01-spark-architecture-and-execution.md)),
-  which is why DataFrames beat hand-written RDD code.
+  A Spark **DataFrame** is just a **table** — rows and named columns — like a
+  spreadsheet. The clever part: Spark can spread that table across many computers,
+  yet still let you work with it as if it were one tidy table on your screen.
 
-  **The essentials:**
-  - The `SparkSession` (`spark`) is your entry point — already created for you here.
-  - `spark.createDataFrame(data, schema)` builds one from a Python collection;
-    in production you'd read Parquet/Kafka/JDBC instead.
-  - DataFrames are **immutable** and **lazy** — operations return a *new* DataFrame
-    and nothing runs until an **action** like `.show()`/`.count()`.
+  ```
+   ┌────────┬─────┐
+   │ ticker │ qty │   ← named columns
+   ├────────┼─────┤
+   │ AAPL   │ 100 │   ← each row is one record
+   │ GOOG   │  50 │
+   │ MSFT   │  30 │
+   └────────┴─────┘
+  ```
+
+  - `spark` (already set up for you) is your starting point.
+  - `spark.createDataFrame(data, ["ticker", "qty"])` builds a table from a Python
+    list. (In a real job you'd read a file or a database instead.)
+  - Spark is **lazy**: building or changing a DataFrame does no real work until you
+    ask for a result with something like `.show()`. That "wait until it's actually
+    needed" habit is part of how Spark stays fast on huge data.
 
   **Mission:** Create a DataFrame named `df` from the list below, with columns
   `ticker` and `qty`.

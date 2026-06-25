@@ -6,21 +6,21 @@ difficulty: 4
 concepts: ["event time", "window", "withWatermark", "late data"]
 needs_spark: true
 brief: |
-  **What & why.** The capstone of streaming, and the concept interviews probe
-  hardest. Aggregate by **event time** (when something *happened*) rather than
-  **processing time** (when it *arrived*) — because events arrive late and out of
-  order, and correct analytics must bucket them by when they occurred.
+  This is the big idea in streaming. You usually want to group events by **when they
+  actually happened** ("event time"), not when they reached your system — because
+  events often arrive late or out of order, and a correct report must put them in the
+  right time bucket.
 
-  **The two pieces:**
-  - **Windows** — `F.window("ts", "10 minutes")` groups events into time buckets
-    (tumbling = non-overlapping; add a slide for sliding windows).
-  - **Watermark** — `withWatermark("ts", "1 minute")` tells Spark "don't expect data
-    older than (max event time − 1 min)". This is the **trade-off knob**: it bounds
-    how long window **state** is kept (so memory doesn't grow forever) and decides
-    how late is *too* late — events past the watermark are **dropped**.
+  Two pieces work together:
+  - **Windows** — `F.window("ts", "10 minutes")` chops time into buckets (here,
+    10-minute blocks) and groups events into them.
+  - **Watermark** — `withWatermark("ts", "1 minute")` tells Spark "stop waiting for
+    stragglers more than a minute late". This matters because Spark has to *remember*
+    each open bucket to add late events; the watermark lets it eventually close old
+    buckets and free that memory (very-late events are dropped).
 
-  **Interview soundbite:** "Event time + watermark gives correct, bounded-state
-  aggregation over late, out-of-order data" ([Handbook ch.3 §2–3](../../docs/handbook/03-streaming-internals.md)).
+  In short: event-time windows + a watermark give you correct counts over late,
+  out-of-order data, without remembering everything forever.
 
   **Mission:** Stream `data/sample/stream_events` and count events per `ticker`
   within **10-minute** tumbling windows over the event-time column `ts`. Declare a

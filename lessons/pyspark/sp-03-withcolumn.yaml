@@ -6,21 +6,23 @@ difficulty: 3
 concepts: ["withColumn", "expressions", "columns"]
 needs_spark: true
 brief: |
-  **What & why.** Real pipelines enrich data by computing new columns.
-  `withColumn(name, expr)` returns a new DataFrame with an added (or, if the name
-  exists, **replaced**) column. The expression is a **column expression** built from
-  `F.col(...)` and functions — evaluated by Catalyst across the cluster, not row by
-  row in Python.
+  Often you want to add a **new column** worked out from existing ones — for example,
+  a `total` that's `price * qty`. `withColumn("total", ...)` does that, giving you a
+  new table with the extra column (and if the name already exists, it replaces it).
 
-  **The essentials:**
-  - `F` is `pyspark.sql.functions` (already imported). Build expressions like
-    `F.col("price") * F.col("qty")`, `F.upper(...)`, `F.when(...).otherwise(...)`.
-  - Prefer these **built-in column functions** over Python UDFs — they stay in the
-    JVM and Catalyst can optimize them ([sp-19](sp-19-udf.yaml) shows the UDF cost).
+  ```
+   ┌────────┬───────┬─────┐              ┌────────┬───────┬─────┬───────┐
+   │ ticker │ price │ qty │  add column  │ ticker │ price │ qty │ total │
+   │ AAPL   │  190  │ 100 │  total =     │ AAPL   │  190  │ 100 │ 19000 │
+   │ GOOG   │  142  │  50 │  price*qty ► │ GOOG   │  142  │  50 │  7100 │
+   └────────┴───────┴─────┘              └────────┴───────┴─────┴───────┘
+  ```
 
-  **Gotcha (interview-relevant).** Chaining **many** `withColumn` calls builds a
-  deep plan and can be slow to analyze; for lots of new columns, do them in one
-  `select`/`withColumns(...)` instead.
+  - `F` is a toolbox of ready-made column functions (already imported). You build
+    the new value from it: `F.col("price") * F.col("qty")`, `F.upper(...)`, and so on.
+    `F.col("price")` just means "the price column".
+  - Prefer these built-in functions to writing your own — they're faster (more on
+    that in [sp-19](sp-19-udf.yaml)).
 
   **Mission:** Add a column named `total` equal to `price * qty` to the `orders`
   DataFrame. Store the result in `priced`.

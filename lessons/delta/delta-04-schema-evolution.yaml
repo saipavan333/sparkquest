@@ -7,22 +7,20 @@ concepts: ["schema evolution", "mergeSchema", "append"]
 needs_spark: true
 needs_delta: true
 brief: |
-  **What & why.** Upstream schemas drift — a new field appears. By default Delta
-  **enforces** schema on write (rejecting mismatches, which protects you from silent
-  corruption), but when you *intend* to add a column you opt into **schema
-  evolution** with `mergeSchema`: Delta widens the table and backfills existing rows
-  with `null` for the new column instead of failing the job.
+  Over time, the data coming in changes shape — a new column appears. By default Delta
+  is strict: if your new data's columns don't match the table, it **refuses the
+  write**. That strictness is on purpose — it stops bad or mismatched data sneaking
+  in. But when you *do* want to add a column, you opt in with **`mergeSchema`**, and
+  Delta widens the table, filling the new column with `null` for the older rows.
 
-  **The essentials:**
-  - `.option("mergeSchema", "true")` on an append adds new columns; existing rows get
-    `null`.
-  - **Enforcement is the default and a feature** — it's a data-quality guardrail
-    ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)); evolution
-    is the deliberate exception.
-  - Overwrites can fully replace the schema with `overwriteSchema`.
+  - Add `.option("mergeSchema", "true")` to an append to allow the new column through.
+  - Older rows automatically get `null` in that new column.
 
-  **Contrast.** Delta tracks columns by name; **Iceberg** tracks by **field id**, so
-  renames/reorders are safe there ([Handbook ch.14 §4](../../docs/handbook/14-apache-iceberg.md)).
+  ```
+   table:        ticker, qty
+   new data:     ticker, qty, sector   + mergeSchema
+   result:       ticker, qty, sector   (old rows show sector = null)
+  ```
 
   **Mission:** A table has `ticker, qty`. Append a row that *also* has a `sector`
   column, using `mergeSchema`. Then read the whole table into `result`.

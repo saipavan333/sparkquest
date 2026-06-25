@@ -4,6 +4,14 @@
 > time vs processing time, watermarks, state, checkpointing, and exactly-once** —
 > the correctness machinery. Get these right and you're in rare company.*
 
+> **In plain words.** Batch jobs work on data that sits still; **streaming** works on
+> data that keeps arriving. The trick to understanding it: picture the incoming data
+> as a table that **never stops growing**, and your query keeps running over the new
+> rows. The hard parts are all about time and memory — grouping events by *when they
+> happened* (not when they arrived), deciding how long to wait for late ones
+> (**watermarks**), and making sure nothing is counted twice if something restarts.
+> Each of those is unpacked below.
+
 ## 1. The core idea: a stream is an unbounded table
 
 Structured Streaming models a stream as a **table that grows forever**. Your query

@@ -6,18 +6,18 @@ difficulty: 3
 concepts: ["createOrReplaceTempView", "spark.sql", "SQL"]
 needs_spark: true
 brief: |
-  **What & why.** Prefer SQL? Spark speaks it fluently. Register a DataFrame as a
-  **temporary view**, then query it with `spark.sql(...)`. Crucially, **SQL and the
-  DataFrame API compile to the *exact same* Catalyst plan** — there's no performance
-  difference, so choose whichever reads clearer for the task (often SQL for complex
-  multi-join analytics, the DataFrame API for programmatic pipelines).
+  If you already know SQL (the `SELECT ... FROM ... WHERE` language used with
+  databases), good news: Spark speaks it too. You give a DataFrame a name, then write
+  ordinary SQL against that name.
 
-  **The essentials:**
-  - `df.createOrReplaceTempView("name")` makes it queryable; it lives for the
-    session and isn't persisted.
-  - `createOrReplaceGlobalTempView` shares across sessions (under `global_temp`).
-  - You can freely mix: query with `spark.sql(...)`, then keep chaining DataFrame
-    ops on the result.
+  - `df.createOrReplaceTempView("trades")` gives the table a temporary name you can
+    query (it lasts for your session — nothing is saved to disk).
+  - Then `spark.sql("SELECT ... FROM trades")` runs the query and returns a new
+    DataFrame.
+
+  An important reassurance: doing something in SQL and doing it with the DataFrame
+  steps (`groupBy`, `agg`, …) run **exactly the same way** underneath — same speed.
+  Use whichever is clearer for the job, and you can freely mix the two.
 
   **Mission:** Register `trades` as a view named `trades`, then use SQL to compute
   the **average price per ticker**, aliased as `avg_price`. Store the resulting

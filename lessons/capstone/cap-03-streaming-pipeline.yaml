@@ -6,22 +6,24 @@ difficulty: 5
 concepts: ["streaming ETL", "filter", "join", "aggregation"]
 needs_spark: true
 brief: |
-  **What & why.** The real-time finale: a complete streaming pipeline that
-  **filters → enriches (stream-static join) → aggregates**, all on a live stream
-  with the *same* DataFrame API as batch. It ties together everything from the
-  Streaming track into the shape of a production job.
+  The real-time finale: a full streaming pipeline that **filters → adds details →
+  summarises**, all on a live stream — using the same DataFrame steps you'd use for
+  batch. It pulls together everything from the Streaming track into the shape of a
+  real job.
 
-  **The pipeline, stage by stage:**
-  1. **Filter** early (`amount >= 500`) — drop noise before the expensive steps.
-  2. **Enrich** via a **stream-static join** to the `sectors` dimension
-     ([st-06](../streaming/st-06-stream-static-join.yaml)) — no watermark needed.
-  3. **Aggregate** per sector; an aggregation without a watermark uses
-     `outputMode("complete")` ([st-02](../streaming/st-02-streaming-agg.yaml)).
+  ```
+   live events ─► filter (amount >= 500) ─► join sectors ─► count per sector ─► out
+  ```
 
-  **From here to production:** swap the file source for **Kafka**, the memory sink
-  for **`foreachBatch` + Delta `MERGE`**, add a **checkpoint** for exactly-once, and
-  a data-quality gate — the architecture in [Handbook ch.13](../../docs/handbook/13-kafka-and-streaming-io.md).
-  `trigger(availableNow=True)` keeps this lesson deterministic for grading.
+  Stage by stage:
+  1. **Filter** early (`amount >= 500`) to drop noise before the heavier steps.
+  2. **Add details** by joining the fixed `sectors` lookup
+     ([st-06](../streaming/st-06-stream-static-join.yaml)).
+  3. **Summarise** by counting per sector. (An aggregation like this, with no
+     watermark, sends results out in `complete` mode.)
+
+  In a real system you'd swap the file source for Kafka and the memory output for a
+  Delta table — but the shape of the pipeline stays exactly the same.
 
   **Mission:** Stream `data/sample/stream_events`, keep only events with
   `amount >= 500`, join the static `sectors` table, then count events per sector

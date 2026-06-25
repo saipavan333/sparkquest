@@ -7,22 +7,20 @@ concepts: ["iceberg", "table format", "SQL"]
 needs_spark: true
 needs_iceberg: true
 brief: |
-  **What & why.** **Apache Iceberg** is an open **table format** (like Delta) that
-  brings ACID transactions, **snapshots**, hidden partitioning, and **engine-agnostic**
-  metadata to data lakes. Its edge over Delta: the same tables are queryable by
-  Spark, Flink, Trino, and others, and it supports **partition evolution**. Instead
-  of "files in a directory", a **catalog** points at a metadata tree
-  (table metadata → manifest list → manifests → data files) — see
-  [Handbook ch.14](../../docs/handbook/14-apache-iceberg.md).
+  **Apache Iceberg** is another way to turn files on storage into a proper, safe table
+  — the same idea as Delta ([delta-01](../delta/delta-01-create.yaml)), just a
+  different popular option. Its big selling point is that **many tools** (Spark,
+  Flink, Trino, and more) can all read and write the *same* Iceberg tables, so you're
+  not locked into one engine.
 
-  **The essentials:**
-  - Tables live under a **catalog**: `catalog.namespace.table` — here `local.db.<t>`.
-  - Created with SQL `CREATE TABLE … USING iceberg`; then normal `INSERT`/`SELECT`.
-  - Every write creates a new **snapshot** (the basis of time travel,
-    [iceberg-04](iceberg-04-time-travel.yaml)).
+  - Iceberg tables live under a **catalog** and are named in three parts:
+    `catalog.database.table`. Here the catalog is called `local`, so a table is
+    `local.db.trades`.
+  - You create and use them with plain SQL: `CREATE TABLE … USING iceberg`, then the
+    normal `INSERT` and `SELECT`.
 
-  An Iceberg catalog named `local` is already configured for you.
-  *(Runs in CI/Docker, which can fetch the Iceberg JAR.)*
+  (A `local` Iceberg catalog is already set up for you. This lesson runs in the cloud
+  build, which can fetch the Iceberg add-on.)
 
   **Mission:** Create an Iceberg table `local.db.trades (ticker STRING, qty
   BIGINT)`, insert two rows, then read it back into `out`.

@@ -10,6 +10,13 @@ brief: |
   - **Sets** hold only **unique** items — no duplicates allowed. They're perfect for
     removing repeats, or quickly checking "have I already seen this one?" with
     `x in s`. You write one with curly braces: `{1, 2, 3}`.
+
+    ```
+     input:  AAPL  GOOG  AAPL  MSFT  GOOG
+                      │ a set keeps each value only once
+                      ▼
+     set:    { AAPL, GOOG, MSFT }   ──►  3 unique
+    ```
   - **Tuples** are like lists but **can't be changed** once they're made (that
     "can't be changed" property is called *immutable*). You write them with round
     brackets: `(ticker, qty)`. Good for grouping a few values that belong together.

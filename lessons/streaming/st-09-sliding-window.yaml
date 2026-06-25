@@ -6,22 +6,21 @@ difficulty: 4
 concepts: ["sliding window", "overlapping windows", "window", "watermark"]
 needs_spark: true
 brief: |
-  **What & why.** A **tumbling** window ([st-03](st-03-windowed-watermark.yaml)) is
-  fixed and non-overlapping. A **sliding** window adds a **slide interval** smaller
-  than the window, so windows **overlap** — every event falls into multiple windows.
-  That's how you compute **moving metrics**: "5-minute rolling count updated every
-  minute", "1-hour trailing average refreshed every 10 minutes".
+  A plain time window ([st-03](st-03-windowed-watermark.yaml)) chops time into
+  back-to-back blocks (0–10, 10–20, …). A **sliding** window instead **overlaps** —
+  it starts a fresh window more often than the window's length, so each event can
+  fall into more than one. That's how you get "moving" metrics, like a 10-minute
+  rolling count that refreshes every 5 minutes.
 
-  **The one new argument:**
-  - `F.window("ts", "10 minutes", "5 minutes")` → **size** 10 min, **slide** 5 min.
-    An event at 12:07 lands in both the 12:00–12:10 and 12:05–12:15 windows.
-  - Omit the slide (`F.window("ts", "10 minutes")`) and it's a tumbling window
-    (size == slide).
-  - Still needs a **watermark** to bound and finalise state, exactly like tumbling.
+  ```
+   window 1: |————10 min————|
+   window 2:      |————10 min————|   (starts 5 min later, overlaps window 1)
+   window 3:           |————10 min————|
+  ```
 
-  **Gotcha.** Overlap multiplies work: a 60-min window sliding every 1 min puts each
-  event in **60** windows — more state and compute. Size the slide to the freshness
-  you actually need.
+  - The only new thing is a second time value: `F.window("ts", "10 minutes",
+    "5 minutes")` means "10-minute windows, a new one every 5 minutes".
+  - As with any time window, you still set a **watermark** so old windows can close.
 
   **Mission:** Stream `data/sample/stream_events`, watermark `ts` by `1 minute`, and
   count events per `ticker` in **10-minute** windows **sliding every 5 minutes**.

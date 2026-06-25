@@ -6,11 +6,12 @@ difficulty: 3
 concepts: ["broadcast variable", "shared variables", "RDD", "lookup"]
 needs_spark: true
 brief: |
-  When tasks need a large **read-only** lookup (a dimension map, a model), shipping
-  a copy with every task is wasteful. A **broadcast variable** caches the value
-  **once per executor**. Create it with `sc.broadcast(value)` and read it with
-  `.value` inside your transformation. (This is the RDD-level cousin of
-  `F.broadcast()` for DataFrame joins.)
+  When every task needs the same **read-only lookup** (say, a small table that maps a
+  code to a full name), sending a copy along with each task is wasteful. A
+  **broadcast variable** sends it **once to each machine** instead, and the tasks
+  there share it. You create it with `sc.broadcast(value)` and read it back with
+  `.value`. (It's the low-level cousin of the broadcast join in
+  [perf-03](../performance/perf-03-broadcast-join.yaml).)
 
   **Mission:** Broadcast the `lookup` dict, then map each country code in `codes`
   to its full name. Collect into a list named `result`.

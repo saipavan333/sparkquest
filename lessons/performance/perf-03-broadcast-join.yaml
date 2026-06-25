@@ -6,24 +6,24 @@ difficulty: 4
 concepts: ["broadcast", "join", "shuffle avoidance"]
 needs_spark: true
 brief: |
-  **What & why.** A normal (sort-merge) join **shuffles both** tables across the
-  network by the join key — expensive. When one side is **small** (a dimension, a
-  lookup), you don't need to: **broadcast** it to every executor, build a hash table
-  there, and probe the big side **locally**. No shuffle of the big table — often a
-  10×+ speed-up. This is the single most useful join optimization.
+  Joining two big tables is slow because Spark has to move (shuffle) both of them
+  across the network so matching keys end up together. But when **one side is small**
+  (a little lookup table), there's a shortcut: send a **copy of the small table to
+  every machine**, and each machine joins its slice of the big table locally. No
+  moving the big table at all — often a huge speed-up. This is the most useful join
+  trick to know.
 
-  **How Spark decides:**
-  - Automatically broadcasts a side estimated ≤
-    `spark.sql.autoBroadcastJoinThreshold` (**default 10 MB**).
-  - You can **force** it with `F.broadcast(small)` when you *know* it's small but
-    the optimizer's estimate is off (common after filters/joins).
-  - With AQE on, Spark can even convert a planned sort-merge join into a broadcast
-    join at runtime once it sees the real size.
+  ```
+                ┌─ machine 1 : its big-table slice  +  [copy of small table]
+   small table ─┼─ machine 2 : its big-table slice  +  [copy of small table]
+   (copied to   └─ machine 3 : its big-table slice  +  [copy of small table]
+    everyone)
+  ```
 
-  **Gotcha.** Broadcasting something **too big** collects it to the driver and ships
-  it everywhere → driver OOM or a slow broadcast. Only broadcast genuinely small
-  sides, and remember it needs an **equi-join**. (Deep dive:
-  [Handbook ch.9](../../docs/handbook/09-joins-shuffle-aqe.md).)
+  - Wrap the small side in `F.broadcast(...)`: `big.join(F.broadcast(sectors),
+    "ticker")`. (Spark also does this automatically when it can tell a side is small.)
+  - Only do it for a genuinely **small** table — broadcasting a big one sends huge
+    copies everywhere and can crash the driver.
 
   **Mission:** Join `big` with the small `sectors` lookup on `ticker`, broadcasting
   `sectors`. Store the result in `joined`.

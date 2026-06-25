@@ -6,21 +6,26 @@ difficulty: 3
 concepts: ["groupBy", "aggregation", "sum", "alias"]
 needs_spark: true
 brief: |
-  **What & why.** Aggregation collapses many rows into summaries — the heartbeat of
-  analytics. `groupBy(col).agg(...)` is Spark's distributed `GROUP BY`, and it's a
-  **wide transformation**: rows for each key must meet on one machine, so it
-  triggers a **shuffle** ([Handbook ch.1 §3](../../docs/handbook/01-spark-architecture-and-execution.md)).
+  **Aggregating** means squashing many rows into a summary — totals, averages, counts.
+  `groupBy("ticker").agg(...)` gathers all the rows that share a value, then combines
+  each group into a single summary row.
 
-  **The essentials:**
-  - `.agg(F.sum("qty").alias("total"))` — always **alias** aggregates or you get
-    ugly auto-names like `sum(qty)`. Combine several: `.agg(F.sum(...), F.avg(...),
-    F.countDistinct(...))`.
-  - **Map-side combine:** `sum`/`count`/`avg`/`max` pre-aggregate on each partition
-    *before* the shuffle, so only partial results cross the network — cheap. By
-    contrast `collect_list` ships every value and can blow up memory.
+  ```
+   ┌────────┬─────┐                       ┌────────┬───────┐
+   │ ticker │ qty │   group by ticker,    │ ticker │ total │
+   │ AAPL   │ 100 │   then add up qty      │ AAPL   │  170  │
+   │ AAPL   │  70 │   ──────────────────►  │ GOOG   │   70  │
+   │ GOOG   │  70 │                        │ MSFT   │   30  │
+   │ MSFT   │  30 │                        └────────┴───────┘
+   └────────┴─────┘
+  ```
 
-  **Interview angle.** Skew bites here: one hot key → one giant reduce task. Fixes
-  are AQE skew handling, salting, or pre-aggregation ([Handbook ch.9 §6](../../docs/handbook/09-joins-shuffle-aqe.md)).
+  - Always give the result a clean name with `.alias(...)`:
+    `.agg(F.sum("qty").alias("total"))` — otherwise you get an ugly name like
+    `sum(qty)`.
+  - To gather each group's rows together, Spark has to move data between machines.
+    That move is called a **shuffle** — it's the main thing that makes big jobs slow,
+    so grouping isn't free.
 
   **Mission:** From `trades`, compute the **total quantity per ticker**. Name the
   aggregated column `total` and store the result in `totals`.

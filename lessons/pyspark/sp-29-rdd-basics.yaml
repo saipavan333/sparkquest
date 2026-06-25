@@ -6,12 +6,15 @@ difficulty: 2
 concepts: ["RDD", "sparkContext", "map", "filter", "collect"]
 needs_spark: true
 brief: |
-  Beneath every DataFrame sits an **RDD** — a partitioned, immutable collection
-  you operate on in parallel. You rarely need it, but interviewers do. Reach the
-  low-level API through `spark.sparkContext` (conventionally `sc`).
+  Beneath every DataFrame sits an older, lower-level thing called an **RDD** — just a
+  big collection of items spread across machines that you can work on in parallel.
+  You'll rarely use it directly (DataFrames are easier and faster), but it's worth
+  meeting once, and interviewers like to ask about it. You reach it through
+  `spark.sparkContext`, usually shortened to `sc`.
 
-  RDD transformations (`map`, `filter`) are **lazy**; an **action** like
-  `collect()` runs the pipeline and pulls results to the driver.
+  Just like DataFrames, RDD steps such as `map` (change each item) and `filter` (keep
+  some items) are **lazy** — nothing actually runs until an **action** like
+  `collect()` gathers the results back to you.
 
   **Mission:** From the integers 1..6, square each number, keep only the squares
   **greater than 10**, and `collect()` them — sorted ascending — into `result`.

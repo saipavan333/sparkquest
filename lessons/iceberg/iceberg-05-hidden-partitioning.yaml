@@ -7,19 +7,19 @@ concepts: ["iceberg", "hidden partitioning", "partition transform", "bucket"]
 needs_spark: true
 needs_iceberg: true
 brief: |
-  **What & why.** Iceberg's headline feature. In Hive/Delta you partition by a
-  *column you must also filter on* — and analysts forget, scanning everything.
-  Iceberg partitions by a **transform of a column** (`bucket`, `days`, `truncate`,
-  `years`…) recorded in metadata, so queries filter on the **raw** column and
-  Iceberg **derives the partition automatically** — pruning files without the user
-  writing any partition-specific `WHERE`.
+  Iceberg's standout feature. Normally, to make a query fast you have to split the
+  table by a column **and remember to filter on that exact column** — and people
+  forget, so the speed-up is lost. Iceberg lets you split by a **rule applied to a
+  column** (like "bucket by ticker" or "by day of the timestamp"), and it quietly
+  remembers the rule. You then just filter on the **normal** column and Iceberg works
+  out which parts to read for you — hence "hidden".
 
-  **The essentials:**
-  - Declare with a transform: `PARTITIONED BY (bucket(4, ticker))` or `(days(ts))`.
-  - Query naturally: `WHERE ticker = 'AAPL'` — Iceberg maps it to the right bucket
-    and skips the rest. No `WHERE bucket = ...` gymnastics.
-  - Bonus: **partition evolution** — change the transform later without rewriting old
-    data ([Handbook ch.14 §3–4](../../docs/handbook/14-apache-iceberg.md)).
+  - You set it up once: `PARTITIONED BY (bucket(4, ticker))`.
+  - You query naturally: `WHERE ticker = 'AAPL'` — no special partition column to
+    remember, and Iceberg still skips the parts it doesn't need.
+
+  (Bonus: you can even change the splitting rule later without rewriting the old data
+  — something Delta and old-style tables can't do.)
 
   **Mission:** Create `local.db.ev (ticker STRING, amount BIGINT)` **partitioned by
   `bucket(4, ticker)`**, insert three rows, then select just the AAPL rows into

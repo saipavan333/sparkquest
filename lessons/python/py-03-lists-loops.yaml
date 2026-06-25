@@ -10,6 +10,15 @@ brief: |
   where the items have an order and can repeat. You write one with square brackets:
   `[0.02, -0.01, 0.03]`.
 
+  Picture a list as labelled boxes in a row, each at a numbered position:
+
+  ```
+  position:   0      1       2
+            ┌──────┬───────┬──────┐
+            │ 0.02 │ -0.01 │ 0.03 │
+            └──────┴───────┴──────┘
+  ```
+
   A **loop** lets you do something with each item, one at a time. The most common
   pattern is adding things up as you go:
   - Start a running total at `0`.

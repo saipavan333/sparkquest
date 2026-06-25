@@ -7,9 +7,17 @@ concepts: ["iceberg", "MERGE", "upsert", "CDC"]
 needs_spark: true
 needs_iceberg: true
 brief: |
-  `MERGE INTO` is the upsert workhorse — the heart of change-data-capture: update
-  rows that exist, insert the ones that don't, in a single atomic statement. It's
-  identical in spirit to Delta's `MERGE` and is the most-asked lakehouse operation.
+  `MERGE INTO` is the **upsert** in SQL form — in one statement it **up**dates the
+  rows that already exist and in**serts** the ones that are new. It's the same idea as
+  Delta's merge ([delta-02](../delta/delta-02-merge.yaml)), and it's the most common
+  way to keep a table in sync with incoming changes.
+
+  ```
+   accounts: id1=100  id2=50      updates: id1=999  id3=30
+                       │ MERGE on id
+                       ▼
+   result:   id1=999 (updated)  id2=50 (kept)  id3=30 (inserted)
+  ```
 
   **Mission:** Create `local.db.accounts` with `(1, 100)` and `(2, 50)`. Then
   `MERGE` the `updates` source (id `1` → `999`, new id `3` → `30`): update matches,

@@ -6,11 +6,13 @@ difficulty: 3
 concepts: ["data quality", "validation", "quarantine", "filter"]
 needs_spark: true
 brief: |
-  The senior move on dirty data isn't `dropna()` — it's **validate and quarantine**:
-  keep the clean rows flowing, route the bad ones somewhere visible (with a reason),
-  and never silently lose data. Here you build the **valid** half.
+  The grown-up way to handle messy data isn't to quietly throw bad rows away with
+  `dropna()`. It's to **validate and quarantine**: keep the good rows moving, and set
+  the bad ones aside somewhere you can see them (with a reason) — so nothing is lost
+  silently. Here you build the **good** half.
 
-  A row is **valid** when `amount >= 0` **and** `customer_id` is not null.
+  A row counts as **valid** when `amount >= 0` **and** `customer_id` is present (not
+  null).
 
   **Mission:** From `df`, select only the valid rows into `valid`.
 starter_code: |

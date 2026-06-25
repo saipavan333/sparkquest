@@ -6,21 +6,23 @@ difficulty: 4
 concepts: ["struct", "nested data", "dot access"]
 needs_spark: true
 brief: |
-  **What & why.** Semi-structured data (JSON, Avro, Kafka payloads) nests fields
-  inside a **struct** — a column whose value is itself a row of named subfields.
-  This is exactly what `from_json` produces, so flattening structs is the routine
-  next step in any ingestion pipeline.
+  A **struct** is a column whose value is itself a little group of named fields — a
+  mini-row tucked inside a single cell. You meet these a lot with JSON, where one
+  field holds an object like `{"price": 190, "qty": 100}`.
 
-  **The essentials:**
-  - Reach in with **dot notation**: `F.col("trade.price")`; alias to lift it to a
-    clean top-level name.
-  - `df.select("trade.*")` flattens *all* subfields at once.
-  - Build one with `F.struct("a", "b")`; structs nest arbitrarily (struct of arrays
-    of structs).
+  ```
+   ┌────────┬──────────────────────┐          ┌────────┬───────┬─────┐
+   │ ticker │ trade                │ flatten  │ ticker │ price │ qty │
+   │ AAPL   │ {price:190, qty:100} │  ──────► │ AAPL   │  190  │ 100 │
+   └────────┴──────────────────────┘          └────────┴───────┴─────┘
+  ```
 
-  **Interview angle.** Struct access is **free** — it's metadata, not a shuffle or
-  scan of new data — whereas `explode`-ing an array multiplies rows. Know the
-  difference: structs widen, arrays lengthen.
+  - Reach inside a struct with a **dot**: `F.col("trade.price")` grabs the inner
+    `price`. Add `.alias("price")` to give it a clean top-level name.
+  - `df.select("trade.*")` pulls out *all* the inner fields at once.
+
+  (Pulling fields out of a struct is cheap — it's just renaming, no data is moved.
+  That's different from `explode` ([sp-14](sp-14-explode.yaml)), which makes new rows.)
 
   The types module is available as `T`.
 

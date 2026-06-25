@@ -6,17 +6,16 @@ difficulty: 4
 concepts: ["Window", "dense_rank", "ranking", "ties"]
 needs_spark: true
 brief: |
-  **What & why.** Three ranking functions number rows within an ordered window, and
-  they differ **only on ties** — choosing the right one is a classic SQL interview
-  point:
-  - **`row_number`** — always **unique** (1,2,3,4) even for ties; arbitrary
-    tie-break. Use for "exactly one per group" (top-N).
-  - **`rank`** — ties **share** a rank, then it **skips** (1,1,3) — like sports
-    standings.
-  - **`dense_rank`** — ties share a rank, **no gap** (1,1,2) — for "distinct levels".
+  When you number rows within a group, three functions do it — and the only
+  difference is how they treat **ties** (rows that are equal):
+  - **`row_number`** — always a unique number (1, 2, 3, 4), even for ties. Use it
+    when you want exactly one row per group.
+  - **`rank`** — ties get the **same** number, then it **skips** ahead (1, 1, 3) —
+    like finishing places in a race.
+  - **`dense_rank`** — ties get the same number, with **no gap** after (1, 1, 2).
 
-  **Mental check:** two people tie for 1st. Next is 3rd (`rank`) or 2nd
-  (`dense_rank`)? Answering that instantly signals you know windows.
+  Quick check: two rows tie for 1st place. Is the next one 3rd (`rank`) or 2nd
+  (`dense_rank`)? Knowing that shows you've got the idea.
 
   You'll need `from pyspark.sql.window import Window`. `F` is imported.
 

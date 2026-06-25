@@ -6,21 +6,19 @@ difficulty: 2
 concepts: ["round", "abs", "ceil", "floor", "math functions"]
 needs_spark: true
 brief: |
-  **What & why.** Numeric clean-up — rounding money to cents, taking magnitudes,
-  bucketing to whole units — is everyday work, and Spark ships **built-in** math
-  functions in `F` so it stays in the JVM (fast, vectorised) instead of a Python UDF.
+  Sometimes you need to tidy up numbers — round prices, drop a minus sign, or round
+  to a whole number. Spark's `F` toolbox has all of these, ready to use on a whole
+  column at once.
 
-  **The toolkit:**
-  - **Rounding:** `F.round(col, n)` (half-up to `n` decimals), `F.bround` (banker's
-    rounding), `F.ceil` / `F.floor` (up/down to a whole number — returned as a
-    **bigint**).
-  - **Magnitude / sign:** `F.abs`, `F.signum`.
-  - **Power / roots / logs:** `F.pow`, `F.sqrt`, `F.exp`, `F.log`.
-  - **Modulo:** the `%` operator on columns (`F.col("x") % 3`).
+  - **Round:** `F.round(col, 2)` keeps 2 decimal places.
+  - **Round to a whole number:** `F.ceil(col)` always rounds **up**, `F.floor(col)`
+    always rounds **down**.
+  - **Drop the sign:** `F.abs(col)` turns `-2.3` into `2.3` (the "size" of a number,
+    ignoring whether it's positive or negative).
 
-  **Gotcha (interview-relevant).** `float`/`double` carry tiny binary rounding
-  error, so two "equal" decimals can differ in the 15th place. For **money**, store
-  `DecimalType` and round explicitly — never trust raw float equality.
+  (Heads-up: computers store decimals with a microscopic rounding error, so two
+  numbers that look identical can differ far past the decimal point. For money,
+  round on purpose rather than trusting decimals to match exactly.)
 
   **Mission:** From `df`, build `out` with `ticker`, `achg` = the **absolute**
   `change`, `cp` = `ceil(price)`, and `fp` = `floor(price)`.

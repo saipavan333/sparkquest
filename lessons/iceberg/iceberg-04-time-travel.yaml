@@ -7,15 +7,16 @@ concepts: ["iceberg", "time travel", "snapshots", "VERSION AS OF"]
 needs_spark: true
 needs_iceberg: true
 brief: |
-  **What & why.** Every write to an Iceberg table creates a new **snapshot** — a
-  complete, immutable view of the table at that commit. Old snapshots stick around,
-  which gives you **time travel** (read the table *as it was*) and **rollback** for
-  free. It's how you audit "what did this table look like before the bad job ran?"
-  and how you reproduce a report from last Tuesday.
+  Every time you write to an Iceberg table, it saves a **snapshot** — a complete
+  picture of the table at that moment. The old snapshots stick around, so you can read
+  the table **as it looked earlier** (called **time travel**) or roll back a bad
+  change. It's how you answer "what did this table look like before this morning's
+  job?" or rerun last week's report on last week's data.
 
-  **How you read an old version:** by **snapshot id** (`VERSION AS OF <id>` or the
-  `snapshot-id` read option) or by wall-clock time (`TIMESTAMP AS OF '...'`). The
-  available snapshots live in the `<table>.snapshots` metadata table.
+  - Each snapshot has an id. You can read an old one with the `snapshot-id` option (or
+    in SQL, `VERSION AS OF <id>`), or travel by time with `TIMESTAMP AS OF '...'`.
+  - The list of snapshots lives in a companion table, `<your_table>.snapshots`, which
+    is how the exercise looks up the first one's id.
 
   **Mission:** Create `local.db.px` and insert `('AAPL', 100)` — that's snapshot 1.
   Capture its `snapshot_id`. Insert `('AAPL', 200)` — now the table has both rows.

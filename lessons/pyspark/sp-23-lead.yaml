@@ -6,21 +6,15 @@ difficulty: 4
 concepts: ["Window", "lead", "time series"]
 needs_spark: true
 brief: |
-  **What & why.** `lead` is `lag`'s mirror — it looks at the **next** row in an
-  ordered window. Use it for forward-looking features: "what was the price the day
-  after?", time-to-next-event, and detecting gaps between consecutive rows (the
-  basis of sessionization — [sp-27](sp-27-sessionization.yaml)).
+  `lead` is the mirror image of `lag` ([sp-17](sp-17-window-lag.yaml)): instead of
+  the row *before*, it looks at the row **after** the current one. Use it for
+  forward-looking questions like "what was the price the next day?" or "how long
+  until this customer's next order?".
 
-  **The essentials:**
-  - `F.lead("price").over(w)`; `F.lead("price", n, default)` looks `n` rows ahead
-    with a boundary default.
-  - The **last** row of each partition has no successor → `null`.
-  - `lead`/`lag` together let you compare a row to both neighbours — common in
-    time-series feature engineering.
-
-  **Interview tie-in.** "Difference between consecutive events per user" = `lead`/
-  `lag` over `partitionBy(user).orderBy(ts)` — no self-join needed, which is the
-  whole point of window functions.
+  - `F.lead("price").over(w)` gives the next row's price within the ordered window.
+  - The **last** row of each group has nothing after it, so its `lead` is `null`.
+  - Together, `lag` (look back) and `lead` (look ahead) let a row compare itself to
+    both of its neighbours — without any complicated self-join.
 
   **Mission:** For each ticker ordered by date `d`, add `next_price` = the
   following day's `price` (null on the last day). Select `ticker`, `d`,

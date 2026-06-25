@@ -10,6 +10,13 @@ brief: |
   give them a name, and then "call" that name whenever you want those steps to run —
   like a recipe you can follow again and again instead of re-writing it each time.
 
+  ```
+    inputs              function            result
+    (100, 110, 10) ──► ┌──────────┐ ──►  (110-100)*10 = 100
+                       │  pnl()   │
+                       └──────────┘
+  ```
+
   - You create one with the word `def`, then list its **inputs** (called
     *parameters*) in brackets, and use **`return`** to hand a result back:
     `def add(a, b): return a + b`.

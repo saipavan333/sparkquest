@@ -6,22 +6,18 @@ difficulty: 4
 concepts: ["stateful aggregation", "groupBy", "complete output mode"]
 needs_spark: true
 brief: |
-  **What & why.** Streaming shines when it maintains a *running* aggregate as data
-  arrives. Spark keeps the aggregation **state** for you between micro-batches
-  (in a **state store** — HDFS- or RocksDB-backed), so each batch updates the
-  totals rather than recomputing from scratch.
+  Streaming really shines when it keeps a **running total** that updates as new data
+  arrives. Spark quietly remembers the totals so far (its "state") and just adds the
+  new data each time, instead of recounting everything from scratch.
 
-  **The essentials — output modes (a top interview question):**
-  - **`complete`** — re-emit the *entire* result table each trigger. **Required for
-    aggregations without a watermark** (this lesson). State grows unbounded, so it's
-    only safe for small key spaces.
-  - **`append`** — emit only new rows; for aggregations it needs a **watermark** so
-    Spark knows when a group is final ([st-03](st-03-windowed-watermark.yaml)).
-  - **`update`** — emit only changed rows.
-
-  **Gotcha.** Unbounded stateful aggregation in `complete` mode keeps state for
-  *every* key forever — in production you bound it with event-time windows +
-  watermarks so old state can be evicted.
+  When a streaming query does a `groupBy(...).count()`, you have to tell Spark how to
+  send the results out — the **output mode**:
+  - **`complete`** — re-send the whole results table every time. This is what
+    aggregations need when there's no watermark (this lesson). It's fine when there
+    are only a handful of groups.
+  - **`append`** — only send brand-new rows (used with watermarks — see
+    [st-03](st-03-windowed-watermark.yaml)).
+  - **`update`** — only send the rows that changed.
 
   **Mission:** Stream the same `data/sample/stream_events` folder and compute a
   live **count of events per ticker**. Because it's an aggregation, use

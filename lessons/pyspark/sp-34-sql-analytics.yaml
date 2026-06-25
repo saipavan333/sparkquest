@@ -6,9 +6,13 @@ difficulty: 4
 concepts: ["spark.sql", "window function", "ROW_NUMBER", "subquery"]
 needs_spark: true
 brief: |
-  Window functions in **SQL** are the #1 analytics interview topic. The classic
-  pattern — **top-N per group** — is `ROW_NUMBER() OVER (PARTITION BY ... ORDER BY
-  ...)` filtered in an outer query (you can't filter on a window alias directly).
+  This is a window function ([sp-07](sp-07-window.yaml)) written in **SQL**. The most
+  common version is **top-N per group** — for example, the single biggest trade for
+  each ticker: you number the rows inside each group with `ROW_NUMBER()`, then keep
+  the ones numbered `1`.
+
+  One quirk: you can't filter on that row-number in the same `SELECT`, so you wrap the
+  query inside an outer `SELECT` and filter there (the solution shows the shape).
 
   **Mission:** Register `trades` as a temp view, then with `spark.sql` find the
   **largest trade per ticker** (one row each) into `out` with columns

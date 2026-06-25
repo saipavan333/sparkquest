@@ -6,20 +6,19 @@ difficulty: 5
 concepts: ["stream-stream join", "watermark", "state", "event time"]
 needs_spark: true
 brief: |
-  **What & why.** Joining two *live* streams — e.g. ad **impressions** with later
-  **clicks** — is the hardest streaming join and a frequent senior interview topic.
-  Unlike a stream-static join ([st-06](st-06-stream-static-join.yaml)), each side
-  must **buffer** rows in state to wait for a match on the other side. Left
-  unbounded, that state grows forever — so **both** streams need a **watermark**
-  plus a **time-range condition**, which together tell Spark when it's safe to stop
-  waiting (and evict old state).
+  Joining **two live streams** — say, ad views with the clicks that follow — is the
+  trickiest streaming join. The problem: a match's two halves may arrive at different
+  times, so each side has to **wait and remember** recent rows until the matching row
+  shows up on the other side.
 
-  **The essentials:**
-  - `withWatermark("ts", ...)` on **both** streams (required for append output).
-  - The join condition includes the equi-key **and** a time bound, e.g.
-    `right.ts BETWEEN left.ts AND left.ts + interval 10 minutes` — this bounds state.
-  - Inner stream-stream joins emit a match once both rows have arrived and the
-    watermark guarantees no earlier match remains.
+  Because a stream never ends, you can't wait (or remember) forever. So you give Spark
+  two limits:
+  - A **watermark** on **both** streams — "stop waiting for things older than this".
+  - A **time window** in the join condition — e.g. "match a click within 10 minutes
+    of the view".
+
+  Together these let Spark match recent rows and then safely forget the old ones, so
+  its memory stays bounded.
 
   **Mission:** Read `data/sample/stream_events` as **two** watermarked streams
   (`left`, `right`), inner-join them on `ticker` within a 10-minute event-time

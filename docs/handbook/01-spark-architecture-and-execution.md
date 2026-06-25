@@ -4,7 +4,12 @@
 > to tasks running on executors — and name what Catalyst and Tungsten did along
 > the way — you've cleared the bar most candidates fail.*
 
-## 1. The cluster: driver and executors
+> **In plain words.** Spark runs your job on a group of computers working together.
+> One computer (the **driver**) is the boss: it reads your code and makes a plan. The
+> others (the **executors**) are the workers that actually crunch the data, each on
+> its own slice. This chapter follows what happens, step by step, from the moment you
+> ask for an answer to the workers handing it back. Don't worry about the jargon —
+> each new word (Catalyst, Tungsten, shuffle, partition…) is explained as it comes up.
 
 A Spark application is one **driver** process coordinating many **executor**
 processes.

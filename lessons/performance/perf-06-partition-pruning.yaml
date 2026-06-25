@@ -6,10 +6,16 @@ difficulty: 3
 concepts: ["partitionBy", "partition pruning", "parquet", "predicate pushdown"]
 needs_spark: true
 brief: |
-  Writing data **partitioned by a column** lays it out in one directory per value
-  (`region=US/`, `region=EU/`…). When you later **filter on that column**, Spark
-  reads only the matching directories — **partition pruning** — often a 10–100×
-  I/O win. It's the physical-layout half of predicate pushdown.
+  When you save data **split by a column**, Spark writes a separate folder for each
+  value — `region=US/`, `region=EU/`, and so on. Later, when you filter on that
+  column, Spark reads **only the matching folder** and ignores the rest. This is
+  called **partition pruning**, and it can mean reading a tiny fraction of the data.
+
+  ```
+   saved as:   region=US/    region=EU/    region=APAC/
+                   │
+   filter region == "US"  ─►  reads only this folder, skips the others
+  ```
 
   **Mission:** Write `df` to Parquet **partitioned by `region`**, then read it back
   and keep only `region == "US"` into `out`.

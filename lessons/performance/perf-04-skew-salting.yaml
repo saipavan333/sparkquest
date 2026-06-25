@@ -6,24 +6,22 @@ difficulty: 5
 concepts: ["data skew", "salting", "key distribution"]
 needs_spark: true
 brief: |
-  **What & why.** **Skew** is the #1 cause of a Spark job that's 95% done and then
-  hangs forever. When one key (a "celebrity" user, a `NULL` foreign key, one mega
-  merchant) holds most of the rows, the shuffle sends them all to **one** task —
-  that straggler runs for an hour while every other core sits idle. You'll see it
-  in the Spark UI as one task with `max` duration / shuffle-read 100× the median.
+  **Skew** is the classic reason a Spark job gets to 95% and then seems to hang. When
+  one key holds most of the rows (one giant customer, lots of missing/`NULL` keys),
+  all those rows land on a **single** machine — so one worker grinds away for ages
+  while the rest sit idle, having already finished.
 
-  **Salting** breaks the hot key into `N` synthetic sub-keys (`key_0 … key_{N-1}`)
-  so its rows spread across `N` partitions and `N` tasks. When you join, you
-  replicate the *other* side across all `N` salts so matches still happen; then you
-  aggregate away the salt.
+  ```
+   even work:  [██] [██] [██] [██]      ← all machines finish together
+   skewed:     [██████████████] [▪] [▪] ← one machine has it all (the slow one)
+  ```
 
-  **The fuller toolkit (name all three in interviews):**
-  - **Let AQE handle it** — `spark.sql.adaptive.skewJoin.enabled` splits skewed
-    partitions automatically (often enough; free).
-  - **Salting** — this lesson's technique, for when you need manual control.
-  - **Broadcast** the other side — if it's small, skew on the join key stops
-    mattering. Also handle `NULL` keys separately. (Deep dive:
-  [Handbook ch.9 §6](../../docs/handbook/09-joins-shuffle-aqe.md).)
+  **Salting** fixes it by splitting the hot key into several fake sub-keys (like
+  `HOT_0`, `HOT_1`, `HOT_2`), so its rows spread across several machines instead of
+  piling onto one. You do the work per sub-key, then combine the pieces.
+
+  (Spark can also smooth out skew automatically — that setting is on by default — but
+  it's important to recognise skew and know salting as the manual fix.)
 
   **Mission:** Every row has the same hot `key` ("HOT"). Add a `salted_key` that
   appends `_` plus `id % 3`, turning one key into **3** buckets. Then store the

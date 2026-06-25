@@ -25,6 +25,17 @@ brief: |
   - The **indented** lines under each branch are what runs. In Python, indentation
     (the spaces at the start of a line) is how you show which lines belong together.
 
+  The same decision drawn as a flow — Python takes the first path that fits:
+
+  ```
+   amount >= 1000 ? ──yes──► "large"
+        | no
+   amount >= 100 ?  ──yes──► "medium"
+        | no
+        v
+      "small"
+  ```
+
   (Later you'll meet Spark's `when().otherwise()` — it's the same idea, for tables.)
 
   **Mission:** Write `band(amount)` returning `"large"` if `amount >= 1000`,

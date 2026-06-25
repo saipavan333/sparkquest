@@ -6,23 +6,18 @@ difficulty: 3
 concepts: ["accumulator", "shared variables", "RDD", "metrics"]
 needs_spark: true
 brief: |
-  **What & why.** An **accumulator** is a write-only-from-executors, read-from-driver
-  shared variable — a distributed **counter/sum**. It's how you gather **side
-  metrics** (bad-row counts, bytes processed) across the cluster without a second
-  pass over the data. It's the RDD cousin of the broadcast variable
-  ([sp-31](sp-31-rdd-broadcast.yaml)): broadcast ships data *out*, accumulators
-  collect numbers *back*.
+  An **accumulator** is a shared counter that all the machines can **add to**, and
+  that you read back at the end on the driver (your main program). It's the easy way
+  to gather a side number across the whole cluster — like "how many bad rows did we
+  see?" — without a second pass over the data.
 
-  **The essentials:**
-  - Create on the driver: `acc = sc.accumulator(0)`; executors **add** with
-    `acc += 1`; only the **driver** reads `acc.value`.
-  - Add-only and commutative/associative — you can't read it inside a task.
+  - Create it on the driver: `bad = sc.accumulator(0)`.
+  - Each machine adds to it inside the work: `bad.add(1)`.
+  - Read the final total back on the driver with `bad.value`.
 
-  **The caveat interviewers reward.** Accumulators are guaranteed **exactly-once
-  only inside actions** (like `foreach`). Inside *transformations* (`map`), a task
-  retry or recomputation can apply the update **more than once** — so use
-  accumulators for **debugging/metrics**, never for values your logic depends on.
-  (For real aggregates, use DataFrame aggregations.)
+  Use accumulators for **metrics and debugging only**, not for numbers your result
+  depends on — if Spark retries a piece of work, an accumulator can occasionally be
+  added to more than once. For real totals, use a normal aggregation.
 
   **Mission:** Using an **accumulator** and `rdd.foreach`, count how many amounts in
   `amounts` are **negative**, storing the total in `n_bad`.

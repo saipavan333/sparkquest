@@ -6,22 +6,19 @@ difficulty: 4
 concepts: ["to_date", "datediff", "year"]
 needs_spark: true
 brief: |
-  **What & why.** Time drives pipelines — you partition by date, window by hour,
-  and compute holding periods. Parse strings to real date/timestamp types first
-  (`to_date`/`to_timestamp`), then compute on them; comparing raw strings is a
-  classic bug.
+  Lots of data jobs care about dates — grouping by day, or working out how long
+  something was held. The key habit: if a date arrives as **text** (like
+  `"2026-01-15"`), turn it into a real date first, then do the maths. Comparing dates
+  while they're still plain text leads to bugs.
 
-  **The toolkit:**
-  - Parse: `to_date(col[, fmt])`, `to_timestamp(...)`. Default format is
-    `yyyy-MM-dd` (the same codes as Python's `strptime` — [py-15](../python/py-15-datetime.yaml)).
-  - Extract: `year`, `month`, `dayofmonth`, `hour`, `date_format(col, "yyyy-MM")`.
-  - Arithmetic: `datediff(end, start)` (whole days), `date_add`/`date_sub`,
-    `months_between`, `current_date`.
+  - **Turn text into a date:** `F.to_date(col)` (or `F.to_timestamp` for a date *and*
+    time). It expects the usual year-month-day order.
+  - **Pull pieces out:** `F.year(col)`, `F.month(col)`, `F.dayofmonth(col)`.
+  - **Do date maths:** `F.datediff(end, start)` gives the number of days between two
+    dates.
 
-  **Gotcha (interview-relevant): timezones.** `to_timestamp` interprets in the
-  session timezone; mismatches cause off-by-hours errors. Standardize on **UTC** —
-  the batch cousin of streaming's event-time handling
-  ([Handbook ch.3](../../docs/handbook/03-streaming-internals.md)).
+  (It's the same idea as the Python dates lesson,
+  [py-15](../python/py-15-datetime.yaml) — just applied to a whole column at once.)
 
   **Mission:** From `df` (string `buy`/`sell` dates), build `dated` with columns
   `ticker`, `held` (days between sell and buy via `datediff`), and `yr` (the year

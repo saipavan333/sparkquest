@@ -9,6 +9,13 @@
 > official [Iceberg docs](https://iceberg.apache.org/docs/latest/) and
 > [Spark guide](https://iceberg.apache.org/docs/latest/spark-getting-started/).
 
+> **In plain words.** **Apache Iceberg** is another way to turn files on storage into
+> a safe, database-like table — the same goal as Delta (chapter 5), just a different
+> popular option. Its big advantages: many different tools can read the same tables,
+> and it can speed up queries automatically without you remembering special tricks
+> ("hidden partitioning"). This chapter explains how it works and when you'd choose
+> it over Delta.
+
 ## 1. The problem Iceberg solves
 
 Classic **Hive tables** track data as "all files under these directories." That

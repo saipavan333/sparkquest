@@ -6,24 +6,21 @@ difficulty: 3
 concepts: ["partitions", "repartition", "coalesce", "shuffle"]
 needs_spark: true
 brief: |
-  **What & why.** A **partition** is Spark's unit of parallelism — one task runs
-  per partition on one core. Get the count wrong and everything suffers: too **few**
-  and most of your cluster sits idle (each task may also spill/OOM on too much
-  data); too **many** and scheduler overhead dominates while tasks do trivial work.
-  Aim for partitions of roughly **128–200 MB**, and a count that's a small multiple
-  of total cores.
+  Spark splits your data into chunks called **partitions**, and works on them in
+  parallel — one chunk per worker at a time. The number of chunks matters: too
+  **few** and most of your machines sit idle; too **many** and Spark wastes time
+  managing tiny scraps of work. A good size is roughly 100–200 MB per chunk.
 
-  **The two levers (know the difference cold — it's a classic interview question):**
-  - `repartition(n)` — a **full shuffle** into exactly `n` *balanced* partitions.
-    Can grow or shrink the count; use it to fix skew or increase parallelism.
-  - `coalesce(n)` — **merges** existing partitions with **no shuffle**. Only
-    *shrinks*, and can leave partitions uneven — but it's far cheaper, so prefer it
-    to reduce partitions (e.g. before writing fewer output files).
+  Two tools change the chunk count (knowing the difference is a classic interview
+  question):
+  - `repartition(n)` — reshuffles the data into exactly `n` evenly-sized chunks. It
+    can make **more or fewer**, but it moves data around (a shuffle), so it's not
+    cheap.
+  - `coalesce(n)` — just **merges** neighbouring chunks together without moving data.
+    It can only make **fewer**, but it's much cheaper.
 
-  **Gotcha.** Because `coalesce` avoids the shuffle by combining neighbours,
-  coalescing to very few partitions can also throttle the *upstream* stage's
-  parallelism. Rule of thumb: shrinking → `coalesce`; rebalancing or growing →
-  `repartition`. (Deep dive: [Handbook ch.1 §3](../../docs/handbook/01-spark-architecture-and-execution.md).)
+  Rule of thumb: to **shrink** the count, use `coalesce`; to **grow** it or even it
+  out, use `repartition`.
 
   **Mission:** Take `df`, `repartition` it into **4** partitions, then `coalesce`
   to **2**. Store the final partition count in `n` (use `.rdd.getNumPartitions()`).

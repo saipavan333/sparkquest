@@ -6,21 +6,20 @@ difficulty: 4
 concepts: ["foreachBatch", "custom sink", "micro-batch"]
 needs_spark: true
 brief: |
-  **What & why.** `foreachBatch(fn)` hands you each micro-batch as an ordinary
-  **batch DataFrame** (plus a `batch_id`), so inside it you can do *anything* the
-  batch API allows — **upsert to Delta/JDBC**, write to **multiple sinks**, or call
-  an external service. It's the escape hatch that makes Structured Streaming
-  production-ready, because the built-in sinks can't express upserts.
+  Spark processes a stream in small chunks called **micro-batches**. `foreachBatch`
+  hands you **each chunk as an ordinary (batch) DataFrame**, so inside it you can do
+  anything you'd do with a normal DataFrame — write it to a database, save it to
+  several places at once, or call an outside service. It's the escape hatch that lets
+  streaming do things the built-in outputs can't.
 
-  **The essentials:**
-  - Signature: `def fn(batch_df, batch_id): ...` — `batch_df` is a normal DataFrame.
-  - The headline pattern is **`foreachBatch` + Delta `MERGE`** for idempotent CDC
-    upserts ([Handbook ch.13 §6](../../docs/handbook/13-kafka-and-streaming-io.md)).
-  - It's **at-least-once** at the batch level (a batch can re-run on recovery) — use
-    the `batch_id` or an idempotent write (MERGE) to stay exactly-once.
+  - You write a small function `def handle(batch_df, batch_id): ...`, where `batch_df`
+    is just a regular DataFrame for that chunk, and attach it with
+    `.writeStream.foreachBatch(handle)`.
+  - The most famous use is `foreachBatch` + a Delta `MERGE` to upsert changes into a
+    table ([Handbook ch.13](../../docs/handbook/13-kafka-and-streaming-io.md)).
 
-  **Testing tip.** Because the body is a plain DataFrame transform, you can unit-test
-  it directly — no streaming harness needed.
+  Handy bonus: because the inside is a plain DataFrame, you can test that function on
+  its own, with no streaming needed.
 
   **Mission:** Stream `data/sample/stream_events` and use `foreachBatch` to record
   each batch's row count into the `processed` list. After the query finishes, store

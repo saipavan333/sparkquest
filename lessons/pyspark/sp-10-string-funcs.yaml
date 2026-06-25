@@ -6,20 +6,20 @@ difficulty: 3
 concepts: ["upper", "concat_ws", "string functions"]
 needs_spark: true
 brief: |
-  **What & why.** Cleaning and reshaping text is half of data engineering — raw
-  feeds arrive with inconsistent case, stray whitespace, and packed fields. Spark
-  ships dozens of **built-in** string functions in `F`, and using them (instead of
-  a Python UDF) keeps the work in the JVM where Catalyst can optimize it.
+  Cleaning up text is a big part of data work — real data arrives with messy
+  capitalisation, extra spaces, and several values squashed into one field. Spark's
+  `F` toolbox has ready-made functions for all of it, so you rarely have to write
+  your own.
 
-  **The toolkit worth memorising:**
-  - Case/clean: `upper`, `lower`, `trim`/`ltrim`/`rtrim`, `lpad`/`rpad`.
-  - Combine/cut: `concat_ws(sep, ...)` (null-safe join), `substring`, `split`
-    (→ array), `length`.
-  - Pattern: `regexp_replace`, `regexp_extract`, `like`/`rlike`.
+  The handy ones:
+  - **Change case:** `F.upper(col)`, `F.lower(col)`.
+  - **Tidy up:** `F.trim(col)` removes spaces from the ends.
+  - **Join / split:** `F.concat_ws(" ", colA, colB)` glues columns together with a
+    separator; `F.split(col, ",")` breaks one column into a list.
+  - **Find / replace:** `F.regexp_replace`, and `like` for simple pattern matches.
 
-  **Gotcha.** Most string functions return `null` on a `null` input (it propagates);
-  `concat_ws` is the friendly exception — it skips nulls rather than nulling the
-  whole result.
+  (These all work on a whole column at once and run fast inside Spark — better than
+  looping in Python.)
 
   **Mission:** From `df`, add `symbol` = the **uppercased** ticker, and `label` =
   `symbol` and `name` joined by a single space. Store it in `labeled`.

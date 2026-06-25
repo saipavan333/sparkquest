@@ -5,6 +5,13 @@
 > grab-bag of flags. All defaults below are from the Spark SQL Performance Tuning
 > guide — verify for your version.*
 
+> **In plain words.** This chapter is about making a slow Spark job fast. The single
+> biggest cost is usually the **shuffle** — when Spark has to move data between
+> computers to group or join it. Most tuning is about moving less data, splitting it
+> into sensible-sized chunks, and avoiding the trap where one computer gets stuck with
+> far more work than the others. We'll go through how to spot the problem first, then
+> the fixes. ("OOM" just means "out of memory" — a worker ran out of room.)
+
 ## 0. The diagnosis method (say this first)
 
 1. **Open the Spark UI.** Find the slow **stage**. Look at the **task time

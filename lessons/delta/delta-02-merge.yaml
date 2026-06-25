@@ -7,21 +7,22 @@ concepts: ["MERGE", "upsert", "change-data-capture"]
 needs_spark: true
 needs_delta: true
 brief: |
-  **What & why.** `MERGE` (upsert) updates matching rows and inserts new ones in a
-  **single atomic operation** — the foundation of **change-data-capture (CDC)** into
-  a lakehouse and the most-used Delta feature in production. Plain Parquet can't do
-  this (no in-place update); you'd rewrite files by hand and risk partial writes.
+  **`MERGE`** is an "upsert" — **up**date the rows that already exist and in**sert**
+  the ones that are new, all in one safe step. It's the standard way to apply a batch
+  of changes to a table (keeping it in sync with a source), and it's the most-used
+  Delta feature in real pipelines. Plain Parquet can't do this — you'd have to
+  rewrite files by hand.
 
-  **The essentials:**
-  - `DeltaTable.forPath(spark, path)` gives the target; `.merge(source, condition)`
-    then chain `.whenMatchedUpdate(...)`, `.whenNotMatchedInsert(...)`,
-    optionally `.whenMatchedDelete()`, `.execute()`.
-  - It's the engine behind the **streaming CDC sink**: `foreachBatch` + `MERGE`
-    gives idempotent, exactly-once upserts ([Handbook ch.13 §6](../../docs/handbook/13-kafka-and-streaming-io.md)).
-  - Iceberg has the same operation in SQL ([iceberg-03](../iceberg/iceberg-03-merge.yaml)).
+  - You point at the table with `DeltaTable.forPath(spark, path)`, then describe the
+    merge: match on a key, `whenMatchedUpdate(...)` for existing rows,
+    `whenNotMatchedInsert(...)` for new ones, then `.execute()`.
 
-  **Gotcha.** If the source has **duplicate keys** for one target row, MERGE errors
-  (ambiguous update) — dedupe the source first.
+  ```
+   existing:  AAPL=100  GOOG=50         updates:  AAPL=120  MSFT=30
+                          │ MERGE on ticker
+                          ▼
+   result:    AAPL=120 (updated)  GOOG=50 (kept)  MSFT=30 (inserted)
+  ```
 
   **Mission:** A positions table exists with AAPL 100, GOOG 50. Apply `updates`
   (AAPL → 120, MSFT 30) with a `MERGE`: update matched tickers, insert new ones.

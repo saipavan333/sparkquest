@@ -6,11 +6,14 @@ difficulty: 3
 concepts: ["kafka", "from_json", "schema", "value parsing", "structured streaming"]
 needs_spark: true
 brief: |
-  Kafka hands you each record's payload as an opaque **`value`** (bytes). The
-  universal first step in every Kafka pipeline is: **cast to string**, then
-  **`from_json`** with a schema to get typed columns. This is the exact transform
-  you apply right after `spark.readStream.format("kafka")` — practised here on a
-  static frame so it's deterministic.
+  **Kafka** is the most popular system for streams of events. When you read from it,
+  each record's real content arrives squashed into a single `value` column as raw
+  text. So the first thing every Kafka pipeline does is **unpack that text into
+  proper columns**: read the `value` as a string, then use **`from_json`** with a
+  schema to split it into real fields.
+
+  (We practise it here on a normal table so the result is predictable, but it's the
+  exact step you'd run right after reading from Kafka.)
 
   **Mission:** The `value` column holds JSON strings. Parse them with `from_json`
   into typed columns `ticker` (STRING) and `qty` (LONG), selecting both into `out`.

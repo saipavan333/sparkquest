@@ -6,20 +6,21 @@ difficulty: 3
 concepts: ["readStream", "writeStream", "memory sink", "availableNow"]
 needs_spark: true
 brief: |
-  **What & why.** Structured Streaming lets you write a streaming job with the
-  **same DataFrame API** you already know — Spark turns it into an incremental query
-  and handles the "keep it running" part. The core mental model: **a stream is an
-  unbounded table** that grows as data arrives, and your query runs continuously
-  over the new rows ([Handbook ch.3](../../docs/handbook/03-streaming-internals.md)).
+  So far you've worked with data that sits still ("batch"). **Streaming** is for data
+  that keeps arriving — new events every second. The lovely part: you write it with
+  the **same DataFrame steps** you already know, and Spark handles the "keep it
+  running and process new data as it shows up" part.
 
-  **The essentials:**
-  - `spark.readStream` (vs `read`) opens a source; `writeStream` (vs `write`) starts
-    a continuous query. Most sources need an explicit **schema** (no inference).
-  - `.trigger(availableNow=True)` processes all currently-available data then
-    **stops** — which makes streaming **deterministic and testable** (exactly how
-    SparkQuest grades streams; see [Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
-  - The **memory** sink lands results in a queryable table — great for demos/tests.
-  - `.start()` returns a query handle; `.awaitTermination()` waits for it to finish.
+  The key idea: picture a stream as **a table that keeps growing** — new rows get
+  added at the bottom forever, and your query keeps running over them.
+
+  - Use `spark.readStream` (instead of `read`) to open the source, and `writeStream`
+    (instead of `write`) to send results out. Streaming usually needs you to state
+    the **schema** (column types) up front.
+  - `.trigger(availableNow=True)` means "process everything available right now, then
+    stop" — which makes the stream finite and easy to test (it's how these lessons
+    are graded).
+  - The **memory** sink drops the results into a table you can then look at.
 
   We have a folder of JSON event files at `data/sample/stream_events`. You'll read
   it as a stream and land every event into an in-memory table you can query.

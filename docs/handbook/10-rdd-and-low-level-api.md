@@ -8,6 +8,12 @@
 > Source of truth: the official
 > [RDD Programming Guide](https://spark.apache.org/docs/3.5.1/rdd-programming-guide.html).
 
+> **In plain words.** Before DataFrames existed, Spark's basic building block was the
+> **RDD** — a plain collection of items spread across machines. You'll almost always
+> use DataFrames instead (they're easier and faster), but it helps to know what's
+> underneath, and interviewers ask. This chapter explains that lower layer and the
+> few times it's still useful.
+
 ## 1. What an RDD actually is
 
 An **RDD** (Resilient Distributed Dataset) is the original Spark abstraction: an

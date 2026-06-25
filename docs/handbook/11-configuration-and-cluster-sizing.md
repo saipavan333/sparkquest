@@ -9,6 +9,12 @@
 > [Configuration](https://spark.apache.org/docs/3.5.1/configuration.html) and
 > [Tuning](https://spark.apache.org/docs/3.5.1/tuning.html) guides.
 
+> **In plain words.** When you run a Spark job on a cluster, you have to tell it how
+> much muscle to use — how many worker processes, how many CPU cores each, and how
+> much memory each gets. Pick badly and the job is slow or runs out of memory. This
+> chapter gives you simple rules of thumb (and a worked example) for choosing those
+> numbers, plus the handful of settings worth knowing.
+
 ## 1. Where Spark runs: deploy modes & cluster managers
 
 - **Cluster managers** (Spark is agnostic): **Standalone**, **YARN**,

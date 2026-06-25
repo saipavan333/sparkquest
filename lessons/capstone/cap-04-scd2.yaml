@@ -6,10 +6,21 @@ difficulty: 5
 concepts: ["SCD2", "dimensional modeling", "history", "is_current"]
 needs_spark: true
 brief: |
-  **SCD Type 2** preserves history: when a dimension attribute changes, you don't
-  overwrite — you **expire** the old row (`is_current = False`) and **insert** a new
-  current row. It's the most-asked modeling question, and the heart of every
-  customer/product dimension.
+  Imagine a customer moves city. The simple option is to overwrite their old city —
+  but then you lose the fact they ever lived anywhere else. **SCD Type 2** ("Slowly
+  Changing Dimension, type 2") keeps the history instead: it marks the old row as
+  no-longer-current and **adds a new row** for the new value. It's a classic data-
+  modelling question and how real customer/product tables track changes over time.
+
+  ```
+   before:  customer 1 = NYC  (current)
+   moves to SF:
+   after:   customer 1 = NYC  (is_current = false)   ← old row kept, marked old
+            customer 1 = SF   (is_current = true)    ← new current row added
+  ```
+
+  So each change becomes: mark the old row `is_current = false`, and insert a new row
+  with `is_current = true`. Rows that didn't change are left alone.
 
   **Mission:** Apply the change in `changes` to the current `dim`:
   - rows whose `customer_id` changed → set `is_current = False` (expired),

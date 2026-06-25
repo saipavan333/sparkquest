@@ -6,10 +6,12 @@ difficulty: 3
 concepts: ["RDD", "reduceByKey", "map-side combine", "pair RDD"]
 needs_spark: true
 brief: |
-  The canonical RDD interview question: **`reduceByKey` vs `groupByKey`**.
-  `reduceByKey` combines values **map-side** before the shuffle, so each partition
-  ships one partial total per key — far less network, and no OOM on a hot key.
-  `groupByKey` shuffles *every* value. **Always prefer `reduceByKey`.**
+  The classic RDD question: **`reduceByKey` vs `groupByKey`**. Both group values by a
+  key, but `reduceByKey` is smarter — it adds things up **on each machine first**,
+  then combines those small results. That means far less data flying across the
+  network, and no single popular key overwhelming one machine. So **prefer
+  `reduceByKey`**. You make a `(key, value)` pair for each item, and `reduceByKey`
+  combines the values that share a key.
 
   **Mission:** Count the words below using a `(word, 1)` pair RDD and
   `reduceByKey`. Collect the result into a Python dict named `counts`.

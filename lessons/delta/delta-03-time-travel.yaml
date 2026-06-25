@@ -7,22 +7,19 @@ concepts: ["time travel", "versioning", "transaction log"]
 needs_spark: true
 needs_delta: true
 brief: |
-  **What & why.** Because every commit is recorded in the transaction log, Delta
-  lets you query the table **as of** any past version or timestamp — **time
-  travel**. It's invaluable for audits ("what did this report read last quarter?"),
-  reproducibility (pin an ML training set to a version), and recovery (roll back a
-  bad write with `RESTORE`).
+  Because Delta's logbook records every change, you can ask to read the table **as it
+  looked at an earlier point** — this is called **time travel**. It's great for
+  audits ("what did this report show last quarter?"), for repeating an experiment on
+  the exact data you used before, and for recovering from a bad write.
 
-  **The essentials:**
-  - Read by version: `.option("versionAsOf", 0)`; by time:
-    `.option("timestampAsOf", "2026-06-01")`. SQL: `... VERSION AS OF 0`.
-  - Inspect history with `DeltaTable.forPath(...).history()`.
-  - Old versions are retained until **`VACUUM`** physically deletes files past the
-    retention window (default 7 days) — after which travel to those versions fails.
+  - Read an old **version number**: `.option("versionAsOf", 0)` reads the table as it
+    was at version 0 (the first write). Each write makes a new version: 0, 1, 2, …
+  - You can also travel by **time** with `.option("timestampAsOf", "2026-06-01")`.
 
-  **Interview tie-in.** Same capability in Iceberg via snapshots
-  ([iceberg-04](../iceberg/iceberg-04-time-travel.yaml)); the mechanism differs (log
-  vs snapshot tree) but the idea is identical.
+  ```
+   version 0:  AAPL = 100      ← read with versionAsOf 0
+   version 1:  AAPL = 200      ← the current table
+  ```
 
   **Mission:** Write version 0 (AAPL @ 100), then overwrite with version 1
   (AAPL @ 200). Read the table back **as of version 0** into `old`.

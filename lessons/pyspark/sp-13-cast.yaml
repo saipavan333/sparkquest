@@ -6,19 +6,21 @@ difficulty: 3
 concepts: ["cast", "type conversion"]
 needs_spark: true
 brief: |
-  **What & why.** Raw feeds (CSV, JSON, Kafka) often arrive as **strings** — prices,
-  quantities, dates all as text. `.cast(type)` converts a column to the right type
-  so arithmetic, comparisons, and sorting behave correctly (`"100" < "9"` is true as
-  *strings*!). Casting is the bridge between messy ingest and clean computation.
+  Data often arrives as **text** even when it's really numbers — `"100"`, `"189.5"`.
+  Before you can do maths or sort it properly, you convert it to the right type, and
+  `.cast(...)` does that. (Why it matters: while it's still *text*, `"100"` counts as
+  *less than* `"9"`, because text is compared letter by letter — clearly wrong for
+  numbers!)
 
-  **The essentials:**
-  - `F.col("x").cast("double")` (or `.cast(T.DoubleType())`) — string⇄number,
-    number⇄string, string⇄date.
-  - **Invalid casts become `null`**, not errors — `"abc".cast("double")` → `null`.
-    That's a silent data-quality risk: count the nulls after casting to catch bad
-    input ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
-  - Better still, declare types up front with an explicit **schema**
-    ([sp-08](sp-08-schema.yaml)) so you never guess.
+  ```
+   "189.5"  ──.cast("double")──►  189.5    (now a real number you can add and sort)
+  ```
+
+  - `F.col("price_str").cast("double")` turns a text column into decimal numbers.
+  - Careful: if a value can't be converted (like `"abc"` into a number), Spark turns
+    it into `null` instead of raising an error — so it's worth checking for nulls
+    afterwards to catch bad input.
+  - Even better, state the types up front with a schema ([sp-08](sp-08-schema.yaml)).
 
   **Mission:** `price_str` is text. Cast it to a **double** column named `price`,
   keeping `ticker`. Store the result in `casted`.

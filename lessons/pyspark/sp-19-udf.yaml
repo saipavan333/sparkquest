@@ -6,19 +6,18 @@ difficulty: 4
 concepts: ["UDF", "custom logic", "types"]
 needs_spark: true
 brief: |
-  **What & why.** When no built-in expresses your logic, a **UDF** wraps a Python
-  function as a column operation. Powerful, but understand the cost — it's a
-  guaranteed interview question:
+  A **UDF** ("user-defined function") lets you run your **own Python function** on a
+  column, for the times none of the built-in `F` functions do what you need.
 
-  **The performance story (say this):**
-  - A plain Python UDF serializes each row from the JVM to a **Python worker**, runs
-    your code, and serializes back. That **JVM↔Python boundary** is slow, and the
-    UDF is a **black box to Catalyst** — no pushdown, no codegen.
-  - So **prefer built-in `F` functions / `when` / `expr`** whenever possible.
-  - When you must run Python, use a **pandas UDF** ([sp-28](sp-28-pandas-udf.yaml)) —
-    it processes Arrow batches vectorised, far faster than a row-at-a-time UDF.
-  - Always declare the **return type** (`T.StringType()`); a UDF that returns
-    `null`/errors silently is a debugging trap.
+  It's handy, but it has a real cost worth knowing (and a favourite interview
+  question): a plain Python UDF makes Spark hand each value over to Python one at a
+  time, which is **much slower** than the built-in functions that run inside Spark
+  itself. So:
+  - **Prefer built-in functions** (like `F.when(...)`) whenever they can do the job.
+  - Reach for a UDF only when you genuinely need custom Python.
+  - When you do, there's a faster kind — a **pandas UDF** — that works on whole
+    batches at once ([sp-28](sp-28-pandas-udf.yaml)).
+  - Always tell Spark what type your UDF returns (e.g. `T.StringType()`).
 
   `F` and the types module `T` are available.
 

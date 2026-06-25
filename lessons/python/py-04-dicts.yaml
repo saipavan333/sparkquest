@@ -10,6 +10,15 @@ brief: |
   contacts app where a name (the key) gives you a phone number (the value). Here
   we'll map a stock symbol to its price.
 
+  ```
+     key         value
+   ┌──────┐    ┌───────┐
+   │ AAPL │ ─► │ 189.5 │
+   │ GOOG │ ─► │ 142.1 │     look up by key:
+   │ MSFT │ ─► │ 415.6 │       prices["GOOG"] ─► 142.1
+   └──────┘    └───────┘
+  ```
+
   - You write one with curly braces: `{"AAPL": 189.5, "GOOG": 142.1}`.
   - To look a value up, put its key in square brackets: `prices["GOOG"]` gives back
     `142.1`.

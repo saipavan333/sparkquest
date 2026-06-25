@@ -4,6 +4,13 @@
 > "How does the transaction log work?", "OPTIMIZE vs VACUUM?", "Delta vs Iceberg?"
 > The lakehouse is the dominant modern architecture — own this.*
 
+> **In plain words.** Cheap cloud storage is great for holding huge amounts of files,
+> but plain files can't be safely updated or undone. A **lakehouse** adds a
+> "logbook" on top of those files so they behave like a real database table — safe
+> edits, history you can rewind, no half-written messes — while staying on cheap
+> storage. **Delta Lake** is one popular way to do this; the chapter explains how its
+> logbook works and the housekeeping commands that keep it fast.
+
 ## 1. Why a lakehouse exists
 
 A **data lake** (Parquet on S3/ADLS/GCS) is cheap and scalable but **dumb files**:

@@ -6,21 +6,25 @@ difficulty: 4
 concepts: ["ETL", "filter", "withColumn", "groupBy", "pipeline"]
 needs_spark: true
 brief: |
-  **What & why.** Time to put it together. Almost every batch pipeline is an
-  **ETL/ELT** job: **Extract** raw data, **Transform** it (clean → enrich →
-  aggregate), and **Load** the result to a serving table. Structuring it as clear,
-  ordered stages — each a pure DataFrame transform — is what makes a pipeline
-  readable, testable, and debuggable.
+  Time to put the pieces together. Almost every batch job follows the same three
+  stages, known as **ETL**: **Extract** the raw data, **Transform** it (tidy it up,
+  add to it, summarise it), and **Load** the finished result somewhere useful. Doing
+  it as clear, ordered steps is what makes a pipeline easy to read and fix.
 
-  **The standard transform order (and why):**
-  1. **Clean first** — drop/quarantine invalid rows (`price <= 0`) so bad data never
-     reaches the math ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
-  2. **Enrich** — derive columns (`notional = price * qty`), join dimensions.
-  3. **Aggregate** — collapse to the report grain (`groupBy().agg()`).
+  ```
+   raw  ─►  clean  ─►  enrich  ─►  aggregate  ─►  report
+           (drop      (add a       (totals
+            bad rows)  column)      per group)
+  ```
 
-  Filtering **early** also shrinks every downstream shuffle — clean-then-aggregate
-  is both correct and fast. In production you'd write the result to Delta/Iceberg
-  with a data-quality gate before publishing.
+  The usual order, and why:
+  1. **Clean first** — drop the bad rows (here, `price <= 0`) so they never reach the
+     maths.
+  2. **Enrich** — add columns you need (like `notional = price * qty`).
+  3. **Aggregate** — summarise down to the answer (`groupBy(...).agg(...)`).
+
+  Cleaning early also means less data to carry through the heavy steps — tidier *and*
+  faster.
 
   **Mission:** From `raw` trades:
   1. Drop invalid rows where `price <= 0`.

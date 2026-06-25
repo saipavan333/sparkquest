@@ -6,23 +6,18 @@ difficulty: 3
 concepts: ["cache", "persist", "reuse"]
 needs_spark: true
 brief: |
-  **What & why.** Spark is **lazy**: every action re-executes the whole lineage
-  from the last shuffle/source. If you reuse a DataFrame (loop over it, branch it,
-  run several reports off it), you pay that cost *every time*. `cache()` /
-  `persist()` keep the computed result around so subsequent actions are cheap.
+  Spark is **lazy** — it doesn't keep results around; every time you ask for an
+  answer, it recomputes the whole chain of steps from the start. That's wasteful if
+  you use the same result several times (in a loop, or for a few different reports).
+  `cache()` tells Spark "hold on to this result so you don't have to redo it".
 
-  **The mechanics that trip people up:**
-  - `cache()` is **lazy** — it only *marks* the DataFrame; the data isn't stored
-    until the **first action** materialises it. That's why this lesson runs a
-    `count()` after caching.
-  - `cache()` = `persist(MEMORY_AND_DISK)` for DataFrames (spills to disk if it
-    doesn't fit); `persist(level)` lets you pick `MEMORY_ONLY`, `DISK_ONLY`,
-    `MEMORY_AND_DISK`, `_2` (replicated), etc.
-  - Release it with `unpersist()` when done — cached blocks compete with execution
-    memory ([Handbook ch.1 §8](../../docs/handbook/01-spark-architecture-and-execution.md)).
+  - `cache()` is itself lazy — it only *marks* the data to be kept. The data is
+    actually stored the **first time you trigger work** on it, which is why this
+    lesson runs a `count()` right after caching (to fill the cache).
+  - When you're done with it, `unpersist()` frees the memory.
 
-  **Gotcha.** Don't cache everything — caching something used **once** just wastes
-  memory and can evict useful blocks. Cache only what you genuinely **reuse**.
+  One piece of judgement: don't cache everything. Caching something you only use
+  once just wastes memory — cache only what you genuinely reuse.
 
   **Mission:** Build the aggregate `agg`, **cache** it, then trigger one action so
   the cache materialises.

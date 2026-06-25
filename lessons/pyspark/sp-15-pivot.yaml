@@ -6,17 +6,23 @@ difficulty: 4
 concepts: ["pivot", "groupBy", "reshaping"]
 needs_spark: true
 brief: |
-  **What & why.** Pivoting turns **row values into columns** — the shape reports and
-  ML feature tables want (one row per entity, one column per category).
-  `groupBy(keys).pivot(col).agg(...)` does it in one expression: group by the row
-  key, spread the distinct values of `col` across columns, aggregate the cell.
+  **Pivoting** turns the *values* in a column into new *columns* — the shape you want
+  for a summary grid (one row per thing, one column per category).
+  `groupBy("ticker").pivot("side").sum("qty")` reads as: one row per ticker, a column
+  for each `side` (BUY/SELL), each cell filled with the summed `qty`.
 
-  **The essentials:**
-  - Missing key/category combinations come out as **`null`** (no data for that cell).
-  - **Performance:** Spark must learn the distinct pivot values, which costs an
-    extra pass. Pass them explicitly — `.pivot("side", ["BUY", "SELL"])` — to skip
-    that pass and guard against unexpected categories.
-  - The inverse (columns → rows) is an **unpivot** via `stack(...)`/`selectExpr`.
+  ```
+   ┌────────┬──────┬─────┐             ┌────────┬─────┬──────┐
+   │ ticker │ side │ qty │   spread    │ ticker │ BUY │ SELL │
+   │ AAPL   │ BUY  │ 100 │   side into  │ AAPL   │ 100 │  40  │
+   │ AAPL   │ SELL │  40 │   columns ─► │ GOOG   │  50 │ null │
+   │ GOOG   │ BUY  │  50 │             └────────┴─────┴──────┘
+   └────────┴──────┴─────┘   (GOOG never sold → empty cell is null)
+  ```
+
+  - A combination with no data (GOOG + SELL) shows up as `null`.
+  - Tip: naming the categories up front — `.pivot("side", ["BUY", "SELL"])` — is a
+    little faster, since otherwise Spark scans the data first to find them.
 
   **Mission:** Pivot `trades` so each `side` (BUY/SELL) becomes a column holding
   the **summed** `qty` per `ticker`. Store the result in `pvt`.

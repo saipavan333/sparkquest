@@ -4,6 +4,13 @@
 > the inevitable "How do you track a customer who changes address?" — that's SCD
 > Type 2, and getting it right is a senior signal.*
 
+> **In plain words.** "Data modelling" just means deciding how to lay out your tables
+> so they're easy and fast to report on. The classic pattern is a big **facts** table
+> (the events — sales, clicks) surrounded by small **dimension** tables (the details —
+> customers, products), called a *star schema*. This chapter covers that, plus how to
+> keep **history** when details change over time (the "SCD Type 2" idea, which you
+> also practise in [cap-04](../../lessons/capstone/cap-04-scd2.yaml)).
+
 ## 1. OLTP vs OLAP (why modeling differs)
 
 - **OLTP** (transactional apps) — many small reads/writes, **normalized** (3NF) to

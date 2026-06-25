@@ -6,23 +6,21 @@ difficulty: 4
 concepts: ["left join", "left_anti", "unmatched rows"]
 needs_spark: true
 brief: |
-  **What & why.** Beyond inner joins, the join *type* (`how`) decides which rows
-  survive — and picking the right one is a common interview discriminator:
-  - **`inner`** — only matching keys (default).
-  - **`left`/`right`/`full` outer** — keep all rows of one/both sides, `null` where
-    no match.
-  - **`left_semi`** — keep left rows that **have** a match (a filter; no right
-    columns added).
-  - **`left_anti`** — keep left rows with **no** match — perfect for finding orphans,
-    reconciling datasets, and "which ids are missing?".
+  A join ([sp-05](sp-05-join.yaml)) can keep different rows depending on the **kind**
+  of join you pick with `how=...`. Choosing the right one is a common interview
+  question:
 
-  **The essentials:**
-  - `semi`/`anti` add **no columns** from the right and can't duplicate left rows —
-    cleaner and cheaper than an outer join + null-filter.
-  - Outer joins introduce nulls you must then handle ([sp-12](sp-12-null-handling.yaml)).
+  - **`inner`** (the default) — keep only rows that match in **both** tables.
+  - **`left`** — keep **every** left-table row; where there's no match, the new
+    columns are left blank (`null`).
+  - **`left_anti`** — keep only the left rows with **no** match. Great for "which of
+    these aren't in the other table?" (finding missing or orphan records).
+  - **`left_semi`** — keep left rows that **do** have a match, but add no new columns
+    (it acts like a filter).
 
-  **Gotcha.** Watch for **fan-out**: if the right side has duplicate keys, an
-  inner/left join multiplies left rows — a classic cause of inflated counts.
+  One thing to watch: if the right table has the same key more than once, an inner or
+  left join will **repeat** the matching left rows — a frequent reason counts come
+  out higher than expected.
 
   **Mission:** Find trades whose ticker has **no** sector in the lookup, using a
   `left_anti` join. Store them in `unmatched`.

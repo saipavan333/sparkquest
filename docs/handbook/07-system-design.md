@@ -4,6 +4,12 @@
 > reason about tradeoffs under real constraints. Use one repeatable framework
 > every time so you never freeze.*
 
+> **In plain words.** This chapter zooms out from single commands to designing a
+> whole pipeline: where data comes in, how it flows through cleaning and
+> transforming, and where it lands — plus the practical worries like "what if it
+> fails halfway?" and "how do we re-run yesterday safely?". It gives you a simple,
+> repeatable way to think through any "design a data pipeline" question.
+
 ## 1. The framework (memorize the spine)
 
 **Requirements → Data model → Ingestion → Processing → Storage → Serving →

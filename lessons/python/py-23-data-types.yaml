@@ -15,7 +15,13 @@ brief: |
 
   The most useful everyday skill is **converting** between them. Data usually
   arrives as text, so you turn it into real numbers before doing maths:
-  `int("100")` gives you the number `100`, and `float("189.5")` gives `189.5`. You
+  `int("100")` gives you the number `100`, and `float("189.5")` gives `189.5`.
+
+  ```
+    text             real number
+    "100"   ──int()──►   100      (now you can do maths)
+    "189.5" ──float()─►  189.5
+  ``` You
   can check a value's type any time with `type(x)`.
 
   One more handy idea. A few values count as "false" when you test them in a

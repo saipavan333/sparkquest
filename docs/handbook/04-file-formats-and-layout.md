@@ -4,6 +4,12 @@
 > group?", "how does predicate pushdown actually work?", "partition vs bucket?")
 > separate people who've *read* about Spark from people who've *operated* it.*
 
+> **In plain words.** This chapter is about *how data is stored on disk*, and why
+> that makes such a difference to speed. The headline idea: storing data **column by
+> column** (the Parquet format) instead of row by row lets Spark read only the
+> columns and rows it actually needs — often a fraction of the file. We'll also look
+> at how you arrange files into folders so queries can skip the ones they don't need.
+
 ## 1. Row vs columnar storage
 
 - **Row-oriented** (CSV, JSON, **Avro**) stores all fields of a record together.

@@ -10,6 +10,13 @@
 > Source of truth: the official
 > [SQL Performance Tuning guide](https://spark.apache.org/docs/3.5.1/sql-performance-tuning.html).
 
+> **In plain words.** Joining two tables means matching up rows that share a key. The
+> catch: to do that across many computers, Spark often has to **move the data around**
+> so matching rows end up together — that move is the **shuffle**, and it's the slow,
+> expensive part. This chapter covers the different ways Spark can do a join (and when
+> it picks each), the trick of copying a small table everywhere to skip the move, and
+> what to do when one popular key clogs a single machine.
+
 ## 1. The shuffle, precisely
 
 A **shuffle** is a redistribution of rows across partitions by a key, and it is

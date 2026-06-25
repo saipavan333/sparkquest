@@ -6,21 +6,24 @@ difficulty: 4
 concepts: ["Window", "frame", "cumulative sum"]
 needs_spark: true
 brief: |
-  **What & why.** A **running (cumulative) total** — account balances, cumulative
-  volume, YTD revenue — is a windowed `sum` with an explicit **frame**: every row
-  from the start of the partition up to the current one. Understanding window
-  **frames** separates people who memorised `row_number` from people who actually
-  understand windows.
+  A **running total** is a sum that builds up as you go — like a bank balance after
+  each transaction. It's a window `sum` that adds up every row from the start up to
+  the current one.
 
-  **Frames in one breath:**
-  - `rowsBetween(unboundedPreceding, currentRow)` → running total (this lesson).
-  - The default frame for an **ordered** window is `rangeBetween(unboundedPreceding,
-    currentRow)` — subtly different (RANGE groups equal-ordering rows together;
-    ROWS counts physical rows). For cumulative sums, be explicit with **`rowsBetween`**.
-  - `rowsBetween(-2, 0)` → trailing 3-row moving average.
+  ```
+   day   amt    running total
+   1     100  ─►   100
+   2      50  ─►   150   (100 + 50)
+   3      30  ─►   180   (100 + 50 + 30)
+  ```
 
-  **Gotcha.** A cumulative window must be **ordered**; without `orderBy` the frame
-  is the whole partition (you'd get the grand total on every row).
+  - The key extra piece is the **frame** — how far back to add. For a running total
+    you say "from the beginning up to this row":
+    `.rowsBetween(Window.unboundedPreceding, Window.currentRow)`.
+  - The window must be **ordered** (`orderBy`), otherwise "up to this row" has no
+    meaning and you'd just get the grand total on every line.
+  - Change the frame to make a moving average, e.g. `rowsBetween(-2, 0)` averages the
+    last 3 rows.
 
   **Mission:** For `AAPL`, compute the cumulative `amt` ordered by date `d`, as
   column `cum`. Select `ticker`, `d`, `cum` into `running`.

@@ -23,6 +23,14 @@ brief: |
       ...
   ```
 
+  ```
+   tickers:   AAPL     GOOG     MSFT
+                |        |        |     zip pairs them up
+   prices:    189.5    142.1    415.6
+                v        v        v
+            (AAPL,189.5) (GOOG,142.1) (MSFT,415.6)
+  ```
+
   A handy move: `dict(zip(keys, values))` turns two lists into a lookup table (a
   dictionary). One thing to watch — `zip` stops as soon as the shorter list runs
   out, so make sure your two lists line up.

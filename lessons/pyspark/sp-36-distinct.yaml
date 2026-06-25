@@ -6,21 +6,27 @@ difficulty: 2
 concepts: ["distinct", "dropDuplicates", "deduplication"]
 needs_spark: true
 brief: |
-  **What & why.** Removing duplicates is a routine cleaning step — and a wide
-  transformation (it **shuffles** to compare rows across partitions). Two tools,
-  with an important difference:
+  Removing duplicate rows is a routine cleaning step. There are two tools, and the
+  difference between them is worth knowing:
 
-  - **`df.distinct()`** — keep unique **whole rows** (all columns must match).
-  - **`df.dropDuplicates(["ticker"])`** — keep the first row per **subset** of
-    columns; the other columns come along for the ride. More flexible — it's how you
-    "keep one row per key".
+  - **`df.distinct()`** — keeps **whole rows** that are unique (every column has to
+    match for two rows to count as the same).
+  - **`df.dropDuplicates(["ticker"])`** — keeps one row per **chosen column(s)**.
+    This is how you say "just one row per ticker", even if the other columns differ.
 
-  **The essentials:**
-  - `distinct()` == `dropDuplicates()` with no subset (all columns).
-  - With a subset, *which* row survives is arbitrary unless you `orderBy` first
-    (e.g. keep the latest by sorting on a timestamp, then dedup).
-  - Both cost a shuffle — dedup **early** so less data flows downstream, and beware
-    that a wide `distinct` on high-cardinality data is expensive.
+  ```
+   ┌────────┐   df.distinct()   ┌────────┐
+   │ AAPL   │                   │ AAPL   │
+   │ GOOG   │   drop repeats    │ GOOG   │
+   │ AAPL   │   ─────────────►  │ MSFT   │
+   │ MSFT   │                   └────────┘
+   │ GOOG   │
+   └────────┘
+  ```
+
+  Tip: to keep a *specific* row per key (say, the newest), sort first with `orderBy`,
+  then `dropDuplicates(["ticker"])`. Like grouping, removing duplicates makes Spark
+  compare rows across machines (a shuffle), so do it early when you can.
 
   **Streaming tie-in.** The streaming version, `dropDuplicates` + a **watermark**,
   bounds the state it must remember ([st-04](../streaming/st-04-streaming-dedup.yaml)).

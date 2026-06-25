@@ -5,6 +5,13 @@
 > hard SQL one (window functions, gaps-and-islands). These are easy points if you
 > drill them.*
 
+> **In plain words.** Two skills sit under everything else: the **Python** you write
+> Spark with, and the **SQL** you query data with. This chapter goes a little deeper
+> into both — the Python features that come up a lot (and one famous quirk about
+> running things at the same time), and the SQL patterns interviewers love, like
+> window functions. If a term feels advanced, the matching lessons in the Python and
+> PySpark tracks cover the same idea hands-on.
+
 ---
 
 ## Part A — Python deep

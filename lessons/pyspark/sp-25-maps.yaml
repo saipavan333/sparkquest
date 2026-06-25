@@ -6,21 +6,24 @@ difficulty: 4
 concepts: ["MapType", "map access", "semi-structured"]
 needs_spark: true
 brief: |
-  **What & why.** A **map** column holds **key→value pairs per row** with arbitrary,
-  per-row keys — think a flexible JSON object or a bag of tags/attributes. Use it
-  when the set of keys varies row to row (a **struct** is the right choice when the
-  fields are fixed and known).
+  A **map** column holds **key→value pairs inside a single cell** — like a little
+  dictionary ([py-04](../python/py-04-dicts.yaml)) tucked into each row. It's handy
+  when the set of keys can differ from row to row (for example, a bag of tags).
 
-  **The essentials:**
-  - Read by key: `F.col("meta")["sector"]` or `F.col("meta.sector")`; a missing key
-    yields `null`.
-  - Build/inspect: `F.create_map(...)`, `F.map_keys`, `F.map_values`,
-    `F.explode` (a map explodes to `key`,`value` rows).
+  - Read a value by its key: `F.col("meta")["sector"]`. If the key isn't there, you
+    get `null`.
 
-  **Interview angle: map vs struct.** Map = dynamic keys, all values share **one
-  type**, no schema enforcement on keys. Struct = fixed, named, individually-typed
-  fields with schema validation. Reach for struct when you can — you get type
-  safety and column pruning.
+  ```
+   ┌────────┬───────────────────┐         ┌────────┬────────┐
+   │ ticker │ meta              │ pull    │ ticker │ sector │
+   │ AAPL   │ {sector: "Tech"}  │ "sector"│ AAPL   │ Tech   │
+   │ JPM    │ {sector: "Fin"}   │  ─────► │ JPM    │ Fin    │
+   └────────┴───────────────────┘         └────────┴────────┘
+  ```
+
+  Map vs **struct** ([sp-20](sp-20-structs.yaml)): use a **map** when the keys vary
+  and all values are the same type; use a **struct** when the fields are fixed and
+  known (it's safer and a bit faster).
 
   **Mission:** Each row has a `meta` map. Pull the `sector` value into a top-level
   column `sector` (keeping `ticker`). Store the result in `out`.

@@ -6,17 +6,23 @@ difficulty: 5
 concepts: ["Window", "lag", "cumulative sum", "sessionization"]
 needs_spark: true
 brief: |
-  **What & why.** A senior favourite that combines three window skills. **Sessionize**
-  a user's event stream — group consecutive events into sessions, starting a new one
-  whenever the idle gap exceeds a threshold (e.g. a new web session after 30 min
-  idle). This is the canonical **gaps-and-islands** problem, and being able to
-  derive it live is a strong signal.
+  A classic real-world task: split a user's stream of events into **sessions** — a
+  fresh session begins whenever they've been idle longer than some gap (think "a new
+  website visit after 30 minutes away"). It's a neat combination of the window tools
+  you just learned (it's known as the "gaps and islands" problem).
 
-  **The three-step pattern (memorise it):**
+  ```
+   events (minutes):  1   2          10   11
+                      └─┬─┘          └──┬──┘
+                     session 1      session 2     (gap of 8 minutes → new session)
+  ```
 
-  1. `lag` the timestamp to get the previous event's time.
-  2. Flag a **new session** when the gap > threshold (or there's no previous row).
-  3. **Cumulative-sum** the flags into a `session` id.
+  The three steps:
+  1. Use `lag` ([sp-17](sp-17-window-lag.yaml)) to get the **previous** event's time.
+  2. Mark a **new session** (a `1`) whenever the gap is bigger than the threshold (or
+     there's no previous row).
+  3. Take a **running total** ([sp-22](sp-22-running-total.yaml)) of those `1`s — that
+     climbing count becomes the session number.
 
   **Mission:** For `events` (a `ts` in minutes), start a new session when the gap
   is **greater than 5**. Produce `out` with `user`, `ts`, `session`.

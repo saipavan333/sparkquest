@@ -6,21 +6,19 @@ difficulty: 3
 concepts: ["na.fill", "na.drop", "nulls"]
 needs_spark: true
 brief: |
-  **What & why.** Missing data is everywhere, and nulls **propagate** silently:
-  `null + 5` is `null`, `null == null` is **not** true, and unhandled nulls quietly
-  skew aggregates and break joins. Handle them *deliberately*.
+  Missing values (Python's `None`, shown as `null` in a table) turn up constantly in
+  real data, and they spread quietly: `null + 5` is still `null`, and a single
+  missing value can throw off a total or break a join. So deal with them on purpose.
 
-  **The toolkit:**
-  - `df.na.fill({"qty": 0})` — replace nulls per column (or a single value for all).
-  - `df.na.drop()` — drop rows with any null; `df.na.drop(subset=["qty"])` targets
-    columns; `how="all"` only drops all-null rows.
-  - `F.coalesce(a, b, c)` — first non-null wins (great for fallback/default columns).
-  - Test with `F.col("x").isNull()` / `isNotNull()` — never `== None`.
+  - **Fill them in:** `df.na.fill({"qty": 0})` replaces missing `qty` values with 0.
+  - **Drop them:** `df.na.drop()` removes any row that has a missing value;
+    `df.na.drop(subset=["qty"])` only checks the `qty` column.
+  - **Take the first value that exists:** `F.coalesce(a, b)` gives `a` if it's there,
+    otherwise `b` — handy for setting defaults.
+  - **Check for missing:** use `F.col("x").isNull()` / `isNotNull()`.
 
-  **Interview angle.** `null` join keys never match yet all hash to one partition →
-  skew; and counting nulls is a core **data-quality** check
-  ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)). Decide
-  fill-vs-drop-vs-quarantine on purpose, not by accident.
+  Whether to fill, drop, or set bad rows aside is a real decision — make it
+  deliberately rather than letting nulls sneak through.
 
   **Mission:** The `qty` for GOOG is missing (`None`). Replace every null `qty`
   with `0`, storing the result in `filled`.

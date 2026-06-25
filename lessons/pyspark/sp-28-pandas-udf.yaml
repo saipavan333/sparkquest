@@ -6,20 +6,16 @@ difficulty: 4
 concepts: ["pandas_udf", "Arrow", "vectorized UDF"]
 needs_spark: true
 brief: |
-  **What & why.** A plain Python UDF ([sp-19](sp-19-udf.yaml)) processes **one row at
-  a time** across the slow JVM↔Python boundary. A **pandas UDF** (a.k.a. vectorized
-  UDF) instead receives a whole **batch** as a pandas `Series` via Apache **Arrow**
-  — so serialization is columnar and bulk, and your code runs vectorised in NumPy/
-  pandas. Typically **10–100× faster** than a row-at-a-time UDF, and the right tool
-  when you genuinely must run Python (custom math, an ML model's `predict`).
+  A plain Python UDF ([sp-19](sp-19-udf.yaml)) is slow because Spark sends values to
+  Python **one at a time**. A **pandas UDF** is the fast version: Spark hands your
+  function a whole **batch** of values at once, so there's far less back-and-forth.
+  It's usually much faster, and it's the right choice when you really do need Python
+  (for example, to run a machine-learning model on each row).
 
-  **The essentials:**
-  - `@pandas_udf(returnType)` (or `F.pandas_udf(fn, type)`); the function maps a
-    `pd.Series` → `pd.Series` of the **same length**.
-  - Still slower than a pure built-in expression — the ladder is **built-in `F` >
-    pandas UDF > Python UDF**.
-  - Needs `pyarrow`; great for applying a model batch-wise inside `mapInPandas`/
-    `applyInPandas` for grouped work.
+  - You mark it with `@pandas_udf(returnType)`; your function receives a batch of
+    values and returns a batch of the same size.
+  - A built-in `F` function is still fastest of all, so the order of preference is:
+    **built-in functions first, pandas UDF next, plain Python UDF last.**
 
   `F` and the types module `T` are available.
 

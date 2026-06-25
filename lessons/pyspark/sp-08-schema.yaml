@@ -6,19 +6,17 @@ difficulty: 3
 concepts: ["StructType", "StructField", "types"]
 needs_spark: true
 brief: |
-  **What & why.** In production you almost never let Spark **guess** types — you
-  declare a schema. It's **faster** (inference reads the data an extra time) and
-  **safer** (a column that should be a number won't silently become a string when
-  the source drifts). Schema-on-read is a core data-quality control
-  ([Handbook ch.15](../../docs/handbook/15-testing-and-data-quality.md)).
+  A **schema** is the list of a table's columns and what type each one holds (text,
+  whole number, decimal, and so on). Spark can *guess* the schema by peeking at your
+  data, but in real jobs you usually **state it yourself**. That's faster (Spark
+  doesn't have to scan the data just to figure out the types) and safer (a column
+  that should be a number can't quietly turn into text if the source changes).
 
-  **The essentials:**
-  - A schema is a `T.StructType([...])` of `T.StructField(name, type, nullable)`.
-  - Common types: `StringType`, `LongType`/`IntegerType`, `DoubleType`,
-    `BooleanType`, `TimestampType`, `ArrayType`, `StructType` (nested), `MapType`.
-  - `LongType` vs `IntegerType` matters at scale (overflow); financial amounts often
-    use `DecimalType` for exactness.
-  - The types module is available to you as `T` (`pyspark.sql.types`).
+  - You build a schema as a list of fields:
+    `T.StructType([T.StructField("ticker", T.StringType()), ...])`.
+  - Common types: `StringType` (text), `LongType`/`IntegerType` (whole numbers),
+    `DoubleType` (decimals), `BooleanType` (true/false), `TimestampType` (date+time).
+  - `T` is the types toolbox (`pyspark.sql.types`), already available to you.
 
   **Mission:** Build `df` from `data` using an explicit schema: `ticker` as
   `StringType`, `qty` as `LongType`, `price` as `DoubleType`.

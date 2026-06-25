@@ -9,6 +9,13 @@
 > the official
 > [Structured Streaming + Kafka Integration guide](https://spark.apache.org/docs/3.5.1/structured-streaming-kafka-integration.html).
 
+> **In plain words.** **Kafka** is a system that carries streams of events between
+> applications — think of it as a never-ending conveyor belt of messages. This
+> chapter shows how Spark reads from it, how to unpack each message (they arrive as
+> raw text you turn into proper columns), how to write results back, and — the part
+> interviewers care about — how to make sure every event is counted exactly once,
+> even if something restarts.
+
 ## 1. Kafka in 90 seconds
 
 - A **topic** is a named log, split into **partitions**. Ordering is guaranteed

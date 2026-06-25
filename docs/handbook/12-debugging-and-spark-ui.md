@@ -8,6 +8,12 @@
 > [Web UI guide](https://spark.apache.org/docs/3.5.1/web-ui.html) and
 > [Tuning guide](https://spark.apache.org/docs/3.5.1/tuning.html).
 
+> **In plain words.** When a Spark job is slow, you don't guess — you look. Spark
+> comes with a web page (the **Spark UI**) that shows what every part of your job
+> did: how long each step took, how much data moved, and whether one worker was stuck
+> doing far more than the others. This chapter teaches you how to read that page like
+> a detective and a simple checklist for tracking down the slow part.
+
 ## 1. The Spark UI tabs (where to look)
 
 Reachable at `http://<driver>:4040` while the app runs (or the History Server

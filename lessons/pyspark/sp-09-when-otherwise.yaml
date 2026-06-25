@@ -6,20 +6,24 @@ difficulty: 3
 concepts: ["when", "otherwise", "conditional columns"]
 needs_spark: true
 brief: |
-  **What & why.** `F.when(condition, value).otherwise(value)` is Spark's `CASE WHEN`
-  — the column-expression way to bucket, flag, derive, and classify rows. It's how
-  you build feature flags, risk bands, and the `dq_error` reason column in the
-  quarantine pattern.
+  This is the table version of an "if / else" ([py-25](../python/py-25-conditionals.yaml)).
+  `F.when(condition, value).otherwise(other_value)` makes a new column whose value
+  depends on each row — perfect for labelling or bucketing rows ("large" vs "small",
+  "valid" vs "bad").
 
-  **The essentials:**
-  - Chain multiple branches: `F.when(c1, v1).when(c2, v2).otherwise(v3)` — first
-    match wins, like SQL `CASE`.
-  - Omit `.otherwise(...)` and unmatched rows get **`null`**.
-  - Conditions are column expressions: `(F.col("amount") >= 1000) & (...)`.
+  ```
+   when(amount >= 1000, "large").otherwise("small")
 
-  **Gotcha.** Keep branch result types consistent (all strings, all ints) — mixing
-  types confuses the inferred column type. This is a built-in expression, so it's
-  far faster than a Python UDF doing `if/else`.
+   amount = 1200  ─►  "large"
+   amount =  800  ─►  "small"
+   amount = 1500  ─►  "large"
+  ```
+
+  - Chain more choices with extra `.when(...)`: `F.when(a, x).when(b, y).otherwise(z)`
+    — the first one that's true wins.
+  - If you leave off `.otherwise(...)`, rows that match nothing get `None` (empty).
+  - Keep the results the same kind of value (all text, or all numbers) so the new
+    column has one clear type.
 
   **Mission:** Add a column `band` to `trades`: `"large"` when `amount` is at least
   `1000`, otherwise `"small"`. Store the result in `tagged`.

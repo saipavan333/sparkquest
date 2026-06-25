@@ -7,22 +7,21 @@ concepts: ["delta", "ACID", "write", "read"]
 needs_spark: true
 needs_delta: true
 brief: |
-  **What & why.** **Delta Lake** turns a folder of Parquet files into an **ACID
-  table**. The secret is the **transaction log** (`_delta_log/`): a JSON record of
-  every commit (which files were added/removed), periodically checkpointed to
-  Parquet. That log gives you atomic writes, consistent reads (no half-written
-  data), concurrent writers, and the version history behind time travel — all on
-  cheap object storage, no database server ([Handbook ch.5](../../docs/handbook/05-lakehouse-and-delta.md)).
+  Plain Parquet files are great for *reading*, but they can't safely be *changed* —
+  there's no way to update a row or undo a half-finished write. **Delta Lake** fixes
+  that by adding a **logbook** next to the files (a folder called `_delta_log`) that
+  records every change. With that logbook, a folder of files starts behaving like a
+  proper database table: safe updates, no half-written messes, and a full history you
+  can rewind.
 
-  **The essentials:**
-  - Write/read with `format("delta")`; otherwise it's the DataFrame API you know.
-  - A Delta table *is* Parquet **plus** the `_delta_log` — readers consult the log
-    to know exactly which files form the current snapshot.
-  - This is what enables `MERGE`, time travel, and schema evolution (the next three
-    lessons) that plain Parquet can't do.
+  - You read and write it just like before, but with `format("delta")` instead of
+    `parquet`.
+  - A Delta table is really "Parquet files **plus** that logbook of changes".
+  - The logbook is what makes the next three lessons possible — updating rows, going
+    back in time, and changing the columns — none of which plain Parquet can do.
 
-  A Delta-enabled `spark` session and the `DeltaTable` helper are ready for you.
-  *(This lesson runs in CI/Docker, which can fetch the Delta JAR.)*
+  (A Delta-ready `spark` and a `DeltaTable` helper are set up for you. This lesson
+  runs in the cloud build, which can fetch the Delta add-on.)
 
   **Mission:** Write `df` as a Delta table at `path`, then read it back into
   `loaded`.
